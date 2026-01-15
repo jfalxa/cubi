@@ -1,0 +1,53 @@
+<script lang="ts">
+  import { ContextMenu } from "bits-ui";
+  import type { Vector2 } from "@babylonjs/core";
+
+  import type { AvailableCommand } from "$/commands";
+  import { groupBy } from "$/utils/collection";
+
+  type Props = {
+    position?: Vector2;
+    commands: AvailableCommand[];
+  };
+
+  let { commands, position }: Props = $props();
+
+  let open = $state(false);
+  let grouped = $derived(groupBy(commands, (cmd) => cmd.group));
+
+  $effect(() => {
+    open = position !== undefined && commands.length > 0;
+  });
+
+  const customAnchor = {
+    getBoundingClientRect() {
+      return DOMRect.fromRect({
+        x: position?.x ?? 0,
+        y: position?.y ?? 0,
+        width: 0,
+        height: 0,
+      });
+    },
+  };
+</script>
+
+<ContextMenu.Root bind:open>
+  <ContextMenu.Portal>
+    <ContextMenu.Content
+      {customAnchor}
+      class="w-48 overflow-hidden rounded-sm bg-white p-1 outline-none"
+    >
+      {#each Object.keys(grouped) as group}
+        {#each grouped[group] as cmd}
+          <ContextMenu.Item
+            onclick={cmd.action}
+            class="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-900 hover:text-white outline-none"
+          >
+            {cmd.label}
+          </ContextMenu.Item>
+        {/each}
+        <ContextMenu.Separator class="m-1 h-0.5 bg-gray-200 last:hidden" />
+      {/each}
+    </ContextMenu.Content>
+  </ContextMenu.Portal>
+</ContextMenu.Root>
