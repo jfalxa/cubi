@@ -5,6 +5,7 @@ import { CameraStore, useCameraSync } from "./camera.svelte";
 import { ContextMenuStore } from "./context-menu.svelte";
 import { GridStore, useGridSync } from "./grid.svelte";
 import { MeasureStore } from "./measure.svelte";
+import { ModeStore } from "./mode.svelte";
 import { SelectionStore, useSelectionSync } from "./selection.svelte";
 import { ShapeStore, useShapeSync } from "./shape.svelte";
 
@@ -15,6 +16,7 @@ export interface Stores {
   selection: SelectionStore;
   contextMenu: ContextMenuStore;
   measure: MeasureStore;
+  mode: ModeStore;
 }
 
 export function createStores() {
@@ -24,8 +26,9 @@ export function createStores() {
   const selection = new SelectionStore(shapes);
   const contextMenu = new ContextMenuStore();
   const draw = new MeasureStore();
+  const mode = new ModeStore();
 
-  return { shapes, camera, grid, selection, contextMenu, measure: draw };
+  return { shapes, camera, grid, selection, contextMenu, measure: draw, mode };
 }
 
 export function useSync(stores: Stores, stage: Stage, tools: Tools) {

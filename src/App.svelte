@@ -22,6 +22,7 @@
     selection: stores.selection,
     grid: stores.grid,
     contextMenu: stores.contextMenu,
+    mode: stores.mode,
   });
 
   const tools = new Tools({
@@ -54,6 +55,12 @@
 <button class="fixed right-4 top-4" onclick={() => (usageOpen = true)}>
   Usage
 </button>
+
+{#if stores.mode.mode === 'play'}
+  <div class="fixed left-4 top-4 bg-black/80 text-white px-3 py-1 rounded text-sm">
+    PLAY MODE (no controls yet) — refresh to exit
+  </div>
+{/if}
 
 <UsageDialog bind:open={usageOpen} />
 

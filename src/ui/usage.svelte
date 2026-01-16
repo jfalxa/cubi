@@ -187,4 +187,12 @@
       content in a JSON file on your device
     </li>
   </ul>
+  <h3 id="play">Play</h3>
+  <ul>
+    <li>Shortcut: <code>P</code></li>
+    <li>Requires a single shape selected</li>
+    <li>Possess the selected shape and explore your world in third-person</li>
+    <li>Controls: ESDF to move, Space/Ctrl to ascend/descend, mouse to orbit camera</li>
+    <li>Press Escape to return to the editor</li>
+  </ul>
 </Dialog>

@@ -56,16 +56,16 @@ WoW-like third-person camera:
 
 ### phase 1: mode infrastructure
 
-1. **create mode store**
+1. ~~**create mode store**~~ ✓
    - `src/stores/mode.svelte.ts`
    - state: `mode: 'edit' | 'play'`, `shapeId: string | null`
    - `playAsShape(shapeId)` and `edit()` methods
 
-2. **wire up mode store**
+2. ~~**wire up mode store**~~ ✓
    - export from `src/stores/index.ts`
    - add to store creation in App.svelte
 
-3. **add play command**
+3. ~~**add play command**~~ ✓
    - new command in `src/commands/play.ts`
    - keybind: P when shape selected
    - calls `modeStore.playAsShape(selectedShapeId)`

@@ -10,17 +10,20 @@ import { OpenCommand, SaveCommand, ImportCommand, ExportCommand } from "./file";
 import { GroupCommand, UngroupCommand } from "./group";
 import { RedoCommand, UndoCommand } from "./history";
 import { NewCommand } from "./new";
+import { PlayCommand } from "./play";
 import { RotateCCWCommand, RotateCWCommand } from "./rotate";
 import { ColorsCommand } from "./colors";
 import { SizeCommand } from "./size";
 import type { GridStore } from "$/stores/grid.svelte";
 import type { ContextMenuStore } from "$/stores/context-menu.svelte";
+import type { ModeStore } from "$/stores/mode.svelte";
 
 export interface Dependencies {
   selection: SelectionStore;
   shapes: ShapeStore;
   grid: GridStore;
   contextMenu: ContextMenuStore;
+  mode: ModeStore;
 }
 
 export class Commands {
@@ -39,12 +42,13 @@ export class Commands {
   ungroup: UngroupCommand;
   colors: ColorsCommand;
   size: SizeCommand;
+  play: PlayCommand;
 
   private shapes: ShapeStore;
   private selection: SelectionStore;
   private commands!: Command[];
 
-  constructor({ shapes, selection, grid, contextMenu }: Dependencies) {
+  constructor({ shapes, selection, grid, contextMenu, mode }: Dependencies) {
     this.open = new OpenCommand(shapes);
     this.save = new SaveCommand(shapes);
     this.import = new ImportCommand(shapes);
@@ -60,6 +64,7 @@ export class Commands {
     this.ungroup = new UngroupCommand(shapes);
     this.colors = new ColorsCommand(shapes);
     this.size = new SizeCommand(grid);
+    this.play = new PlayCommand(mode);
 
     this.shapes = shapes;
     this.selection = selection;
@@ -109,6 +114,7 @@ export class Commands {
       this.new,
       this.open,
       this.save,
+      this.play,
     ];
   }
 
