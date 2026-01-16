@@ -3,7 +3,7 @@ import { Vector2, Vector3 } from "@babylonjs/core";
 import type { Stage } from "$/stage";
 import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import { ShapeMesh } from "$/stage/mesh";
-import type { MoveInfo } from "$/stage/pointer";
+import type { ClickInfo, MoveInfo } from "$/stage/pointer";
 import type { PartialShape, Shape } from "$/types";
 import { getGridElevation, getGridPoint } from "$/utils/rays";
 import {
@@ -84,7 +84,7 @@ export class DrawTool implements Tool {
       }
 
       case CommitDrawIntent: {
-        return this.handleCommit();
+        return this.handleCommit(context.info as ClickInfo);
       }
 
       case RevertDrawIntent: {
@@ -106,11 +106,15 @@ export class DrawTool implements Tool {
     this.ghost.update(this.shape);
   }
 
-  handleCommit = () => {
+  handleCommit = (info: ClickInfo) => {
     switch (this.state) {
       case "idle": {
         this.state = "base";
         this.ghost.setEnabled(true);
+        const { camera, grid } = this.stage;
+        const position = getGridPoint(info.position, camera, grid);
+        if (!position) break;
+        this.update({ position, width: 0, height: 0, depth: 0 });
         return true;
       }
 
@@ -148,13 +152,6 @@ export class DrawTool implements Tool {
     const { camera, grid } = this.stage;
 
     switch (this.state) {
-      case "idle": {
-        const position = getGridPoint(info.position, camera, grid);
-        if (!position) break;
-        this.update({ position, width: 0, height: 0, depth: 0 });
-        break;
-      }
-
       case "base": {
         const position = getGridPoint(info.position, camera, grid);
         if (!position) break;

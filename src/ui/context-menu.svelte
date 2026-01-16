@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ContextMenu, Portal } from "bits-ui";
+  import { ContextMenu } from "bits-ui";
   import type { Vector2 } from "@babylonjs/core";
 
   import type { AvailableCommand } from "$/commands";
@@ -30,7 +30,13 @@
       });
     },
   };
+
+  function preventNativeContextMenu(e: Event) {
+    if (open) e.preventDefault();
+  }
 </script>
+
+<svelte:document oncontextmenu={preventNativeContextMenu} />
 
 <ContextMenu.Root bind:open>
   <ContextMenu.Portal>

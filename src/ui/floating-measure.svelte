@@ -13,7 +13,7 @@
 </script>
 
 <div
-  class="pointer-events-none fixed rounded-sm bg-white px-1.5 py-1 font-mono text-sm"
+  class="surface pointer-events-none fixed rounded-sm px-1.5 py-1 font-mono text-sm"
   style="left: {position.x + 16}px; top: {position.y + 16}px;"
 >
   {meter(box.width)} × {meter(box.depth)} × {meter(box.height)}

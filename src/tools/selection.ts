@@ -3,10 +3,11 @@ import type { Vector2 } from "@babylonjs/core";
 import type { Stage } from "$/stage";
 import type { Context, Intent } from "$/stage/interactions";
 import { createIntent } from "$/stage/interactions";
-import type { ClickInfo } from "$/stage/pointer";
-import { areShapesConnected } from "$/utils/bounds";
+import type { ClickInfo, MoveInfo } from "$/stage/pointer";
+import { areShapesConnected, getBoundingBox } from "$/utils/bounds";
 
 import type { Tool } from ".";
+import type { Box } from "$/types";
 
 const SelectIntent = createIntent("select");
 const SelectConnectedIntent = createIntent("select-connected");
@@ -20,6 +21,7 @@ export class SelectionTool implements Tool {
   stage: Stage;
 
   selected = new Set<string>();
+
   private onSelect: SelectionCallbacks["onSelect"];
 
   constructor(stage: Stage, callbacks: SelectionCallbacks) {

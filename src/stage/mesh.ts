@@ -53,11 +53,26 @@ export class ShapeMesh extends Mesh {
     return this.metadata.selected;
   }
 
+  isGroup(group: string | undefined) {
+    return this.metadata.shape.group === group;
+  }
+
   setSelected(selected: boolean) {
+    if (this.metadata.selected === selected) return;
+
     const color = selected ? getColors().ghost : this.metadata.shape.color;
     this.edgesColor = Color4.FromHexString(color);
     this.edgesWidth = selected ? 24 : this.ghost ? 8 : 4;
     this.metadata.selected = selected;
+    this.renderOutline = false;
+  }
+
+  setHighlight(highlighted: boolean) {
+    if (this.renderOutline === highlighted) return;
+
+    this.renderOutline = !this.isSelected() && highlighted;
+    this.outlineWidth = highlighted ? 0.1 : 0;
+    this.outlineColor = Color3.FromHexString(getColors().ghost);
   }
 
   private initVertexData(shape: Shape) {

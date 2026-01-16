@@ -10,6 +10,7 @@ import type { ShapeStore } from "$/stores/shape.svelte";
 import { ContextMenuTool } from "./context-menu";
 import { DrawTool } from "./draw";
 import { LayerTool } from "./layer";
+import { MeasureTool } from "./measure";
 import { MoveTool } from "./move";
 import { ResizeTool } from "./resize";
 import { SelectionTool } from "./selection";
@@ -31,6 +32,7 @@ export class Tools {
   draw: DrawTool;
   resize: ResizeTool;
   move: MoveTool;
+  measure: MeasureTool;
 
   constructor({
     stage,
@@ -47,6 +49,11 @@ export class Tools {
         this.draw.reset();
         this.selection.clear();
       },
+    });
+
+    this.measure = new MeasureTool(stage, {
+      onMeasure: (box, position) => measure.update(box, position),
+      onNothing: () => measure.clear(),
     });
 
     this.selection = new SelectionTool(stage, {
