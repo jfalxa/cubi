@@ -40,6 +40,7 @@ Right click while on the first step cancels the whole drawing operation.
 ### Layering
 
 - While pressing the `Control/Command` key, double click on some point of a shape to move the drawing grid to that vertical layer
+- Doing this on an empty space (with no shape under the mouse) resets the grid layer to 0.
 
 ## Commands
 

@@ -6,11 +6,14 @@ import {
   StandardMaterial,
   Texture,
   Vector3,
+  type MeshPredicate,
 } from "@babylonjs/core";
 
 import type { View } from "./view";
 
 export class Grid {
+  static ignore: MeshPredicate = (mesh) => mesh.name !== "grid";
+
   view: View;
   mesh: GroundMesh;
   texture: DynamicTexture;

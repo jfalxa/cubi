@@ -48,7 +48,7 @@ export class LayerTool implements Tool {
   }
 
   handleLayer = (info: ClickInfo) => {
-    const picked = this.stage.pick(info.position);
+    const picked = this.stage.pick(info.position, Grid.ignore);
     const position = picked.pickedPoint
       ? Grid.snap(picked.pickedPoint)
       : Vector3.Zero();

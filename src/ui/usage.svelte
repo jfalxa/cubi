@@ -95,6 +95,10 @@
             While pressing the <code>Control/Command</code> key, double click on
             some point of a shape to move the drawing grid to that vertical layer
           </li>
+          <li>
+            Doing this on an empty space (with no shape under the mouse) resets
+            the grid layer to 0.
+          </li>
         </ul>
         <h2 id="commands">Commands</h2>
         <p>
