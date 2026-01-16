@@ -1,47 +1,93 @@
-# Svelte + TS + Vite
+# Cubi
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+Draw axis aligned boxes that snap to a grid in 3D.
 
-## Recommended IDE Setup
+## Usage
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+### Navigation
 
-## Need an official Svelte framework?
+- To move around the scene, drag the mouse with the middle button, or press Control/Command and drag with the left button
+- To rotate the camera, drag the mouse with the right button, or press Control/Command + Shift and drag with the left button
+- To zoom in or out, use the mouse wheel or scroll with your trackpad
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+### Drawing
 
-## Technical considerations
+1. Click an empty space to select the first corner
+2. Move the mouse and click again to select the opposite corner
+3. Move the mouse and click to confirm height
 
-**Why use this over SvelteKit?**
+### Selection
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+- Click a shape to select it
+- `Shift`-click a shape to add/remove it from the current list of selected shapes
+- Double click a shape to select it and all other shapes that are in contact with it
+- `Shift`-double click to add a shape and its contacts to the list of selected shapes
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+### Moving
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+- Left click a selected shape and move the mouse around while holding the left mouse button to move a shape on the horizontal axes
+- `Shift`-drag a selected shape to move it exclusively on the vertical axis
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+### Resizing
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+- While pressing the `Alt` key, drag around one of the current selection bounding box faces to resize the shapes in that direction
 
-**Why include `.vscode/extensions.json`?**
+### Layering
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+- While pressing the `Control/Command` key, double click on some point of a shape to move the drawing grid to that vertical layer
 
-**Why enable `allowJs` in the TS template?**
+### Commands
 
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
+All commands are accessible by right clicking the scene to open the context menu.
+It will adapt based on where the mouse is pointing at, and the current selection.
 
-**Why is HMR not preserving my local component state?**
+#### Undo/Redo
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
+- Shortcut: `Command/Control-Z` and `Command/Control-Shift-Z`
+- Undo/redo actions that modified the shapes
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+#### Delete
 
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+- Shortcut: `Delete` or `Backspace`
+- Remove the currently selected shapes from the scene
+
+#### Duplicate
+
+- Shortcut: `D`
+- Duplicate the current selection
+
+#### Group
+
+- Shortcut: `G`
+- Group all the selected shapes together, so that clicking any of them later will select all the others.
+- Note that there is only one level of grouping, if you select two different groups and group them, all the shapes will form a single new group.
+
+#### Ungroup
+
+- Shortcut: `Shift-G`
+- Ungroup the currently selected shapes
+
+#### Colors
+
+- No shortcut, only available in context menu.
+- This is a menu that allows you to pick a color for the current selection
+
+#### Rotate +/- 90˚
+
+- Shortcut: `R` and `Shift-R`
+- Rotate the selection by +/- 90˚
+
+#### New
+
+- Shortcut: `Control/Command-N` (might conflict with core browser shortcuts)
+- Empty the current scene and undo/redo history
+
+#### Open
+
+- Shortcut: `Control/Command-O`
+- Shows a file picker where you can select a cubi JSON file that will be loaded in the current scene
+
+#### Save
+
+- Shortcut: `Control/Command-S`
+- Shows a download dialog that allows you to store the current scene's content in a JSON file on your device
