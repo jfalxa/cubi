@@ -12,6 +12,8 @@ export class GridStore {
   depth = $state(0);
   layer = $state(0);
 
+  showGridForm = $state(false);
+
   constructor(init?: GridInit) {
     this.width = init?.width ?? 100;
     this.depth = init?.depth ?? 100;

@@ -8,6 +8,7 @@
   import ContextMenu from "$/ui/context-menu.svelte";
   import FloatingMeasure from "$/ui/floating-measure.svelte";
   import UsageDialog from "$/ui/usage.svelte";
+  import GridForm from "./ui/grid-form.svelte";
 
   let container: HTMLDivElement;
 
@@ -18,6 +19,7 @@
   const commands = new Commands({
     shapes: stores.shapes,
     selection: stores.selection,
+    grid: stores.grid,
   });
 
   const tools = new Tools({
@@ -57,6 +59,8 @@
   commands={stores.contextMenu.commands}
   position={stores.contextMenu.position}
 />
+
+<GridForm grid={stores.grid} />
 
 {#if stores.measure.box && stores.measure.position}
   <FloatingMeasure

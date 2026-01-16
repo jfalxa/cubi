@@ -12,10 +12,13 @@ import { RedoCommand, UndoCommand } from "./history";
 import { NewCommand } from "./new";
 import { RotateCCWCommand, RotateCWCommand } from "./rotate";
 import { ColorsCommand } from "./colors";
+import { SizeCommand } from "./size";
+import type { GridStore } from "$/stores/grid.svelte";
 
 export interface Dependencies {
   selection: SelectionStore;
   shapes: ShapeStore;
+  grid: GridStore;
 }
 
 export class Commands {
@@ -31,12 +34,13 @@ export class Commands {
   group: GroupCommand;
   ungroup: UngroupCommand;
   colors: ColorsCommand;
+  size: SizeCommand;
 
   private shapeStore: ShapeStore;
   private selectionStore: SelectionStore;
   private commands!: Command[];
 
-  constructor({ shapes, selection }: Dependencies) {
+  constructor({ shapes, selection, grid }: Dependencies) {
     this.open = new OpenCommand(shapes);
     this.save = new SaveCommand(shapes);
     this.new = new NewCommand(shapes);
@@ -49,6 +53,7 @@ export class Commands {
     this.group = new GroupCommand(shapes);
     this.ungroup = new UngroupCommand(shapes);
     this.colors = new ColorsCommand(shapes);
+    this.size = new SizeCommand(grid);
 
     this.shapeStore = shapes;
     this.selectionStore = selection;
@@ -92,6 +97,7 @@ export class Commands {
       this.colors,
       this.rotateClockwise,
       this.rotateCounterclockwise,
+      this.size,
       this.new,
       this.open,
       this.save,

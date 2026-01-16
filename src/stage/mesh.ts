@@ -62,7 +62,7 @@ export class ShapeMesh extends Mesh {
 
     const color = selected ? getColors().ghost : this.metadata.shape.color;
     this.edgesColor = Color4.FromHexString(color);
-    this.edgesWidth = selected ? 24 : this.ghost ? 8 : 4;
+    this.edgesWidth = selected ? 8 : this.ghost ? 4 : 2;
     this.metadata.selected = selected;
     this.renderOutline = false;
   }
@@ -71,7 +71,7 @@ export class ShapeMesh extends Mesh {
     if (this.renderOutline === highlighted) return;
 
     this.renderOutline = !this.isSelected() && highlighted;
-    this.outlineWidth = highlighted ? 0.1 : 0;
+    this.outlineWidth = highlighted ? 0.05 : 0;
     this.outlineColor = Color3.FromHexString(getColors().ghost);
   }
 
