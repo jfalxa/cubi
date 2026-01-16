@@ -32,6 +32,16 @@ export class Movement {
 		if (this.flying) this.velocityY = 0
 	}
 
+	setCollisionState(grounded: boolean, hitCeiling: boolean) {
+		if (grounded && this.velocityY <= 0) {
+			this.velocityY = 0
+			this.grounded = true
+		}
+		if (hitCeiling && this.velocityY > 0) {
+			this.velocityY = 0
+		}
+	}
+
 	update(position: Vector3, deltaTime: number): Vector3 {
 		const direction = new Vector3(0, 0, 0)
 

@@ -8,6 +8,7 @@ import type { Stage } from '$/stage'
 import { KeyboardInput } from './input'
 import { PlayCamera } from './camera'
 import { Movement } from './movement'
+import { Collision } from './collision'
 
 export class PlayMode {
 	private stage: Stage
@@ -17,6 +18,7 @@ export class PlayMode {
 	private input?: KeyboardInput
 	private camera?: PlayCamera
 	private movement?: Movement
+	private collision?: Collision
 	private observer?: Observer<Scene>
 
 	private shapeId?: string
@@ -53,6 +55,7 @@ export class PlayMode {
 		)
 		this.camera.setControlledShape(shapeId)
 		this.movement = new Movement(this.input, this.camera, this.stage.view.scene, shapeId)
+		this.collision = new Collision(this.shapes, shapeId)
 		this.mode.flying = true
 
 		hotkeys('r', 'play', () => {
@@ -78,6 +81,7 @@ export class PlayMode {
 		this.camera = undefined
 
 		this.movement = undefined
+		this.collision = undefined
 
 		this.stage.view.scene.activeCamera = this.stage.camera
 
@@ -93,7 +97,7 @@ export class PlayMode {
 	}
 
 	private update = () => {
-		if (!this.shapeId || !this.movement || !this.camera) return
+		if (!this.shapeId || !this.movement || !this.camera || !this.collision) return
 
 		const shape = this.shapes.current.find(s => s.id === this.shapeId)
 		if (!shape) {
@@ -103,12 +107,20 @@ export class PlayMode {
 
 		const deltaTime = this.stage.view.engine.getDeltaTime() / 1000
 
-		const newPosition = this.movement.update(shape.position, deltaTime)
+		const proposed = this.movement.update(shape.position, deltaTime)
 
-		if (!newPosition.equals(shape.position)) {
-			this.shapes.patch({ id: this.shapeId, position: newPosition })
+		let finalPosition = proposed
+		if (!this.movement.flying) {
+			const bounds = { width: shape.width, height: shape.height, depth: shape.depth }
+			const resolved = this.collision.resolve(shape.position, proposed, bounds)
+			this.movement.setCollisionState(resolved.grounded, resolved.hitCeiling)
+			finalPosition = resolved.position
 		}
 
-		this.camera.follow(newPosition)
+		if (!finalPosition.equals(shape.position)) {
+			this.shapes.patch({ id: this.shapeId, position: finalPosition })
+		}
+
+		this.camera.follow(finalPosition)
 	}
 }

@@ -185,20 +185,30 @@ WoW-like third-person camera:
 
 ---
 
-### phase 5: collision (future)
+### phase 5: collision
 
 note: current ground detection uses shape.position (corner). collision needs to account for controlled shape's bounding box - derive collision bounds from shape dimensions.
 
-16. **AABB collision detection**
+16. ~~**AABB collision detection**~~ ✓
     - before applying movement, check if new position overlaps any shape
     - collision bounds derived from controlled shape's width/height/depth
 
-17. **wall sliding**
+17. ~~**wall sliding**~~ ✓
     - when blocked, project movement onto collision surface
     - check each axis independently (X, then Z)
 
-18. **step-up**
+18. ~~**step-up**~~ ✓
     - if blocked but obstacle height < 0.3 units, step up onto it
+
+---
+
+### 🔍 checkpoint: collision works
+
+- walk into wall → stop, no clipping
+- walk diagonally into wall → slide along it
+- walk into low obstacle (< 0.3) → step up onto it
+- jump into ceiling → bonk, fall back
+- fly mode still bypasses collision (R key)
 
 ---
 
@@ -239,6 +249,7 @@ note: current ground detection uses shape.position (corner). collision needs to 
 | `src/play/index.ts` | new - orchestrator |
 | `src/play/camera.ts` | new - follow camera |
 | `src/play/movement.ts` | new - shape movement |
+| `src/play/collision.ts` | new - AABB collision |
 | `src/play/input.ts` | new - keyboard polling |
 | `src/App.svelte` | mode switching |
 
