@@ -23,12 +23,14 @@ export class Interactions {
   stage: Stage;
   pointer: Pointer;
 
+  enabled: boolean;
   locked: boolean;
   interactives: Interactive[] = [];
 
   constructor(stage: Stage) {
     this.stage = stage;
     this.pointer = new Pointer(stage.view, this.process);
+    this.enabled = true;
     this.locked = false;
   }
 
@@ -48,6 +50,7 @@ export class Interactions {
   }
 
   process = (info: PointerInfo) => {
+    if (!this.enabled) return;
     const context: Context = { locked: this.locked, info };
 
     const intents: [Interactive, Intent][] = [];

@@ -2,6 +2,7 @@
   import { onDestroy, onMount } from "svelte";
 
   import { Commands } from "$/commands";
+  import { PlayMode } from "$/play";
   import { Stage } from "$/stage";
   import { createStores, useSync } from "$/stores";
   import { Tools } from "$/tools";
@@ -35,12 +36,17 @@
     measure: stores.measure,
   });
 
+  const playMode = new PlayMode(stage, stores.shapes, stores.mode);
+  stores.mode.onEnterPlay = (shapeId) => playMode.enter(shapeId);
+  stores.mode.onExitPlay = () => playMode.exit();
+
   onMount(() => {
     stage.mount(container);
     commands.open.mount(container);
   });
 
   onDestroy(() => {
+    playMode.exit();
     tools.dispose();
     stage.dispose();
   });
@@ -58,7 +64,7 @@
 
 {#if stores.mode.mode === 'play'}
   <div class="fixed left-4 top-4 bg-black/80 text-white px-3 py-1 rounded text-sm">
-    PLAY MODE (no controls yet) — refresh to exit
+    ESDF to move · Space/Ctrl up/down · ESC to exit
   </div>
 {/if}
 

@@ -83,26 +83,26 @@ WoW-like third-person camera:
 
 ### phase 2: fly mode (MVP)
 
-4. **keyboard state tracker**
+4. ~~**keyboard state tracker**~~ ✓
    - `src/play/input.ts`
    - track pressed keys via keydown/keyup
    - poll state each frame rather than event-driven
    - keys: E/S/D/F for movement, Space, Ctrl
 
-5. **create PlayMode orchestrator**
+5. ~~**create PlayMode orchestrator**~~ ✓
    - `src/play/index.ts`
    - `enter(scene, shapeId)`: hide grid, disable editor, create camera targeting shape
    - `exit()`: show grid, restore editor, switch camera
    - owns render loop observer, cleans up on exit
 
-6. **third-person camera**
+6. ~~**third-person camera**~~ ✓
    - `src/play/camera.ts`
    - ArcRotateCamera targeting player position
    - initial distance ~5 units, behind player
    - scroll wheel zoom (2-20 range)
    - right-drag orbits (or pointer lock toggle)
 
-7. **movement controller**
+7. ~~**movement controller**~~ ✓
    - `src/play/movement.ts`
    - moves the shape directly (updates shape.position in store)
    - ESDF movement relative to camera facing (XZ plane)
@@ -110,7 +110,7 @@ WoW-like third-person camera:
    - speed: ~8 units/sec
    - owns its update loop lifecycle
 
-8. **hook up enter/exit flow**
+8. ~~**hook up enter/exit flow**~~ ✓
    - App.svelte: when mode changes to 'play', call PlayMode.enter()
    - when mode changes to 'edit', call PlayMode.exit()
    - handle edge cases (shape deleted, scene change)
@@ -130,7 +130,7 @@ WoW-like third-person camera:
 
 ### phase 3: camera polish
 
-9. **smooth camera follow**
+9. ~~**smooth camera follow**~~ ✓
    - camera lerps to target position (slight lag)
    - avoids jarring snaps on direction change
 
