@@ -9,7 +9,7 @@ play mode is a **parallel stage** sharing the babylon scene but with its own cam
 - no special entity type. any shape can be possessed
 - keybind (P or Enter) while shape selected → enter play mode at that shape's position
 - escape → exit back to editor
-- ESDF movement (quake-style), WoW-style third-person camera
+- WASD movement (quake-style), WoW-style third-person camera
 
 ```
 src/
@@ -87,7 +87,7 @@ WoW-like third-person camera:
    - `src/play/input.ts`
    - track pressed keys via keydown/keyup
    - poll state each frame rather than event-driven
-   - keys: E/S/D/F for movement, Space, Ctrl
+   - keys: W/A/S/D for movement, Space, Ctrl
 
 5. ~~**create PlayMode orchestrator**~~ ✓
    - `src/play/index.ts`
@@ -105,7 +105,7 @@ WoW-like third-person camera:
 7. ~~**movement controller**~~ ✓
    - `src/play/movement.ts`
    - moves the shape directly (updates shape.position in store)
-   - ESDF movement relative to camera facing (XZ plane)
+   - WASD movement relative to camera facing (XZ plane)
    - space = ascend, ctrl = descend
    - speed: ~8 units/sec
    - owns its update loop lifecycle
@@ -119,7 +119,7 @@ WoW-like third-person camera:
 
 ### 🔍 checkpoint: flyable MVP
 
-- enter play mode, fly around freely with ESDF + space/ctrl
+- enter play mode, fly around freely with WASD + space/ctrl
 - camera follows behind, can orbit with mouse
 - escape returns to editor cleanly
 - no physics yet, just free movement
@@ -134,12 +134,12 @@ WoW-like third-person camera:
    - camera lerps to target position (slight lag)
    - avoids jarring snaps on direction change
 
-10. **camera collision (optional)**
+10. ~~**camera collision (optional)**~~ ✓
     - raycast from player to camera
     - if blocked, pull camera closer
     - prevents camera clipping through walls
 
-11. **play mode HUD**
+11. ~~**play mode HUD**~~ ✓
     - "ESC to exit" hint on enter (fades after 2s)
     - optional: velocity/position debug overlay
 
@@ -155,22 +155,22 @@ WoW-like third-person camera:
 
 ### phase 4: ground and gravity
 
-12. **ground detection**
+12. ~~**ground detection**~~ ✓
     - raycast down from player position
     - find highest shape surface below player
     - store `groundHeight` and `isGrounded`
 
-13. **gravity system**
+13. ~~**gravity system**~~ ✓
     - when not grounded: apply downward velocity
     - terminal velocity cap (~20 units/sec)
     - snap to ground when close and descending
 
-14. **walk/fly toggle**
+14. ~~**walk/fly toggle**~~ ✓
     - R key toggles between walk and fly mode
     - walk mode: gravity applies, can't ascend freely
     - fly mode: as before
 
-15. **basic jump**
+15. ~~**basic jump**~~ ✓
     - space while grounded → upward velocity impulse
     - gravity pulls back down
 
@@ -187,9 +187,11 @@ WoW-like third-person camera:
 
 ### phase 5: collision (future)
 
+note: current ground detection uses shape.position (corner). collision needs to account for controlled shape's bounding box - derive collision bounds from shape dimensions.
+
 16. **AABB collision detection**
     - before applying movement, check if new position overlaps any shape
-    - player capsule: height 1.8, radius 0.4
+    - collision bounds derived from controlled shape's width/height/depth
 
 17. **wall sliding**
     - when blocked, project movement onto collision surface
@@ -245,7 +247,7 @@ WoW-like third-person camera:
 ## verification (MVP)
 
 1. select shape, press P → camera moves to third-person behind shape
-2. ESDF moves the shape around, space/ctrl ascends/descends
+2. WASD moves the shape around, space/ctrl ascends/descends
 3. mouse orbits camera around shape
 4. scroll zooms in/out
 5. escape returns to editor, camera restored

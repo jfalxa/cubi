@@ -25,19 +25,19 @@ export class KeyboardInput {
 	}
 
 	get forward() {
-		return this.isDown('KeyE')
+		return this.isDown('KeyW')
 	}
 
 	get backward() {
-		return this.isDown('KeyD')
-	}
-
-	get left() {
 		return this.isDown('KeyS')
 	}
 
+	get left() {
+		return this.isDown('KeyA')
+	}
+
 	get right() {
-		return this.isDown('KeyF')
+		return this.isDown('KeyD')
 	}
 
 	get up() {

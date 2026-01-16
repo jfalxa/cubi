@@ -13,7 +13,7 @@ import type { Shape } from "$/types";
 import { getColors } from "$/colors";
 
 export class ShapeMesh extends Mesh {
-  static only: MeshPredicate = (mesh) => mesh instanceof ShapeMesh;
+  static only: MeshPredicate = (mesh, _thinInstanceIndex) => mesh instanceof ShapeMesh;
 
   declare metadata: {
     shape: Shape;

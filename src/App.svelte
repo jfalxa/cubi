@@ -63,10 +63,19 @@
 </button>
 
 {#if stores.mode.mode === 'play'}
-  <div class="fixed left-4 top-4 bg-black/80 text-white px-3 py-1 rounded text-sm">
-    ESDF to move · Space/Ctrl up/down · ESC to exit
+  <div class="play-hud fixed left-4 top-4 bg-black/80 text-white px-3 py-1 rounded text-sm">
+    {stores.mode.flying ? 'fly' : 'walk'} · WASD · {stores.mode.flying ? 'Space/Ctrl up/down' : 'Space jump'} · R toggle · ESC exit
   </div>
 {/if}
+
+<style>
+  .play-hud {
+    animation: fade-out 0.5s ease-out 2s forwards;
+  }
+  @keyframes fade-out {
+    to { opacity: 0; pointer-events: none; }
+  }
+</style>
 
 <UsageDialog bind:open={usageOpen} />
 

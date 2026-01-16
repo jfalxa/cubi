@@ -51,7 +51,14 @@ export class PlayMode {
 			editorCamera.beta,
 			editorCamera.radius
 		)
-		this.movement = new Movement(this.input, this.camera)
+		this.camera.setControlledShape(shapeId)
+		this.movement = new Movement(this.input, this.camera, this.stage.view.scene, shapeId)
+		this.mode.flying = true
+
+		hotkeys('r', 'play', () => {
+			this.movement?.toggleFlying()
+			this.mode.flying = this.movement?.flying ?? true
+		})
 
 		this.stage.view.scene.activeCamera = this.camera
 
@@ -77,6 +84,7 @@ export class PlayMode {
 		this.stage.interactions.enabled = true
 
 		hotkeys.unbind('escape', 'play')
+		hotkeys.unbind('r', 'play')
 		if (this.previousScope) {
 			hotkeys.setScope(this.previousScope)
 		}

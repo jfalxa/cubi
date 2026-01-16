@@ -1,17 +1,35 @@
-import { Vector3 } from '@babylonjs/core'
+import { Ray, Vector3, type Scene } from '@babylonjs/core'
 
+import { ShapeMesh } from '$/stage/mesh'
 import type { KeyboardInput } from './input'
 import type { PlayCamera } from './camera'
 
 const SPEED = 16
+const GRAVITY = 30
+const TERMINAL_VELOCITY = 40
+const GROUND_SNAP = 0.1
+const JUMP_VELOCITY = 12
 
 export class Movement {
 	private input: KeyboardInput
 	private camera: PlayCamera
+	private scene: Scene
+	private shapeId: string
 
-	constructor(input: KeyboardInput, camera: PlayCamera) {
+	private velocityY = 0
+	private grounded = false
+	flying = true
+
+	constructor(input: KeyboardInput, camera: PlayCamera, scene: Scene, shapeId: string) {
 		this.input = input
 		this.camera = camera
+		this.scene = scene
+		this.shapeId = shapeId
+	}
+
+	toggleFlying() {
+		this.flying = !this.flying
+		if (this.flying) this.velocityY = 0
 	}
 
 	update(position: Vector3, deltaTime: number): Vector3 {
@@ -21,12 +39,11 @@ export class Movement {
 		if (this.input.backward) direction.z -= 1
 		if (this.input.left) direction.x -= 1
 		if (this.input.right) direction.x += 1
-		if (this.input.up) direction.y += 1
-		if (this.input.down) direction.y -= 1
 
-		if (direction.lengthSquared() === 0) return position
-
-		direction.normalize()
+		if (this.flying) {
+			if (this.input.up) direction.y += 1
+			if (this.input.down) direction.y -= 1
+		}
 
 		const cameraForward = this.camera.getForwardRay().direction
 		const forward = new Vector3(cameraForward.x, 0, cameraForward.z).normalize()
@@ -36,8 +53,46 @@ export class Movement {
 			.add(right.scale(direction.x))
 			.add(Vector3.Up().scale(direction.y))
 
-		const velocity = worldDirection.scale(SPEED * deltaTime)
+		if (worldDirection.lengthSquared() > 0) {
+			worldDirection.normalize()
+		}
 
-		return position.add(velocity)
+		let newPosition = position.add(worldDirection.scale(SPEED * deltaTime))
+
+		if (!this.flying) {
+			const ground = this.detectGround(newPosition)
+
+			if (ground !== null && newPosition.y <= ground + GROUND_SNAP && this.velocityY <= 0) {
+				newPosition.y = ground
+				this.velocityY = 0
+				this.grounded = true
+
+				if (this.input.up) {
+					this.velocityY = JUMP_VELOCITY
+					this.grounded = false
+				}
+			} else {
+				this.grounded = false
+				this.velocityY -= GRAVITY * deltaTime
+				this.velocityY = Math.max(this.velocityY, -TERMINAL_VELOCITY)
+				newPosition.y += this.velocityY * deltaTime
+			}
+		}
+
+		return newPosition
+	}
+
+	private detectGround(position: Vector3): number | null {
+		const ray = new Ray(position.add(new Vector3(0, 0.1, 0)), Vector3.Down(), 1000)
+
+		const hit = this.scene.pickWithRay(ray, (mesh, thinInstanceIndex) => {
+			return ShapeMesh.only(mesh, thinInstanceIndex) && mesh.id !== this.shapeId
+		})
+
+		if (hit?.hit && hit.pickedPoint) {
+			return hit.pickedPoint.y
+		}
+
+		return null
 	}
 }
