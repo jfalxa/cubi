@@ -146,6 +146,23 @@
     <li>Shortcut: <code>R</code> and <code>Shift-R</code></li>
     <li>Rotate the selection by +/- 90˚</li>
   </ul>
+  <h3 id="import">Import</h3>
+  <ul>
+    <li>Shortcut: <code>Control/Command-I</code></li>
+    <li>
+      Imports a JSON file in the current scene, without clearing its current
+      state
+    </li>
+  </ul>
+  <h3 id="export">Export</h3>
+  <ul>
+    <li>Shortcut: <code>Control/Command-E</code></li>
+    <li>Exports the currently selected shapes in a JSON file</li>
+    <li>
+      Combined with &quot;Import&quot;, it allows you to create a library of
+      reusable components
+    </li>
+  </ul>
   <h3 id="new">New</h3>
   <ul>
     <li>

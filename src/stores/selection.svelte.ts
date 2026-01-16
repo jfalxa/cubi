@@ -20,6 +20,10 @@ export class SelectionStore {
     return this.selected.includes(id);
   }
 
+  clear() {
+    this.selected = [];
+  }
+
   refresh() {
     const ids = this.shapeStore.current.map((s) => s.id);
     this.selected = this.selected.filter((id) => ids.includes(id));

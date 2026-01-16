@@ -6,7 +6,7 @@ import type { Shape } from "$/types";
 
 import { DeleteCommand } from "./delete";
 import { DuplicateCommand } from "./duplicate";
-import { OpenCommand, SaveCommand } from "./file";
+import { OpenCommand, SaveCommand, ImportCommand, ExportCommand } from "./file";
 import { GroupCommand, UngroupCommand } from "./group";
 import { RedoCommand, UndoCommand } from "./history";
 import { NewCommand } from "./new";
@@ -26,6 +26,8 @@ export interface Dependencies {
 export class Commands {
   open: OpenCommand;
   save: SaveCommand;
+  import: ImportCommand;
+  export: ExportCommand;
   undo: UndoCommand;
   redo: RedoCommand;
   new: NewCommand;
@@ -38,13 +40,15 @@ export class Commands {
   colors: ColorsCommand;
   size: SizeCommand;
 
-  private shapeStore: ShapeStore;
-  private selectionStore: SelectionStore;
+  private shapes: ShapeStore;
+  private selection: SelectionStore;
   private commands!: Command[];
 
   constructor({ shapes, selection, grid, contextMenu }: Dependencies) {
     this.open = new OpenCommand(shapes);
     this.save = new SaveCommand(shapes);
+    this.import = new ImportCommand(shapes);
+    this.export = new ExportCommand(shapes);
     this.new = new NewCommand(shapes, contextMenu);
     this.undo = new UndoCommand(shapes, selection);
     this.redo = new RedoCommand(shapes, selection);
@@ -57,8 +61,8 @@ export class Commands {
     this.colors = new ColorsCommand(shapes);
     this.size = new SizeCommand(grid);
 
-    this.shapeStore = shapes;
-    this.selectionStore = selection;
+    this.shapes = shapes;
+    this.selection = selection;
 
     this.initCommands();
     this.initHotkeys();
@@ -78,13 +82,13 @@ export class Commands {
   context(id?: string) {
     if (id === undefined) {
       return [];
-    } else if (this.selectionStore.has(id)) {
-      return this.selectionStore.getSelectedShapes();
+    } else if (this.selection.has(id)) {
+      return this.selection.getSelectedShapes();
     } else {
-      const shape = this.shapeStore.current.find((s) => s.id === id);
+      const shape = this.shapes.current.find((s) => s.id === id);
       if (!shape) return [];
       if (!shape.group) return [shape];
-      return this.shapeStore.current.filter((s) => s.group === shape.group);
+      return this.shapes.current.filter((s) => s.group === shape.group);
     }
   }
 
@@ -100,6 +104,8 @@ export class Commands {
       this.rotateClockwise,
       this.rotateCounterclockwise,
       this.size,
+      this.import,
+      this.export,
       this.new,
       this.open,
       this.save,
@@ -112,7 +118,7 @@ export class Commands {
       if (!keys) continue;
       hotkeys(keys, (e) => {
         e.preventDefault();
-        command.execute(this.selectionStore.getSelectedShapes());
+        command.execute(this.selection.getSelectedShapes());
       });
     }
   }

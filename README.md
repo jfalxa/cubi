@@ -84,6 +84,17 @@ It will adapt based on where the mouse is pointing at, and the current selection
 - Shortcut: `R` and `Shift-R`
 - Rotate the selection by +/- 90˚
 
+### Import
+
+- Shortcut: `Control/Command-I`
+- Imports a JSON file in the current scene, without clearing its current state
+
+### Export
+
+- Shortcut: `Control/Command-E`
+- Exports the currently selected shapes in a JSON file
+- Combined with "Import", it allows you to create a library of reusable components
+
 #### New
 
 - Shortcut: `Control/Command-N` (might conflict with core browser shortcuts)

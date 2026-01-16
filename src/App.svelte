@@ -63,7 +63,12 @@
 />
 
 <GridForm grid={stores.grid} />
-<NewDialog shapes={stores.shapes} contextMenu={stores.contextMenu} />
+
+<NewDialog
+  shapes={stores.shapes}
+  selection={stores.selection}
+  contextMenu={stores.contextMenu}
+/>
 
 {#if stores.measure.box && stores.measure.position}
   <FloatingMeasure

@@ -46,11 +46,9 @@ export function stringifyShapes(shapes: Shape[]) {
 
 export function parseShapes(shapes: string): Shape[] {
   try {
-    const parsed = JSON.parse(shapes) as SerializedShape[];
-    return parsed.map((s) => ({
-      ...s,
-      position: Vector3.FromArray(s.position),
-    }));
+    const json = JSON.parse(shapes) as SerializedShape[];
+    const result = json.map((s) => ({ ...s, position: Vector3.FromArray(s.position) })); // prettier-ignore
+    return cloneShapes(result);
   } catch {
     return [];
   }
