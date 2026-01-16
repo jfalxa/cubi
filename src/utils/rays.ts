@@ -31,10 +31,9 @@ export function getGridPoint(
   return Grid.snap(point);
 }
 
-export function getGridElevation(
+export function getElevation(
   pointer: Vector2,
   camera: Camera,
-  grid: Grid,
   reference: Shape
 ) {
   const { position, width, depth } = reference;
@@ -43,9 +42,9 @@ export function getGridElevation(
   const axisDir = Vector3.Up();
 
   const axisPoint = getAxisPoint(pointer, camera, axisOrigin, axisDir);
-  const deltaY = Math.round(axisPoint.y - axisOrigin.y);
+  const deltaY = axisPoint.y - axisOrigin.y;
 
-  return Math.max(deltaY, -position.y);
+  return Math.round(deltaY);
 }
 
 export function getAxisPoint(

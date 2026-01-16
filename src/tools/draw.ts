@@ -5,7 +5,7 @@ import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import { ShapeMesh } from "$/stage/mesh";
 import type { ClickInfo, MoveInfo } from "$/stage/pointer";
 import type { PartialShape, Shape } from "$/types";
-import { getGridElevation, getGridPoint } from "$/utils/rays";
+import { getElevation, getGridPoint } from "$/utils/rays";
 import {
   cloneShape,
   createShape,
@@ -162,12 +162,8 @@ export class DrawTool implements Tool {
       }
 
       case "elevation": {
-        const height = getGridElevation(
-          info.position,
-          camera,
-          grid,
-          this.shape
-        );
+        const elevation = getElevation(info.position, camera, this.shape);
+        const height = Math.max(elevation, -this.shape.position.y);
         this.update({ height });
         this.onDraw(normalizeShape(this.shape), info.position);
         break;

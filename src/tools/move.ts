@@ -5,9 +5,10 @@ import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import type { DragInfo } from "$/stage/pointer";
 import type { Shape } from "$/types";
 import { getBoundingBox } from "$/utils/bounds";
-import { getGridElevation, getGridPoint } from "$/utils/rays";
+import { getElevation, getGridPoint } from "$/utils/rays";
 
 import type { Tool } from ".";
+import { ShapeMesh } from "$/stage/mesh";
 
 const StartMoveIntent = createIntent("start-move");
 const MoveIntent = createIntent("move");
@@ -84,7 +85,8 @@ export class MoveTool implements Tool {
   }
 
   private isOnSelectedShape(position: Vector2) {
-    return this.stage.pickShape(position)?.isSelected() ?? false;
+    const mesh = this.stage.pickShape(position, ShapeMesh.only);
+    return mesh?.isSelected() ?? false;
   }
 
   private moveShapes(travel: Vector3) {
@@ -122,8 +124,8 @@ export class MoveTool implements Tool {
     const { camera, grid } = this.stage;
     const [reference] = this.snapshot;
 
-    const start = getGridElevation(info.start, camera, grid, reference);
-    const current = getGridElevation(info.position, camera, grid, reference);
+    const start = getElevation(info.start, camera, reference);
+    const current = getElevation(info.position, camera, reference);
 
     const minY = getBoundingBox(this.snapshot).min.y;
     const travelY = Math.max(current - start, -minY);

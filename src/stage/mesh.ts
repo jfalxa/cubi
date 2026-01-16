@@ -1,4 +1,4 @@
-import type { Scene } from "@babylonjs/core";
+import type { MeshPredicate, Scene } from "@babylonjs/core";
 import {
   Color3,
   Color4,
@@ -13,7 +13,7 @@ import type { Shape } from "$/types";
 import { getColors } from "$/colors";
 
 export class ShapeMesh extends Mesh {
-  private static i = 1;
+  static only: MeshPredicate = (mesh) => mesh instanceof ShapeMesh;
 
   declare metadata: {
     shape: Shape;
