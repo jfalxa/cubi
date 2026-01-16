@@ -59,6 +59,10 @@
       Hold <code>Shift</code> and double click on a shape to add it and its contacts
       to the list of selected shapes
     </li>
+    <li>
+      If a shape is below the current layer, you can't select it by clicking it,
+      except while holding <code>Shift</code>
+    </li>
   </ul>
   <h3 id="moving">Moving</h3>
   <ul>

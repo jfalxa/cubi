@@ -27,6 +27,7 @@ Right click while on the first step cancels the whole drawing operation.
 - Hold `Shift` and click a shape to add/remove it from the current list of selected shapes
 - Double click a shape to select it and all other shapes that are in contact with it
 - Hold `Shift` and double click on a shape to add it and its contacts to the list of selected shapes
+- If a shape is below the current layer, you can't select it by clicking it, except while holding `Shift`
 
 ### Moving
 

@@ -2,12 +2,13 @@ import type { Vector2 } from "@babylonjs/core";
 
 import type { Stage } from "$/stage";
 import type { Context, Intent } from "$/stage/interactions";
-import { createIntent } from "$/stage/interactions";
+import { createIntent, hasShift } from "$/stage/interactions";
 import type { ClickInfo, MoveInfo } from "$/stage/pointer";
 import { areShapesConnected, getBoundingBox } from "$/utils/bounds";
 
 import type { Tool } from ".";
 import type { Box } from "$/types";
+import { ShapeMesh } from "$/stage/mesh";
 
 const SelectIntent = createIntent("select");
 const SelectConnectedIntent = createIntent("select-connected");
@@ -38,8 +39,9 @@ export class SelectionTool implements Tool {
   proposeIntent(context: Context) {
     switch (context.info.type) {
       case "left-click": {
+        const multiple = hasShift(context);
         if (context.locked) return;
-        if (this.pick(context.info.position)) return SelectIntent;
+        if (this.pick(context.info.position, multiple)) return SelectIntent;
         if (this.selected.size > 0) return ClearIntent;
         break;
       }
@@ -105,12 +107,13 @@ export class SelectionTool implements Tool {
     this.set([]);
   }
 
-  pick(position: Vector2) {
-    return this.stage.pickShape(position);
+  pick(position: Vector2, shapeOnly = false) {
+    const predicate = shapeOnly ? ShapeMesh.only : undefined;
+    return this.stage.pickShape(position, predicate);
   }
 
   selectAt(position: Vector2, multiple = false) {
-    const picked = this.pick(position)!.id;
+    const picked = this.pick(position, multiple)!.id;
 
     if (multiple) {
       this.toggle(picked);
