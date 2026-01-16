@@ -14,6 +14,7 @@ import {
 } from "$/utils/shape";
 
 import type { Tool } from ".";
+import { getColors } from "$/colors";
 
 const DrawIntent = createIntent("draw");
 const CommitDrawIntent = createIntent("commit-draw");
@@ -42,7 +43,7 @@ export class DrawTool implements Tool {
   constructor(stage: Stage, callbacks: DrawCallbacks) {
     this.stage = stage;
 
-    this.shape = createShape({ id: "ghost", color: "#add8e6" });
+    this.shape = createShape({ id: "ghost", color: getColors().ghost });
 
     this.ghost = new ShapeMesh(this.shape, this.stage.view.scene, true);
     this.ghost.setEnabled(false);

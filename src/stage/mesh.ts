@@ -10,6 +10,7 @@ import {
 } from "@babylonjs/core";
 
 import type { Shape } from "$/types";
+import { getColors } from "$/colors";
 
 export class ShapeMesh extends Mesh {
   private static i = 1;
@@ -30,6 +31,7 @@ export class ShapeMesh extends Mesh {
     this.ghost = ghost;
     this.isPickable = !ghost;
 
+    this.edgesWidth = this.ghost ? 8 : 4;
     this.edgesColor = Color4.FromHexString(shape.color);
 
     this.initVertexData(shape);
@@ -52,9 +54,9 @@ export class ShapeMesh extends Mesh {
   }
 
   setSelected(selected: boolean) {
-    const color = selected ? "#76bdd5" : this.metadata.shape.color;
+    const color = selected ? getColors().ghost : this.metadata.shape.color;
     this.edgesColor = Color4.FromHexString(color);
-    this.edgesWidth = selected ? 3 : 1;
+    this.edgesWidth = selected ? 24 : this.ghost ? 8 : 4;
     this.metadata.selected = selected;
   }
 

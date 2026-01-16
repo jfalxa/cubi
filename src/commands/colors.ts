@@ -8,6 +8,7 @@ export class ColorsCommand implements Command {
   group = "colors";
 
   options = {
+    Default: "#dcdcdc",
     Red: "#fa003f",
     Blue: "#004dff",
     Yellow: "#ffd400",

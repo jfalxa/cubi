@@ -1,5 +1,6 @@
 import {
   AbstractMesh,
+  Color4,
   Engine,
   HemisphericLight,
   Light,
@@ -9,12 +10,15 @@ import {
 
 import { ShapeMesh } from "$/stage/mesh";
 import type { Shape } from "$/types";
+import { getColors, watchAppearance, type Colors } from "$/colors";
 
 export class View {
   canvas: HTMLCanvasElement;
   engine: Engine;
   scene: Scene;
   light: Light;
+
+  private removeAppearanceListener: () => void;
 
   static shapesOnly(mesh: AbstractMesh) {
     return mesh instanceof ShapeMesh && !mesh.ghost;
@@ -26,17 +30,23 @@ export class View {
 
     this.engine = new Engine(this.canvas);
     this.scene = new Scene(this.engine);
+
     this.light = new HemisphericLight(
       "hemispheric-light",
       new Vector3(0, 1, 0),
       this.scene
     );
 
+    this.scene.clearColor = Color4.FromHexString(getColors().scene);
+
     this.engine.runRenderLoop(this.render);
     window.addEventListener("resize", this.handleResize);
+
+    this.removeAppearanceListener = watchAppearance(this.handleAppearance);
   }
 
   dispose() {
+    this.removeAppearanceListener();
     window.removeEventListener("resize", this.handleResize);
     this.scene.dispose();
     this.engine.dispose();
@@ -76,5 +86,9 @@ export class View {
 
   private render = () => {
     this.scene.render();
+  };
+
+  private handleAppearance = (colors: Colors) => {
+    this.scene.clearColor = Color4.FromHexString(colors.scene);
   };
 }

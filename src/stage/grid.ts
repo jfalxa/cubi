@@ -10,9 +10,12 @@ import {
 } from "@babylonjs/core";
 
 import type { View } from "./view";
+import { getColors, watchAppearance, type Colors } from "$/colors";
 
 export class Grid {
   static ignore: MeshPredicate = (mesh) => mesh.name !== "grid";
+
+  static gridCellsPerTile = 10;
 
   view: View;
   mesh: GroundMesh;
@@ -22,11 +25,15 @@ export class Grid {
   depth = 1;
   layer = 0;
 
+  private removeAppearanceListener: () => void;
+
   constructor(view: View) {
     this.view = view;
     this.mesh = this.createMesh();
-    this.texture = this.createTexture();
+    this.texture = this.createTexture(getColors());
     this.mesh.material = this.createMaterial();
+
+    this.removeAppearanceListener = watchAppearance(this.handleAppearance);
   }
 
   static snap(point: Vector3) {
@@ -38,6 +45,7 @@ export class Grid {
   }
 
   dispose() {
+    this.removeAppearanceListener();
     this.mesh.dispose();
   }
 
@@ -47,8 +55,9 @@ export class Grid {
 
     this.mesh.scaling.set(width, 1, depth);
 
-    this.texture.uScale = width;
-    this.texture.vScale = depth;
+    this.texture.uScale = width / Grid.gridCellsPerTile;
+    this.texture.vScale = depth / Grid.gridCellsPerTile;
+
     this.texture.update();
   }
 
@@ -65,8 +74,10 @@ export class Grid {
     );
   }
 
-  private createTexture() {
+  private createTexture(colors: Colors) {
     const size = 512;
+    const cells = Grid.gridCellsPerTile;
+    const cellSize = size / cells;
 
     const texture = new DynamicTexture(
       "grid_texture",
@@ -77,18 +88,43 @@ export class Grid {
 
     const ctx = texture.getContext();
 
-    const lineWidth = Math.max(1, Math.floor(size / 256));
+    const minorLineWidth = Math.max(1, Math.floor(size / 512));
+    const midLineWidth = Math.max(2, minorLineWidth * 2);
+    const majorLineWidth = Math.max(3, minorLineWidth * 4);
 
     ctx.clearRect(0, 0, size, size);
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+    ctx.fillStyle = colors.grid;
     ctx.fillRect(0, 0, size, size);
 
-    ctx.fillStyle = "#999999";
-    ctx.fillRect(0, 0, size, lineWidth);
-    ctx.fillRect(0, size - lineWidth, size, lineWidth);
-    ctx.fillRect(0, 0, lineWidth, size);
-    ctx.fillRect(size - lineWidth, 0, lineWidth, size);
+    const drawLine = (pos: number, width: number, isVertical: boolean) => {
+      const offset = Math.round(pos - width / 2);
+
+      if (isVertical) {
+        ctx.fillRect(offset, 0, width, size);
+      } else {
+        ctx.fillRect(0, offset, size, width);
+      }
+    };
+
+    for (let i = 0; i <= cells; i += 1) {
+      let lineWidth: number;
+
+      if (i % 10 === 0) {
+        ctx.fillStyle = colors.major;
+        lineWidth = majorLineWidth;
+      } else if (i % 5 === 0) {
+        ctx.fillStyle = colors.mid;
+        lineWidth = midLineWidth;
+      } else {
+        ctx.fillStyle = colors.minor;
+        lineWidth = minorLineWidth;
+      }
+
+      const pos = i * cellSize;
+      drawLine(pos, lineWidth, true);
+      drawLine(pos, lineWidth, false);
+    }
 
     texture.hasAlpha = true;
     texture.wrapU = Texture.WRAP_ADDRESSMODE;
@@ -111,4 +147,10 @@ export class Grid {
 
     return material;
   }
+
+  private handleAppearance = (colors: Colors) => {
+    this.texture = this.createTexture(colors);
+    this.mesh.material = this.createMaterial();
+    this.setSize(this.width, this.depth);
+  };
 }

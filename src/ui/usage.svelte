@@ -12,20 +12,14 @@
   <Dialog.Portal>
     <Dialog.Overlay class="fixed inset-0 bg-black/40" />
     <Dialog.Content
-      class="fixed left-1/2 top-1/2 w-[min(90vw,900px)] -translate-x-1/2 -translate-y-1/2 rounded-xl prose bg-white shadow-xl overflow-hidden"
+      class="surface prose dark:prose-invert fixed left-1/2 top-1/2 w-[min(90vw,900px)] -translate-x-1/2 -translate-y-1/2 rounded-xl shadow-xl overflow-hidden"
     >
-      <div class="flex items-start justify-between gap-4 p-6">
-        <Dialog.Title class="text-2xl font-semibold text-gray-900">
-          Usage
-        </Dialog.Title>
-        <Dialog.Close
-          class="rounded-md border border-gray-200 px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100"
-        >
-          Close
-        </Dialog.Close>
+      <div class="flex items-center justify-between gap-4 p-6">
+        <Dialog.Title class="text-4xl font-semibold">Usage</Dialog.Title>
+        <Dialog.Close>Close</Dialog.Close>
       </div>
       <div
-        class="mt-4 p-6 max-h-[70vh] space-y-6 overflow-y-auto whitespace-normal text-sm leading-relaxed text-gray-800"
+        class="p-6 max-h-[70vh] space-y-6 overflow-y-auto whitespace-normal text-sm leading-relaxed"
       >
         <h2 id="3d-editor" class="mt-0">3D Editor</h2>
         <h3 id="navigation">Navigation</h3>

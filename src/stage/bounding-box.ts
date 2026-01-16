@@ -10,6 +10,7 @@ import {
 
 import type { Shape } from "$/types";
 import { getBoundingBox } from "$/utils/bounds";
+import { getColors } from "$/colors";
 
 export class BoundingBox extends Mesh {
   static only: MeshPredicate = (mesh) => mesh.name === "bounding-box";
@@ -54,7 +55,7 @@ export class BoundingBox extends Mesh {
       this.getScene()
     );
     material.specularColor = Color3.Black();
-    material.diffuseColor = Color3.FromHexString("#add8e6");
+    material.diffuseColor = Color3.FromHexString(getColors().ghost);
     material.alpha = 0.33;
     this.material = material;
   }

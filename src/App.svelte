@@ -47,10 +47,7 @@
 
 <div bind:this={container}></div>
 
-<button
-  class="fixed right-4 top-4 z-50 rounded-md bg-white/90 px-3 py-2 text-sm font-semibold text-gray-900 shadow-lg hover:bg-white"
-  onclick={() => (usageOpen = true)}
->
+<button class="fixed right-4 top-4" onclick={() => (usageOpen = true)}>
   Usage
 </button>
 
