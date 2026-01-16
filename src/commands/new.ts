@@ -15,6 +15,8 @@ export class NewCommand implements Command {
   }
 
   execute(): void {
-    this.shapes.reset();
+    if (confirm("Your stage is not empty, clear it anyway?")) {
+      this.shapes.reset();
+    }
   }
 }
