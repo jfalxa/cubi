@@ -35,8 +35,12 @@
     <button class="surface rounded-md px-4 py-2" type="button" onclick={cancel}>
       Cancel
     </button>
-    <button class="surface rounded-md px-4 py-2" type="button" onclick={confirm}>
-      Clear
+    <button
+      class="surface rounded-md px-4 py-2"
+      type="button"
+      onclick={confirm}
+    >
+      Confirm
     </button>
   </div>
 </Dialog>
