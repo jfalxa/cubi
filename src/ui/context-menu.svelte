@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { ContextMenu } from "bits-ui";
+  import { ContextMenu, Portal } from "bits-ui";
   import type { Vector2 } from "@babylonjs/core";
 
   import type { AvailableCommand } from "$/commands";
   import { groupBy } from "$/utils/collection";
+  import ColorMenu from "./color-menu.svelte";
 
   type Props = {
     position?: Vector2;
@@ -39,12 +40,16 @@
     >
       {#each Object.keys(grouped) as group}
         {#each grouped[group] as cmd}
-          <ContextMenu.Item
-            onclick={cmd.action}
-            class="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-900 hover:text-white outline-none"
-          >
-            {cmd.label}
-          </ContextMenu.Item>
+          {#if cmd.label == "Colors"}
+            <ColorMenu command={cmd} />
+          {:else}
+            <ContextMenu.Item
+              onclick={() => cmd.action()}
+              class="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-900 hover:text-white outline-none"
+            >
+              {cmd.label}
+            </ContextMenu.Item>
+          {/if}
         {/each}
         <ContextMenu.Separator class="m-1 h-0.5 bg-gray-200 last:hidden" />
       {/each}

@@ -74,7 +74,7 @@ export class ShapeMesh extends Mesh {
     );
     material.specularColor = Color3.Black();
     material.diffuseColor = Color3.FromHexString(shape.color);
-    material.zOffset = this.ghost ? -10 : -0.01 * ShapeMesh.i++;
+    material.zOffset = this.ghost ? -10 : 0;
     if (this.ghost) material.alpha = 0.33;
     this.material = material;
   }
@@ -82,6 +82,7 @@ export class ShapeMesh extends Mesh {
   private updateEdges() {
     this.disableEdgesRendering();
     this.enableEdgesRendering();
+    this.setSelected(this.metadata.selected);
   }
 
   private updateVertexData(shape: Shape) {

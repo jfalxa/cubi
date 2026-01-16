@@ -11,6 +11,7 @@ import { GroupCommand, UngroupCommand } from "./group";
 import { RedoCommand, UndoCommand } from "./history";
 import { NewCommand } from "./new";
 import { RotateCCWCommand, RotateCWCommand } from "./rotate";
+import { ColorsCommand } from "./colors";
 
 export interface Dependencies {
   selection: SelectionStore;
@@ -29,6 +30,7 @@ export class Commands {
   rotateCounterclockwise: RotateCCWCommand;
   group: GroupCommand;
   ungroup: UngroupCommand;
+  colors: ColorsCommand;
 
   private shapeStore: ShapeStore;
   private selectionStore: SelectionStore;
@@ -46,6 +48,7 @@ export class Commands {
     this.rotateCounterclockwise = new RotateCCWCommand(shapes);
     this.group = new GroupCommand(shapes);
     this.ungroup = new UngroupCommand(shapes);
+    this.colors = new ColorsCommand(shapes);
 
     this.shapeStore = shapes;
     this.selectionStore = selection;
@@ -60,7 +63,8 @@ export class Commands {
     return available.map((cmd) => ({
       label: cmd.label,
       group: cmd.group,
-      action: () => cmd.execute(context),
+      options: cmd.options,
+      action: (option?: string) => cmd.execute(context, option),
     }));
   }
 
@@ -85,6 +89,7 @@ export class Commands {
       this.duplicate,
       this.group,
       this.ungroup,
+      this.colors,
       this.rotateClockwise,
       this.rotateCounterclockwise,
       this.new,
@@ -95,7 +100,7 @@ export class Commands {
 
   initHotkeys() {
     for (const command of this.commands) {
-      const keys = command.shortcuts.join(",");
+      const keys = command.shortcuts?.join(",");
       if (!keys) continue;
       hotkeys(keys, (e) => {
         e.preventDefault();
@@ -108,13 +113,15 @@ export class Commands {
 export interface AvailableCommand {
   label: string;
   group: string;
-  action: () => void;
+  options?: Record<string, string>;
+  action: (option?: string) => void;
 }
 
 export interface Command {
   label: string;
   group: string;
-  shortcuts: string[];
+  options?: Record<string, string>;
+  shortcuts?: string[];
   isAvailable(context: Shape[]): boolean;
-  execute(context: Shape[]): void;
+  execute(context: Shape[], option?: string): void;
 }
