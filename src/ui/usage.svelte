@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Dialog } from "bits-ui";
+  import Dialog from "$/ui/dialog.svelte";
 
   type Props = {
     open?: boolean;
@@ -8,20 +8,16 @@
   let { open = $bindable(false) }: Props = $props();
 </script>
 
-<Dialog.Root bind:open>
-  <Dialog.Portal>
-    <Dialog.Overlay class="fixed inset-0 bg-black/40" />
-    <Dialog.Content
-      class="surface prose dark:prose-invert fixed left-1/2 top-1/2 w-[min(90vw,900px)] -translate-x-1/2 -translate-y-1/2 rounded-xl overflow-hidden"
-    >
-      <div class="flex items-center justify-between gap-4 p-6">
-        <Dialog.Title class="text-4xl font-semibold">Usage</Dialog.Title>
-        <Dialog.Close>Close</Dialog.Close>
-      </div>
-      <div
-        class="p-6 max-h-[70vh] space-y-6 overflow-y-auto whitespace-normal text-sm leading-relaxed"
-      >
-        <h2 id="3d-editor" class="mt-0">3D Editor</h2>
+<Dialog
+  bind:open
+  title="Usage"
+  showClose
+  contentClass="prose dark:prose-invert w-[min(90vw,900px)] overflow-hidden"
+  headerClass="p-6"
+  titleClass="text-4xl font-semibold"
+  bodyClass="p-6 max-h-[70vh] space-y-6 overflow-y-auto whitespace-normal text-sm leading-relaxed"
+>
+  <h2 id="3d-editor" class="mt-0">3D Editor</h2>
         <h3 id="navigation">Navigation</h3>
         <ul>
           <li>
@@ -173,7 +169,4 @@
             scene&#39;s content in a JSON file on your device
           </li>
         </ul>
-      </div>
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+</Dialog>
