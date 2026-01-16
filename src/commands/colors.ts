@@ -5,7 +5,7 @@ import type { Command } from ".";
 
 export class ColorsCommand implements Command {
   label = "Colors";
-  group = "shapes";
+  group = "colors";
 
   options = {
     Red: "#fa003f",

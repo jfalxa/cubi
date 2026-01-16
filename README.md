@@ -2,31 +2,36 @@
 
 Draw axis aligned boxes that snap to a grid in 3D.
 
-## Usage
+## 3D Editor
 
 ### Navigation
 
-- To move around the scene, drag the mouse with the middle button, or press Control/Command and drag with the left button
-- To rotate the camera, drag the mouse with the right button, or press Control/Command + Shift and drag with the left button
+- To move around the scene, drag the mouse with the middle button, or press `Control/Command` and drag with the left button
+- To rotate the camera, drag the mouse with the right button, or press `Control/Command-Shift` and drag with the left button
 - To zoom in or out, use the mouse wheel or scroll with your trackpad
 
 ### Drawing
 
-1. Click an empty space to select the first corner
+Adding a box to the scene is done in 3 steps:
+
+1. Click an empty space on the grid to select the first corner
 2. Move the mouse and click again to select the opposite corner
 3. Move the mouse and click to confirm height
+
+At any step, you can press the right mouse button to go back to the previous step.
+Right click while on the first step cancels the whole drawing operation.
 
 ### Selection
 
 - Click a shape to select it
-- `Shift`-click a shape to add/remove it from the current list of selected shapes
+- Hold `Shift` and click a shape to add/remove it from the current list of selected shapes
 - Double click a shape to select it and all other shapes that are in contact with it
-- `Shift`-double click to add a shape and its contacts to the list of selected shapes
+- Hold `Shift` and double click on a shape to add it and its contacts to the list of selected shapes
 
 ### Moving
 
 - Left click a selected shape and move the mouse around while holding the left mouse button to move a shape on the horizontal axes
-- `Shift`-drag a selected shape to move it exclusively on the vertical axis
+- Hold `Shift` and drag a selected shape to move it exclusively on the vertical axis
 
 ### Resizing
 
@@ -36,7 +41,7 @@ Draw axis aligned boxes that snap to a grid in 3D.
 
 - While pressing the `Control/Command` key, double click on some point of a shape to move the drawing grid to that vertical layer
 
-### Commands
+## Commands
 
 All commands are accessible by right clicking the scene to open the context menu.
 It will adapt based on where the mouse is pointing at, and the current selection.
