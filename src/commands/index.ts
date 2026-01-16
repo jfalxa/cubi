@@ -14,11 +14,13 @@ import { RotateCCWCommand, RotateCWCommand } from "./rotate";
 import { ColorsCommand } from "./colors";
 import { SizeCommand } from "./size";
 import type { GridStore } from "$/stores/grid.svelte";
+import type { ContextMenuStore } from "$/stores/context-menu.svelte";
 
 export interface Dependencies {
   selection: SelectionStore;
   shapes: ShapeStore;
   grid: GridStore;
+  contextMenu: ContextMenuStore;
 }
 
 export class Commands {
@@ -40,10 +42,10 @@ export class Commands {
   private selectionStore: SelectionStore;
   private commands!: Command[];
 
-  constructor({ shapes, selection, grid }: Dependencies) {
+  constructor({ shapes, selection, grid, contextMenu }: Dependencies) {
     this.open = new OpenCommand(shapes);
     this.save = new SaveCommand(shapes);
-    this.new = new NewCommand(shapes);
+    this.new = new NewCommand(shapes, contextMenu);
     this.undo = new UndoCommand(shapes, selection);
     this.redo = new RedoCommand(shapes, selection);
     this.delete = new DeleteCommand(shapes, selection);
