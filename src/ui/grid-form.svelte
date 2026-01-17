@@ -11,18 +11,23 @@
 
   let width = $state("");
   let depth = $state("");
+  let unit = $state("");
 
   $effect(() => {
     if (grid.showGridForm) {
-      width = String(grid.width / 10);
-      depth = String(grid.depth / 10);
+      width = String((grid.width * grid.unit) / 100);
+      depth = String((grid.depth * grid.unit) / 100);
+      unit = String(grid.unit);
     }
   });
 
   function confirm() {
+    const newUnit = parseFloat(unit);
+
     grid.update({
-      width: parseFloat(width) * 10,
-      depth: parseFloat(depth) * 10,
+      width: (parseFloat(width) * 100) / newUnit,
+      depth: (parseFloat(depth) * 100) / newUnit,
+      unit: newUnit,
     });
 
     grid.showGridForm = false;
@@ -59,6 +64,17 @@
         min="0.1"
         step="0.1"
         bind:value={depth}
+      />
+    </label>
+
+    <label class="grid gap-2 text-sm">
+      <span class="text-gray-500 dark:text-gray-400">Unit (cm)</span>
+      <input
+        class="surface rounded-md px-3 py-2"
+        type="number"
+        min="0.1"
+        step="0.1"
+        bind:value={unit}
       />
     </label>
   </div>

@@ -2,19 +2,28 @@
   import type { Vector2 } from "@babylonjs/core";
 
   import type { Box } from "$/types";
-  import { meter } from "$/utils/formatters";
 
   interface Props {
     box: Box;
+    unit: number;
     position: Vector2;
   }
 
-  const { box, position }: Props = $props();
+  const { box, unit, position }: Props = $props();
+
+  function meter(dimension: number) {
+    if (dimension < 100) return `${dimension}cm`;
+    else return `${(dimension / 100).toFixed(2)}m`.replace(".00", "");
+  }
+
+  const width = $derived(meter(box.width * unit));
+  const depth = $derived(meter(box.depth * unit));
+  const height = $derived(meter(box.height * unit));
 </script>
 
 <div
   class="surface pointer-events-none fixed rounded-sm px-1.5 py-1 font-mono text-sm"
   style="left: {position.x + 16}px; top: {position.y + 16}px;"
 >
-  {meter(box.width)} × {meter(box.depth)} × {meter(box.height)}
+  {width} × {depth} × {height}
 </div>

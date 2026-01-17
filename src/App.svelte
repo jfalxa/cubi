@@ -73,6 +73,7 @@
 {#if stores.measure.box && stores.measure.position}
   <FloatingMeasure
     box={stores.measure.box}
+    unit={stores.grid.unit}
     position={stores.measure.position}
   />
 {/if}
