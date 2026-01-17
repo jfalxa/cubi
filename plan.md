@@ -212,29 +212,10 @@ note: current ground detection uses shape.position (corner). collision needs to 
 
 ---
 
-### phase 6: quake polish (future)
+### phase 7: extras
 
-19. **acceleration curves**
-    - ground acceleration: fast (~10 units/sec²)
-    - air acceleration: slower (~2 units/sec²)
-    - friction when no input
-
-20. **air control**
-    - can steer while airborne
-    - strafe-jumping for speed (optional)
-
-21. **bunny hop preservation**
-    - jump while landing preserves momentum
-
----
-
-### phase 7: extras (future)
-
-22. **switch shapes during play**
-    - click another shape → teleport to it
-
-23. **charge jump**
-    - hold space to charge, release for power jump
+22. ~~**switch shapes during play**~~ ✓
+    - E while looking at another shape → possess it
 
 ---
 
@@ -257,7 +238,7 @@ note: current ground detection uses shape.position (corner). collision needs to 
 
 ## verification (MVP)
 
-1. select shape, press P → camera moves to third-person behind shape
+1. select shape, press E → camera moves to third-person behind shape
 2. WASD moves the shape around, space/ctrl ascends/descends
 3. mouse orbits camera around shape
 4. scroll zooms in/out

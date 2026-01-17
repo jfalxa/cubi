@@ -1,6 +1,7 @@
 import { Vector3, type Observer, type Scene } from '@babylonjs/core'
 import hotkeys from 'hotkeys-js'
 
+import type { CameraStore } from '$/stores/camera.svelte'
 import type { ShapeStore } from '$/stores/shape.svelte'
 import type { ModeStore } from '$/stores/mode.svelte'
 import type { Stage } from '$/stage'
@@ -14,6 +15,7 @@ export class PlayMode {
 	private stage: Stage
 	private shapes: ShapeStore
 	private mode: ModeStore
+	private cameraStore: CameraStore
 
 	private input?: KeyboardInput
 	private camera?: PlayCamera
@@ -24,10 +26,11 @@ export class PlayMode {
 	private shapeId?: string
 	private previousScope?: string
 
-	constructor(stage: Stage, shapes: ShapeStore, mode: ModeStore) {
+	constructor(stage: Stage, shapes: ShapeStore, mode: ModeStore, cameraStore: CameraStore) {
 		this.stage = stage
 		this.shapes = shapes
 		this.mode = mode
+		this.cameraStore = cameraStore
 	}
 
 	enter(shapeId: string) {
@@ -50,18 +53,21 @@ export class PlayMode {
 			this.stage.view.scene,
 			shape.position,
 			editorCamera.alpha,
-			editorCamera.beta,
-			editorCamera.radius
+			Math.PI / 3,
+			shape.height,
+			shape.depth
 		)
-		this.camera.setControlledShape(shapeId)
+		this.camera.setControlledShape(shape)
 		this.movement = new Movement(this.input, this.camera, this.stage.view.scene, shapeId)
 		this.collision = new Collision(this.shapes, shapeId)
-		this.mode.flying = true
+		this.mode.flying = false
 
 		hotkeys('r', 'play', () => {
 			this.movement?.toggleFlying()
-			this.mode.flying = this.movement?.flying ?? true
+			this.mode.flying = this.movement?.flying ?? false
 		})
+
+		hotkeys('e', 'play', () => this.switchShape())
 
 		this.stage.view.scene.activeCamera = this.camera
 
@@ -84,16 +90,35 @@ export class PlayMode {
 		this.collision = undefined
 
 		this.stage.view.scene.activeCamera = this.stage.camera
+		this.cameraStore.reset()
 
 		this.stage.interactions.enabled = true
 
 		hotkeys.unbind('escape', 'play')
 		hotkeys.unbind('r', 'play')
+		hotkeys.unbind('e', 'play')
 		if (this.previousScope) {
 			hotkeys.setScope(this.previousScope)
 		}
 
 		this.shapeId = undefined
+	}
+
+	private switchShape() {
+		if (!this.camera || !this.input) return
+
+		const targetId = this.camera.pickShapeInView()
+		console.log('switchShape pick:', targetId)
+		if (!targetId) return
+
+		const shape = this.shapes.current.find(s => s.id === targetId)
+		if (!shape) return
+
+		this.shapeId = targetId
+		this.camera.setControlledShape(shape)
+		this.movement = new Movement(this.input, this.camera, this.stage.view.scene, targetId)
+		this.collision = new Collision(this.shapes, targetId)
+		this.mode.shapeId = targetId
 	}
 
 	private update = () => {

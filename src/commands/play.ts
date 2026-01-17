@@ -7,7 +7,7 @@ export class PlayCommand implements Command {
 	label = 'Play'
 	group = 'mode'
 
-	shortcuts = ['p']
+	shortcuts = ['e']
 
 	constructor(private mode: ModeStore) {}
 

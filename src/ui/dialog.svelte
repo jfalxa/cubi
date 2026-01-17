@@ -29,8 +29,7 @@
     children,
   }: Props = $props();
 
-  const baseContentClass =
-    "surface fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl";
+  const baseContentClass = "surface fixed inset-0 m-auto h-fit rounded-xl";
   const baseHeaderClass = "flex items-center justify-between gap-4";
 
   const composedContentClass = $derived(

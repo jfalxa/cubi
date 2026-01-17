@@ -18,7 +18,7 @@ export class Movement {
 
 	private velocityY = 0
 	private grounded = false
-	flying = true
+	flying = false
 
 	constructor(input: KeyboardInput, camera: PlayCamera, scene: Scene, shapeId: string) {
 		this.input = input
@@ -56,12 +56,21 @@ export class Movement {
 		}
 
 		const cameraForward = this.camera.getForwardRay().direction
-		const forward = new Vector3(cameraForward.x, 0, cameraForward.z).normalize()
-		const right = Vector3.Cross(Vector3.Up(), forward).normalize()
+		const flatForward = new Vector3(cameraForward.x, 0, cameraForward.z).normalize()
+		const right = Vector3.Cross(Vector3.Up(), flatForward).normalize()
 
-		const worldDirection = forward.scale(direction.z)
-			.add(right.scale(direction.x))
-			.add(Vector3.Up().scale(direction.y))
+		let worldDirection: Vector3
+		if (this.flying) {
+			// WoW-style: forward/back follow camera pitch
+			worldDirection = cameraForward.scale(direction.z)
+				.add(right.scale(direction.x))
+				.add(Vector3.Up().scale(direction.y))
+		} else {
+			// grounded: movement stays horizontal
+			worldDirection = flatForward.scale(direction.z)
+				.add(right.scale(direction.x))
+				.add(Vector3.Up().scale(direction.y))
+		}
 
 		if (worldDirection.lengthSquared() > 0) {
 			worldDirection.normalize()

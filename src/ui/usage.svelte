@@ -12,7 +12,7 @@
   bind:open
   title="Usage"
   showClose
-  contentClass="prose dark:prose-invert w-[min(90vw,900px)] overflow-hidden"
+  contentClass="prose dark:prose-invert max-w-none w-[min(90vw,1050px)] overflow-hidden"
   headerClass="p-6"
   titleClass="text-4xl font-semibold"
   bodyClass="p-6 max-h-[70vh] space-y-6 overflow-y-auto whitespace-normal text-sm leading-relaxed"
@@ -189,10 +189,9 @@
   </ul>
   <h3 id="play">Play</h3>
   <ul>
-    <li>Shortcut: <code>P</code></li>
-    <li>Requires a single shape selected</li>
-    <li>Possess the selected shape and explore your world in third-person</li>
-    <li>Controls: ESDF to move, Space/Ctrl to ascend/descend, mouse to orbit camera</li>
-    <li>Press Escape to return to the editor</li>
+    <li><code>E</code> enter a shape (from editor or while in play mode)</li>
+    <li><code>R</code> toggle fly/walk mode</li>
+    <li><code>Escape</code> return to editor</li>
+    <li>WASD to move, Space to ascend, Ctrl to descend, mouse to orbit</li>
   </ul>
 </Dialog>

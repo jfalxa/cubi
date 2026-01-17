@@ -119,10 +119,11 @@ export class Commands {
   }
 
   initHotkeys() {
+    hotkeys.setScope('editor')
     for (const command of this.commands) {
       const keys = command.shortcuts?.join(",");
       if (!keys) continue;
-      hotkeys(keys, (e) => {
+      hotkeys(keys, 'editor', (e) => {
         e.preventDefault();
         command.execute(this.selection.getSelectedShapes());
       });
