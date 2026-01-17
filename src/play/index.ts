@@ -60,12 +60,6 @@ export class PlayMode {
 		this.camera.setControlledShape(shape)
 		this.movement = new Movement(this.input, this.camera, this.stage.view.scene, shapeId)
 		this.collision = new Collision(this.shapes, shapeId)
-		this.mode.flying = false
-
-		hotkeys('r', 'play', () => {
-			this.movement?.toggleFlying()
-			this.mode.flying = this.movement?.flying ?? false
-		})
 
 		hotkeys('e', 'play', () => this.switchShape())
 
@@ -95,7 +89,6 @@ export class PlayMode {
 		this.stage.interactions.enabled = true
 
 		hotkeys.unbind('escape', 'play')
-		hotkeys.unbind('r', 'play')
 		hotkeys.unbind('e', 'play')
 		if (this.previousScope) {
 			hotkeys.setScope(this.previousScope)
@@ -134,13 +127,10 @@ export class PlayMode {
 
 		const proposed = this.movement.update(shape.position, deltaTime)
 
-		let finalPosition = proposed
-		if (!this.movement.flying) {
-			const bounds = { width: shape.width, height: shape.height, depth: shape.depth }
-			const resolved = this.collision.resolve(shape.position, proposed, bounds)
-			this.movement.setCollisionState(resolved.grounded, resolved.hitCeiling)
-			finalPosition = resolved.position
-		}
+		const bounds = { width: shape.width, height: shape.height, depth: shape.depth }
+		const resolved = this.collision.resolve(shape.position, proposed, bounds)
+		this.movement.setCollisionState(resolved.grounded, resolved.hitCeiling)
+		const finalPosition = resolved.position
 
 		if (!finalPosition.equals(shape.position)) {
 			this.shapes.patch({ id: this.shapeId, position: finalPosition })

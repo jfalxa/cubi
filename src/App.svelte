@@ -114,9 +114,7 @@
     <div
         class="play-hud fixed left-4 top-4 bg-black/80 text-white px-3 py-1 rounded text-sm"
     >
-        {stores.mode.flying ? "fly" : "walk"} · WASD · {stores.mode.flying
-            ? "Space/Ctrl up/down"
-            : "Space jump"} · R toggle · ESC exit
+        WASD · Space jump · ESC exit
     </div>
 {/if}
 

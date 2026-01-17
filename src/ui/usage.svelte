@@ -190,8 +190,7 @@
   <h3 id="play">Play</h3>
   <ul>
     <li><code>E</code> enter a shape (from editor or while in play mode)</li>
-    <li><code>R</code> toggle fly/walk mode</li>
     <li><code>Escape</code> return to editor</li>
-    <li>WASD to move, Space to ascend, Ctrl to descend, mouse to orbit</li>
+    <li>WASD to move, Space to jump, mouse to orbit</li>
   </ul>
 </Dialog>

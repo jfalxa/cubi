@@ -18,18 +18,12 @@ export class Movement {
 
 	private velocityY = 0
 	private grounded = false
-	flying = false
 
 	constructor(input: KeyboardInput, camera: PlayCamera, scene: Scene, shapeId: string) {
 		this.input = input
 		this.camera = camera
 		this.scene = scene
 		this.shapeId = shapeId
-	}
-
-	toggleFlying() {
-		this.flying = !this.flying
-		if (this.flying) this.velocityY = 0
 	}
 
 	setCollisionState(grounded: boolean, hitCeiling: boolean) {
@@ -50,27 +44,12 @@ export class Movement {
 		if (this.input.left) direction.x -= 1
 		if (this.input.right) direction.x += 1
 
-		if (this.flying) {
-			if (this.input.up) direction.y += 1
-			if (this.input.down) direction.y -= 1
-		}
-
 		const cameraForward = this.camera.getForwardRay().direction
 		const flatForward = new Vector3(cameraForward.x, 0, cameraForward.z).normalize()
 		const right = Vector3.Cross(Vector3.Up(), flatForward).normalize()
 
-		let worldDirection: Vector3
-		if (this.flying) {
-			// WoW-style: forward/back follow camera pitch
-			worldDirection = cameraForward.scale(direction.z)
-				.add(right.scale(direction.x))
-				.add(Vector3.Up().scale(direction.y))
-		} else {
-			// grounded: movement stays horizontal
-			worldDirection = flatForward.scale(direction.z)
-				.add(right.scale(direction.x))
-				.add(Vector3.Up().scale(direction.y))
-		}
+		const worldDirection = flatForward.scale(direction.z)
+			.add(right.scale(direction.x))
 
 		if (worldDirection.lengthSquared() > 0) {
 			worldDirection.normalize()
@@ -78,24 +57,22 @@ export class Movement {
 
 		let newPosition = position.add(worldDirection.scale(SPEED * deltaTime))
 
-		if (!this.flying) {
-			const ground = this.detectGround(newPosition)
+		const ground = this.detectGround(newPosition)
 
-			if (ground !== null && newPosition.y <= ground + GROUND_SNAP && this.velocityY <= 0) {
-				newPosition.y = ground
-				this.velocityY = 0
-				this.grounded = true
+		if (ground !== null && newPosition.y <= ground + GROUND_SNAP && this.velocityY <= 0) {
+			newPosition.y = ground
+			this.velocityY = 0
+			this.grounded = true
 
-				if (this.input.up) {
-					this.velocityY = JUMP_VELOCITY
-					this.grounded = false
-				}
-			} else {
+			if (this.input.up) {
+				this.velocityY = JUMP_VELOCITY
 				this.grounded = false
-				this.velocityY -= GRAVITY * deltaTime
-				this.velocityY = Math.max(this.velocityY, -TERMINAL_VELOCITY)
-				newPosition.y += this.velocityY * deltaTime
 			}
+		} else {
+			this.grounded = false
+			this.velocityY -= GRAVITY * deltaTime
+			this.velocityY = Math.max(this.velocityY, -TERMINAL_VELOCITY)
+			newPosition.y += this.velocityY * deltaTime
 		}
 
 		return newPosition
