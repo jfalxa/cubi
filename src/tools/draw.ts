@@ -24,7 +24,7 @@ export type DrawState = "idle" | "base" | "elevation";
 
 interface DrawCallbacks {
   onDraw: (shape: Shape, position: Vector2) => void;
-  onCommit: (shape: Shape) => void;
+  onCommit: (shape: Shape, subtractive: boolean) => void;
   onCancel: () => void;
 }
 
@@ -35,6 +35,7 @@ export class DrawTool implements Tool {
   ghost: ShapeMesh;
 
   state: DrawState = "idle";
+  subtractive = false;
 
   onDraw: DrawCallbacks["onDraw"];
   onCommit: DrawCallbacks["onCommit"];
@@ -111,6 +112,7 @@ export class DrawTool implements Tool {
       case "idle": {
         this.state = "base";
         this.ghost.setEnabled(true);
+        this.subtractive = info.event.altKey;
         const { camera, grid } = this.stage;
         const position = getGridPoint(info.position, camera, grid);
         if (!position) break;
@@ -126,7 +128,7 @@ export class DrawTool implements Tool {
       case "elevation": {
         const clone = cloneShape(this.shape, { color: "#dcdcdc" });
         const normalized = normalizeShape(clone);
-        if (isValid(normalized)) this.onCommit(normalized);
+        if (isValid(normalized)) this.onCommit(normalized, this.subtractive);
         this.reset();
         return false;
       }

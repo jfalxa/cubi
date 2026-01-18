@@ -3,6 +3,7 @@ import { Vector3 } from "@babylonjs/core";
 import type { PartialShape, SerializedShape, Shape } from "$/types";
 
 import { groupBy } from "./collection";
+import { areShapesConnected, getBounds } from "./bounds";
 
 export function createShape(init: PartialShape): Shape {
   return {
@@ -40,7 +41,7 @@ export function cloneShapes(shapes: Shape[]) {
 
 export function stringifyShapes(shapes: Shape[]) {
   return JSON.stringify(
-    shapes.map((s) => ({ ...s, position: s.position.asArray() }))
+    shapes.map((s) => ({ ...s, position: s.position.asArray() })),
   );
 }
 
@@ -82,4 +83,73 @@ export function normalizeShape(shape: Shape): Shape {
   }
 
   return { ...shape, position, width, height, depth };
+}
+
+export function subtractShapes(a: Shape, b: Shape): Shape[] {
+  if (!areShapesConnected(a, b)) return [a];
+
+  const { min: aMin, max: aMax } = getBounds(a);
+  const { min: bMin, max: bMax } = getBounds(b);
+
+  const iMin = Vector3.Maximize(aMin, bMin);
+  const iMax = Vector3.Minimize(aMax, bMax);
+
+  const epsilon = 1e-6;
+  if (
+    iMax.x - iMin.x <= epsilon ||
+    iMax.y - iMin.y <= epsilon ||
+    iMax.z - iMin.z <= epsilon
+  ) {
+    return [a];
+  }
+
+  const makeBox = (min: Vector3, max: Vector3) => {
+    const width = max.x - min.x;
+    const height = max.y - min.y;
+    const depth = max.z - min.z;
+
+    if (width <= epsilon || height <= epsilon || depth <= epsilon) return null;
+
+    return cloneShape(a, {
+      position: new Vector3(min.x, min.y, min.z),
+      width,
+      height,
+      depth,
+    });
+  };
+
+  const boxes = [
+    // left
+    makeBox(
+      new Vector3(aMin.x, aMin.y, aMin.z),
+      new Vector3(iMin.x, aMax.y, aMax.z),
+    ),
+    // right
+    makeBox(
+      new Vector3(iMax.x, aMin.y, aMin.z),
+      new Vector3(aMax.x, aMax.y, aMax.z),
+    ),
+    // bottom
+    makeBox(
+      new Vector3(iMin.x, aMin.y, aMin.z),
+      new Vector3(iMax.x, iMin.y, aMax.z),
+    ),
+    // top
+    makeBox(
+      new Vector3(iMin.x, iMax.y, aMin.z),
+      new Vector3(iMax.x, aMax.y, aMax.z),
+    ),
+    // front
+    makeBox(
+      new Vector3(iMin.x, iMin.y, aMin.z),
+      new Vector3(iMax.x, iMax.y, iMin.z),
+    ),
+    // back
+    makeBox(
+      new Vector3(iMin.x, iMin.y, iMax.z),
+      new Vector3(iMax.x, iMax.y, aMax.z),
+    ),
+  ];
+
+  return boxes.filter((box): box is Shape => box !== null);
 }

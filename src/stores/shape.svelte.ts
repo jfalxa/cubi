@@ -1,7 +1,12 @@
 import type { View } from "$/stage/view";
 import type { PartialShape, PartialShapeWithId, Shape } from "$/types";
 import { indexById } from "$/utils/collection";
-import { createShape, parseShapes, stringifyShapes } from "$/utils/shape";
+import {
+  createShape,
+  parseShapes,
+  stringifyShapes,
+  subtractShapes,
+} from "$/utils/shape";
 
 export class ShapeStore {
   current = $state.raw<Shape[]>(readLocalStorage());
@@ -29,6 +34,12 @@ export class ShapeStore {
   update(...shapes: PartialShapeWithId[]) {
     this.commit(() => {
       this.patch(...shapes);
+    });
+  }
+
+  carve(shape: Shape) {
+    this.commit(() => {
+      this.current = this.current.flatMap((s) => subtractShapes(s, shape));
     });
   }
 

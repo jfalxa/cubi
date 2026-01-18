@@ -64,8 +64,9 @@ export class Tools {
       onDraw: (shape, position) => {
         measure.update(shape, position);
       },
-      onCommit: (shape) => {
-        shapes.add(shape);
+      onCommit: (shape, subtractive) => {
+        if (subtractive) shapes.carve(shape);
+        else shapes.add(shape);
       },
       onCancel: () => {
         measure.clear();
