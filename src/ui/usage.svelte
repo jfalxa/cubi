@@ -17,7 +17,7 @@
   titleClass="text-4xl font-semibold"
   bodyClass="p-6 max-h-[70vh] space-y-6 overflow-y-auto whitespace-normal text-sm leading-relaxed"
 >
-  <h2 id="3d-editor" class="mt-0">3D Editor</h2>
+  <h2 id="3d-editor">3D Editor</h2>
   <h3 id="navigation">Navigation</h3>
   <ul>
     <li>
@@ -32,6 +32,17 @@
     </li>
     <li>To zoom in or out, use the mouse wheel or scroll with your trackpad</li>
   </ul>
+  <h3 id="layering-active-vertical-level-">Layering (active vertical level)</h3>
+  <ul>
+    <li>
+      While pressing the <code>Control/Command</code> key, double click on some point
+      of a shape to move the drawing grid to that vertical layer
+    </li>
+    <li>
+      Doing this on an empty space (with no shape under the mouse) resets the
+      grid layer to 0.
+    </li>
+  </ul>
   <h3 id="drawing">Drawing</h3>
   <p>Adding a box to the scene is done in 3 steps:</p>
   <ol>
@@ -43,6 +54,13 @@
     At any step, you can press the right mouse button to go back to the previous
     step. Right click while on the first step cancels the whole drawing
     operation.
+  </p>
+  <h3 id="carving">Carving</h3>
+  <p>
+    When holding <code>Alt</code> when starting to draw a new box, the operation
+    will become a &quot;carving&quot; operation. This means that when the drawn box
+    will be committed, it will actually remove its volume from every box it was passing
+    through, splitting them into smaller boxes that leave a hole inbetween.
   </p>
   <h3 id="selection">Selection</h3>
   <ul>
@@ -60,8 +78,8 @@
       to the list of selected shapes
     </li>
     <li>
-      If a shape is below the current layer, you can't select it by clicking it,
-      except while holding <code>Shift</code>
+      If a shape is below the current layer, you can&#39;t select it by clicking
+      it, except while holding <code>Shift</code>
     </li>
   </ul>
   <h3 id="moving">Moving</h3>
@@ -80,17 +98,6 @@
     <li>
       While pressing the <code>Alt</code> key, drag around one of the current selection
       bounding box faces to resize the shapes in that direction
-    </li>
-  </ul>
-  <h3 id="layering">Layering</h3>
-  <ul>
-    <li>
-      While pressing the <code>Control/Command</code> key, double click on some point
-      of a shape to move the drawing grid to that vertical layer
-    </li>
-    <li>
-      Doing this on an empty space (with no shape under the mouse) resets the
-      grid layer to 0.
     </li>
   </ul>
   <h2 id="commands">Commands</h2>
@@ -134,6 +141,19 @@
     <li>Shortcut: <code>Shift-G</code></li>
     <li>Ungroup the currently selected shapes</li>
   </ul>
+  <h3 id="lock">Lock</h3>
+  <ul>
+    <li>Shortcut: <code>L</code></li>
+    <li>
+      Locks the selected shapes so they cannot be selected and modified
+      inadvertently
+    </li>
+  </ul>
+  <h3 id="unclock">Unclock</h3>
+  <ul>
+    <li>Shortcut: <code>Shift-L</code></li>
+    <li>Unlock the selected shapes so they can be modified again</li>
+  </ul>
   <h3 id="colors">Colors</h3>
   <ul>
     <li>No shortcut, only available in context menu.</li>
@@ -145,6 +165,20 @@
   <ul>
     <li>Shortcut: <code>R</code> and <code>Shift-R</code></li>
     <li>Rotate the selection by +/- 90˚</li>
+  </ul>
+  <h3 id="grid-size">Grid size</h3>
+  <ul>
+    <li>No shortcut</li>
+    <li>
+      This is a meny that allows setting the width and depth of the drawing grid
+      in meters.
+    </li>
+    <li>
+      You can also set a &quot;Unit&quot;, that represents the size of a single
+      grid square in centimeters. Note that this won&#39;t resize your shapes,
+      it&#39;s only used to compute the dimensions displayed in the floating
+      measure label.
+    </li>
   </ul>
   <h3 id="import">Import</h3>
   <ul>
@@ -176,7 +210,7 @@
     <li>Shortcut: <code>Control/Command-O</code></li>
     <li>
       Shows a file picker where you can select a cubi JSON file that will be
-      loaded in the current scene
+      loaded as the current scene
     </li>
   </ul>
   <h3 id="save">Save</h3>
