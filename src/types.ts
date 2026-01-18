@@ -8,6 +8,7 @@ export interface Shape {
   height: number;
   depth: number;
   color: string;
+  locked: boolean;
 }
 
 export type PartialShape = Partial<Shape>;

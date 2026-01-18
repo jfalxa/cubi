@@ -43,6 +43,14 @@ export class ShapeStore {
     });
   }
 
+  lock(...shapes: PartialShapeWithId[]) {
+    this.update(...shapes.map((s) => ({ ...s, locked: true })));
+  }
+
+  unlock(...shapes: PartialShapeWithId[]) {
+    this.update(...shapes.map((s) => ({ ...s, locked: false })));
+  }
+
   patch(...shapes: PartialShapeWithId[]) {
     if (this.beforePatch === undefined) {
       this.beforePatch = [...this.current];

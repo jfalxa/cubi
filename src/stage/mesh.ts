@@ -18,6 +18,7 @@ export class ShapeMesh extends Mesh {
   declare metadata: {
     shape: Shape;
     selected: boolean;
+    locked: boolean;
   };
 
   ghost: boolean;
@@ -26,7 +27,7 @@ export class ShapeMesh extends Mesh {
     super(shape.id, scene);
 
     this.id = shape.id;
-    this.metadata = { shape, selected: false };
+    this.metadata = { shape, selected: false, locked: false };
 
     this.ghost = ghost;
     this.isPickable = !ghost;
@@ -37,6 +38,7 @@ export class ShapeMesh extends Mesh {
     this.initVertexData(shape);
     this.initMaterial(shape);
     this.updateEdges();
+    this.setLocked(shape.locked);
   }
 
   update(shape: Shape) {
@@ -47,10 +49,15 @@ export class ShapeMesh extends Mesh {
     this.updateVertexData(shape);
     this.updateMaterial(shape);
     this.updateEdges();
+    this.setLocked(shape.locked);
   }
 
   isSelected() {
     return this.metadata.selected;
+  }
+
+  isLocked() {
+    return this.metadata.locked;
   }
 
   isGroup(group: string | undefined) {
@@ -67,7 +74,15 @@ export class ShapeMesh extends Mesh {
     this.renderOutline = false;
   }
 
+  setLocked(locked: boolean) {
+    if (this.metadata.locked === locked) return;
+
+    this.renderOutline = false;
+    this.metadata.locked = locked;
+  }
+
   setHighlight(highlighted: boolean) {
+    if (this.metadata.locked) return;
     if (this.renderOutline === highlighted) return;
 
     this.renderOutline = !this.isSelected() && highlighted;
@@ -87,7 +102,7 @@ export class ShapeMesh extends Mesh {
   private initMaterial(shape: Shape) {
     const material = new StandardMaterial(
       `${this.id}_material`,
-      this.getScene()
+      this.getScene(),
     );
     material.specularColor = Color3.Black();
     material.diffuseColor = Color3.FromHexString(shape.color);

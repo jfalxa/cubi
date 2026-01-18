@@ -14,6 +14,7 @@ export function createShape(init: PartialShape): Shape {
     height: init.height ?? 0,
     depth: init.depth ?? 0,
     color: init.color ?? "#000000",
+    locked: false,
   };
 }
 

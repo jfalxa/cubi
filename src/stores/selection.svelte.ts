@@ -25,7 +25,10 @@ export class SelectionStore {
   }
 
   refresh() {
-    const ids = this.shapeStore.current.map((s) => s.id);
+    const ids = this.shapeStore.current
+      .filter((s) => !s.locked)
+      .map((s) => s.id);
+
     this.selected = this.selected.filter((id) => ids.includes(id));
   }
 
@@ -37,7 +40,7 @@ export class SelectionStore {
 export function useSelectionSync(
   selectionStore: SelectionStore,
   stage: Stage,
-  selectionTool: SelectionTool
+  selectionTool: SelectionTool,
 ) {
   $effect(() => {
     const shapes = selectionStore.getSelectedShapes();

@@ -15,6 +15,7 @@ import { ColorsCommand } from "./colors";
 import { SizeCommand } from "./size";
 import type { GridStore } from "$/stores/grid.svelte";
 import type { ContextMenuStore } from "$/stores/context-menu.svelte";
+import { LockCommand, UnlockCommand } from "./lock";
 
 export interface Dependencies {
   selection: SelectionStore;
@@ -39,6 +40,8 @@ export class Commands {
   ungroup: UngroupCommand;
   colors: ColorsCommand;
   size: SizeCommand;
+  lock: LockCommand;
+  unlock: UnlockCommand;
 
   private shapes: ShapeStore;
   private selection: SelectionStore;
@@ -60,6 +63,8 @@ export class Commands {
     this.ungroup = new UngroupCommand(shapes);
     this.colors = new ColorsCommand(shapes);
     this.size = new SizeCommand(grid);
+    this.lock = new LockCommand(shapes);
+    this.unlock = new UnlockCommand(shapes);
 
     this.shapes = shapes;
     this.selection = selection;
@@ -100,6 +105,8 @@ export class Commands {
       this.duplicate,
       this.group,
       this.ungroup,
+      this.lock,
+      this.unlock,
       this.colors,
       this.rotateClockwise,
       this.rotateCounterclockwise,

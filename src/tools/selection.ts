@@ -3,12 +3,11 @@ import type { Vector2 } from "@babylonjs/core";
 import type { Stage } from "$/stage";
 import type { Context, Intent } from "$/stage/interactions";
 import { createIntent, hasShift } from "$/stage/interactions";
-import type { ClickInfo, MoveInfo } from "$/stage/pointer";
-import { areShapesConnected, getBoundingBox } from "$/utils/bounds";
+import type { ClickInfo } from "$/stage/pointer";
+import { areShapesConnected } from "$/utils/bounds";
 
 import type { Tool } from ".";
-import type { Box } from "$/types";
-import { ShapeMesh } from "$/stage/mesh";
+import { BoundingBox } from "$/stage/bounding-box";
 
 const SelectIntent = createIntent("select");
 const SelectConnectedIntent = createIntent("select-connected");
@@ -107,8 +106,8 @@ export class SelectionTool implements Tool {
     this.set([]);
   }
 
-  pick(position: Vector2, shapeOnly = false) {
-    const predicate = shapeOnly ? ShapeMesh.only : undefined;
+  pick(position: Vector2, multiple = false) {
+    const predicate = !multiple ? BoundingBox.ignore : undefined;
     return this.stage.pickShape(position, predicate);
   }
 
@@ -124,7 +123,10 @@ export class SelectionTool implements Tool {
 
   selectConnectedAt(position: Vector2, multiple = false) {
     const picked = this.pick(position)!;
-    const meshes = new Set(this.stage.view.getMeshes());
+
+    const meshes = new Set(
+      this.stage.view.getMeshes().filter((m) => !m.isLocked()),
+    );
 
     const stack = [picked];
     const connected = [picked.id];
@@ -162,7 +164,7 @@ export class SelectionTool implements Tool {
           .map((m) => m.metadata.shape)
           .filter((s) => s.group === shape.group)
           .map((s) => s.id);
-      })
+      }),
     );
   }
 
