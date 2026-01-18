@@ -3,11 +3,12 @@ import type { Vector2 } from "@babylonjs/core";
 import type { Stage } from "$/stage";
 import type { Context, Intent } from "$/stage/interactions";
 import { createIntent } from "$/stage/interactions";
-import type { ClickInfo, MoveInfo } from "$/stage/pointer";
-import { areShapesConnected, getBoundingBox } from "$/utils/bounds";
+import type { MoveInfo } from "$/stage/pointer";
+import { getBoundingBox } from "$/utils/bounds";
 
 import type { Tool } from ".";
 import type { Box } from "$/types";
+import { BoundingBox } from "$/stage/bounding-box";
 
 const MeasureIntent = createIntent("measure");
 
@@ -60,7 +61,7 @@ export class MeasureTool implements Tool {
       mesh.setHighlight(false);
     }
 
-    const mesh = this.stage.pickShape(position);
+    const mesh = this.stage.pickShape(position, BoundingBox.ignore);
     if (!mesh) return this.onNothing();
 
     const boxMeshes = [mesh];

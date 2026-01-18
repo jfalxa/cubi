@@ -20,10 +20,6 @@ export class View {
 
   private removeAppearanceListener: () => void;
 
-  static shapesOnly(mesh: AbstractMesh) {
-    return mesh instanceof ShapeMesh && !mesh.ghost;
-  }
-
   constructor() {
     this.canvas = document.createElement("canvas");
     this.canvas.className = "block h-screen w-full";
@@ -34,7 +30,7 @@ export class View {
     this.light = new HemisphericLight(
       "hemispheric-light",
       new Vector3(0, 1, 0),
-      this.scene
+      this.scene,
     );
 
     this.scene.clearColor = Color4.FromHexString(getColors().scene);
@@ -77,7 +73,9 @@ export class View {
   }
 
   getMeshes() {
-    return this.scene.meshes.filter(View.shapesOnly) as ShapeMesh[];
+    return this.scene.meshes.filter(
+      (m) => m instanceof ShapeMesh && !m.ghost,
+    ) as ShapeMesh[];
   }
 
   private handleResize = () => {

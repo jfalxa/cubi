@@ -9,6 +9,8 @@ import { getElevation, getGridPoint } from "$/utils/rays";
 
 import type { Tool } from ".";
 import { ShapeMesh } from "$/stage/mesh";
+import { Grid } from "$/stage/grid";
+import { BoundingBox } from "$/stage/bounding-box";
 
 const StartMoveIntent = createIntent("start-move");
 const MoveIntent = createIntent("move");
@@ -85,8 +87,10 @@ export class MoveTool implements Tool {
   }
 
   private isOnSelectedShape(position: Vector2) {
-    const mesh = this.stage.pickShape(position, ShapeMesh.only);
-    return mesh?.isSelected() ?? false;
+    const mesh = this.stage.pick(position, Grid.ignore).pickedMesh;
+    if (mesh instanceof BoundingBox) return true;
+    if (mesh instanceof ShapeMesh) return mesh.isSelected();
+    return false;
   }
 
   private moveShapes(travel: Vector3) {
@@ -94,7 +98,7 @@ export class MoveTool implements Tool {
       this.snapshot.map((shape) => ({
         ...shape,
         position: shape.position.add(travel),
-      }))
+      })),
     );
   }
 

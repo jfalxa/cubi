@@ -5,6 +5,7 @@ import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import type { ClickInfo } from "$/stage/pointer";
 
 import type { Tool } from ".";
+import { ShapeMesh } from "$/stage/mesh";
 
 const ContextMenuIntent = createIntent("context-menu");
 
@@ -36,8 +37,8 @@ export class ContextMenuTool implements Tool {
   applyIntent(intent: Intent, context: Context): boolean | void {
     if (intent === ContextMenuIntent) {
       const info = context.info as ClickInfo;
-      const shape = this.stage.pickShape(info.position);
-      this.onContextMenu(shape?.id, info.position);
+      const shape = this.stage.pick(info.position, ShapeMesh.only);
+      this.onContextMenu(shape.pickedMesh?.id, info.position);
     }
   }
 }
