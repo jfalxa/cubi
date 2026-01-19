@@ -6,14 +6,16 @@ import {
   StandardMaterial,
   Texture,
   Vector3,
-  type MeshPredicate,
 } from "@babylonjs/core";
 
-import type { View } from "./view";
 import { getColors, watchAppearance, type Colors } from "$/colors";
+import type { MeshFilter } from "$/types";
+
+import type { View } from "./view";
 
 export class Grid {
-  static ignore: MeshPredicate = (mesh) => mesh.name !== "grid";
+  static only: MeshFilter = (mesh) => mesh.name === "grid";
+  static ignore: MeshFilter = (mesh) => mesh.name !== "grid";
 
   static gridCellsPerTile = 10;
 
@@ -40,7 +42,7 @@ export class Grid {
     return new Vector3(
       Math.round(point.x),
       Math.round(point.y),
-      Math.round(point.z)
+      Math.round(point.z),
     );
   }
 
@@ -70,7 +72,7 @@ export class Grid {
     return MeshBuilder.CreateGround(
       "grid", //
       { width: 1, height: 1 },
-      this.view.scene
+      this.view.scene,
     );
   }
 
@@ -83,7 +85,7 @@ export class Grid {
       "grid_texture",
       { width: size, height: size },
       this.view.scene,
-      true
+      true,
     );
 
     const ctx = texture.getContext();

@@ -1,13 +1,18 @@
 import type { Vector2 } from "@babylonjs/core";
 
 import type { Stage } from "$/stage";
-import type { Context, Intent } from "$/stage/interactions";
-import { createIntent, hasShift } from "$/stage/interactions";
+import { Grid } from "$/stage/grid";
+import {
+  createIntent,
+  hasShift,
+  type Context,
+  type Intent,
+} from "$/stage/interactions";
+import { ShapeMesh } from "$/stage/mesh";
 import type { ClickInfo } from "$/stage/pointer";
 import { areShapesConnected } from "$/utils/bounds";
 
 import type { Tool } from ".";
-import { BoundingBox } from "$/stage/bounding-box";
 
 const SelectIntent = createIntent("select");
 const SelectConnectedIntent = createIntent("select-connected");
@@ -107,8 +112,12 @@ export class SelectionTool implements Tool {
   }
 
   pick(position: Vector2, multiple = false) {
-    const predicate = !multiple ? BoundingBox.ignore : undefined;
-    return this.stage.pickShape(position, predicate);
+    const picked = this.stage.pick(position, (mesh) => {
+      if (multiple) return ShapeMesh.selectable(mesh);
+      else return Grid.only(mesh) || ShapeMesh.selectable(mesh);
+    });
+
+    return ShapeMesh.get(picked.pickedMesh);
   }
 
   selectAt(position: Vector2, multiple = false) {
@@ -125,7 +134,7 @@ export class SelectionTool implements Tool {
     const picked = this.pick(position)!;
 
     const meshes = new Set(
-      this.stage.view.getMeshes().filter((m) => !m.isLocked()),
+      this.stage.view.getMeshes().filter((m) => m.isSelectable()),
     );
 
     const stack = [picked];
@@ -135,7 +144,7 @@ export class SelectionTool implements Tool {
       const ref = stack.pop()!;
 
       for (const mesh of meshes) {
-        if (areShapesConnected(ref.metadata.shape, mesh.metadata.shape)) {
+        if (areShapesConnected(ref.shape, mesh.shape)) {
           meshes.delete(mesh);
           connected.push(mesh.id);
           stack.push(mesh);
@@ -156,12 +165,12 @@ export class SelectionTool implements Tool {
         const mesh = this.stage.view.getMeshById(id);
         if (!mesh) return [];
 
-        const shape = mesh.metadata.shape;
+        const shape = mesh.shape;
         if (!shape.group) return [shape.id];
 
         return this.stage.view
           .getMeshes()
-          .map((m) => m.metadata.shape)
+          .map((m) => m.shape)
           .filter((s) => s.group === shape.group)
           .map((s) => s.id);
       }),

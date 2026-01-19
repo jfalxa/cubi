@@ -1,5 +1,4 @@
 import {
-  AbstractMesh,
   Color4,
   Engine,
   HemisphericLight,
@@ -8,9 +7,9 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
+import { getColors, watchAppearance, type Colors } from "$/colors";
 import { ShapeMesh } from "$/stage/mesh";
 import type { Shape } from "$/types";
-import { getColors, watchAppearance, type Colors } from "$/colors";
 
 export class View {
   canvas: HTMLCanvasElement;
@@ -56,7 +55,8 @@ export class View {
 
   getMeshById(id: string) {
     const mesh = this.scene.getMeshById(id);
-    if (mesh instanceof ShapeMesh) return mesh;
+    const shapeMesh = mesh?.metadata?.shapeMesh;
+    if (shapeMesh instanceof ShapeMesh) return shapeMesh;
   }
 
   createMesh(shape: Shape) {
@@ -73,9 +73,9 @@ export class View {
   }
 
   getMeshes() {
-    return this.scene.meshes.filter(
-      (m) => m instanceof ShapeMesh && !m.ghost,
-    ) as ShapeMesh[];
+    return this.scene.meshes
+      .filter(ShapeMesh.only)
+      .map((s) => s.metadata.shapeMesh as ShapeMesh);
   }
 
   private handleResize = () => {

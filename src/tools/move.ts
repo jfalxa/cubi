@@ -1,6 +1,7 @@
 import { Vector2, Vector3 } from "@babylonjs/core";
 
 import type { Stage } from "$/stage";
+import { BoundingBox } from "$/stage/bounding-box";
 import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import type { DragInfo } from "$/stage/pointer";
 import type { Shape } from "$/types";
@@ -8,9 +9,6 @@ import { getBoundingBox } from "$/utils/bounds";
 import { getElevation, getGridPoint } from "$/utils/rays";
 
 import type { Tool } from ".";
-import { ShapeMesh } from "$/stage/mesh";
-import { Grid } from "$/stage/grid";
-import { BoundingBox } from "$/stage/bounding-box";
 
 const StartMoveIntent = createIntent("start-move");
 const MoveIntent = createIntent("move");
@@ -87,10 +85,7 @@ export class MoveTool implements Tool {
   }
 
   private isOnSelectedShape(position: Vector2) {
-    const mesh = this.stage.pick(position, Grid.ignore).pickedMesh;
-    if (mesh instanceof BoundingBox) return true;
-    if (mesh instanceof ShapeMesh) return mesh.isSelected();
-    return false;
+    return this.stage.pick(position, BoundingBox.only).hit;
   }
 
   private moveShapes(travel: Vector3) {

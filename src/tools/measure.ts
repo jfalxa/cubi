@@ -1,14 +1,13 @@
 import type { Vector2 } from "@babylonjs/core";
 
 import type { Stage } from "$/stage";
-import type { Context, Intent } from "$/stage/interactions";
-import { createIntent } from "$/stage/interactions";
+import { createIntent, type Context, type Intent } from "$/stage/interactions";
+import { ShapeMesh } from "$/stage/mesh";
 import type { MoveInfo } from "$/stage/pointer";
+import type { Box } from "$/types";
 import { getBoundingBox } from "$/utils/bounds";
 
 import type { Tool } from ".";
-import type { Box } from "$/types";
-import { BoundingBox } from "$/stage/bounding-box";
 
 const MeasureIntent = createIntent("measure");
 
@@ -54,6 +53,11 @@ export class MeasureTool implements Tool {
     }
   }
 
+  pick(position: Vector2): ShapeMesh | undefined {
+    const picked = this.stage.pick(position, ShapeMesh.selectable);
+    return ShapeMesh.get(picked.pickedMesh);
+  }
+
   handleMeasure(position: Vector2) {
     const meshes = this.stage.view.getMeshes();
 
@@ -61,11 +65,11 @@ export class MeasureTool implements Tool {
       mesh.setHighlight(false);
     }
 
-    const mesh = this.stage.pickShape(position, BoundingBox.ignore);
+    const mesh = this.pick(position);
     if (!mesh) return this.onNothing();
 
     const boxMeshes = [mesh];
-    const group = mesh.metadata.shape.group;
+    const group = mesh.shape.group;
 
     if (mesh.isSelected()) {
       boxMeshes.push(...meshes.filter((s) => s.isSelected()));
@@ -77,7 +81,7 @@ export class MeasureTool implements Tool {
       mesh.setHighlight(true);
     }
 
-    const box = getBoundingBox(boxMeshes.map((s) => s.metadata.shape));
+    const box = getBoundingBox(boxMeshes.map((s) => s.shape));
     this.onMeasure(box, position);
   }
 }

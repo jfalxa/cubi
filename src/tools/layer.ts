@@ -2,8 +2,13 @@ import { Vector3 } from "@babylonjs/core";
 
 import type { Stage } from "$/stage";
 import { Grid } from "$/stage/grid";
-import type { Context, Intent } from "$/stage/interactions";
-import { createIntent, hasCtrl } from "$/stage/interactions";
+import {
+  createIntent,
+  hasCtrl,
+  type Context,
+  type Intent,
+} from "$/stage/interactions";
+import { ShapeMesh } from "$/stage/mesh";
 import type { ClickInfo } from "$/stage/pointer";
 
 import type { Tool } from ".";
@@ -48,10 +53,12 @@ export class LayerTool implements Tool {
   }
 
   handleLayer = (info: ClickInfo) => {
-    const picked = this.stage.pick(info.position, Grid.ignore);
+    const picked = this.stage.pick(info.position, ShapeMesh.only);
+
     const position = picked.pickedPoint
       ? Grid.snap(picked.pickedPoint)
       : Vector3.Zero();
+
     this.onLayer(Math.max(0, position.y));
   };
 }

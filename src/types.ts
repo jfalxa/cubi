@@ -1,4 +1,4 @@
-import type { Vector3 } from "@babylonjs/core";
+import type { AbstractMesh, Vector3 } from "@babylonjs/core";
 
 export interface Shape {
   id: string;
@@ -21,3 +21,5 @@ export interface Box {
   height: number;
   depth: number;
 }
+
+export type MeshFilter = (mesh: AbstractMesh) => boolean;
