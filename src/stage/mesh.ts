@@ -1,182 +1,171 @@
-import type { MeshPredicate, Scene } from "@babylonjs/core";
 import {
+  AbstractMesh,
   Color3,
   Color4,
+  InstancedMesh,
   Mesh,
+  MeshBuilder,
   StandardMaterial,
-  Vector3,
-  VertexBuffer,
-  VertexData,
-} from "@babylonjs/core";
+  type Scene,
+} from '@babylonjs/core';
 
-import type { Shape } from "$/types";
-import { getColors } from "$/colors";
+import { getColors } from '$/colors';
+import type { MeshFilter, Shape } from '$/types';
+import { getCenter, getDimensions } from '$/utils/bounds';
 
-export class ShapeMesh extends Mesh {
-  static only: MeshPredicate = (mesh) => mesh instanceof ShapeMesh;
+const epsilon = 1e-3;
+const sourceMeshesByColor = new Map<string, Mesh>();
 
-  declare metadata: {
-    shape: Shape;
-    selected: boolean;
-    locked: boolean;
+export class ShapeMesh {
+  static only: MeshFilter = (mesh): mesh is InstancedMesh =>
+    mesh instanceof InstancedMesh &&
+    mesh.metadata?.shapeMesh instanceof ShapeMesh;
+
+  static visible: MeshFilter = (mesh): mesh is InstancedMesh =>
+    ShapeMesh.only(mesh) && !mesh.metadata.shapeMesh.cutOff;
+
+  static selectable: MeshFilter = (mesh): mesh is InstancedMesh =>
+    ShapeMesh.only(mesh) && mesh.metadata.shapeMesh.isSelectable();
+
+  static get = (mesh: AbstractMesh | undefined | null) => {
+    const shapeMesh = mesh?.metadata?.shapeMesh;
+    if (shapeMesh instanceof ShapeMesh) return shapeMesh;
   };
 
-  ghost: boolean;
+  id: string;
+  source!: Mesh;
+  instance!: InstancedMesh;
+  scene: Scene;
 
-  constructor(shape: Shape, scene: Scene, ghost = false) {
-    super(shape.id, scene);
+  shape!: Shape;
+  selected: boolean;
+  locked: boolean;
+  cutOff: boolean;
 
+  static getSource(color: string, scene: Scene): Mesh {
+    let source = sourceMeshesByColor.get(color);
+    if (source) return source;
+
+    const material = new StandardMaterial(`mat_${color}`, scene);
+    material.specularColor = Color3.Black();
+    material.diffuseColor = Color3.FromHexString(color);
+
+    source = MeshBuilder.CreateBox(`box_${color}`, { size: 1 }, scene);
+    source.material = material;
+    source.isVisible = false;
+
+    sourceMeshesByColor.set(color, source);
+    return source;
+  }
+
+  constructor(shape: Shape, scene: Scene) {
     this.id = shape.id;
-    this.metadata = { shape, selected: false, locked: false };
+    this.scene = scene;
 
-    this.ghost = ghost;
-    this.isPickable = !ghost;
+    this.selected = false;
+    this.locked = false;
+    this.cutOff = false;
 
-    this.edgesWidth = this.ghost ? 8 : 4;
-    this.edgesColor = Color4.FromHexString(shape.color);
+    this.update(shape);
+  }
 
-    this.initVertexData(shape);
-    this.initMaterial(shape);
-    this.updateEdges();
-    this.setLocked(shape.locked);
+  dispose() {
+    this.instance.dispose();
   }
 
   update(shape: Shape) {
     // only update when reference shape object has changed
-    if (shape === this.metadata.shape) return;
+    if (shape === this.shape) return;
 
-    this.metadata.shape = shape;
-    this.updateVertexData(shape);
-    this.updateMaterial(shape);
+    if (shape.color !== this.shape?.color) {
+      this.instance?.dispose();
+      this.source = ShapeMesh.getSource(shape.color, this.scene);
+      this.instance = this.source.createInstance(shape.id);
+      this.instance.metadata = { shapeMesh: this };
+    }
+
+    this.shape = shape;
+
+    const center = getCenter(shape);
+    const size = getDimensions(shape);
+
+    if (size.x === 0) size.x = epsilon;
+    if (size.y === 0) size.y = epsilon;
+    if (size.z === 0) size.z = epsilon;
+
+    this.instance.position.copyFrom(center);
+    this.instance.scaling.copyFrom(size);
+
     this.updateEdges();
     this.setLocked(shape.locked);
   }
 
   isSelected() {
-    return this.metadata.selected;
+    return this.selected;
   }
 
-  isLocked() {
-    return this.metadata.locked;
+  isSelectable() {
+    return this.instance.isPickable && !this.locked && !this.cutOff;
   }
 
   isGroup(group: string | undefined) {
-    return this.metadata.shape.group === group;
+    return this.shape.group === group;
+  }
+
+  setEnabled(enabled: boolean) {
+    this.instance.setEnabled(enabled);
   }
 
   setSelected(selected: boolean) {
-    if (this.metadata.selected === selected) return;
+    if (this.selected === selected) return;
 
-    const color = selected ? getColors().ghost : this.metadata.shape.color;
-    this.edgesColor = Color4.FromHexString(color);
-    this.edgesWidth = selected ? 8 : this.ghost ? 4 : 2;
-    this.metadata.selected = selected;
-    this.renderOutline = false;
+    const color = selected ? getColors().ghost : this.shape.color;
+
+    this.instance.edgesColor = Color4.FromHexString(color);
+    this.instance.edgesWidth = selected ? 8 : 4;
+    this.selected = selected;
+    this.instance.renderOutline = false;
   }
 
   setLocked(locked: boolean) {
-    if (this.metadata.locked === locked) return;
+    if (this.locked === locked) return;
 
-    this.renderOutline = false;
-    this.metadata.locked = locked;
+    this.instance.renderOutline = false;
+    this.locked = locked;
   }
 
   setHighlight(highlighted: boolean) {
-    if (this.metadata.locked) return;
-    if (this.renderOutline === highlighted) return;
+    if (this.instance.renderOutline === highlighted) return;
 
-    this.renderOutline = !this.isSelected() && highlighted;
-    this.outlineWidth = highlighted ? 0.05 : 0;
-    this.outlineColor = Color3.FromHexString(getColors().ghost);
+    this.instance.renderOutline = highlighted;
+    this.instance.outlineWidth = highlighted ? 1 : 0;
+    this.instance.outlineColor = Color3.FromHexString(getColors().ghost);
   }
 
-  private initVertexData(shape: Shape) {
-    const { positions, normals, indices } = this.buildVertexData(shape);
-    const vertexData = new VertexData();
-    vertexData.positions = positions;
-    vertexData.indices = indices;
-    vertexData.normals = normals;
-    vertexData.applyToMesh(this, true);
-  }
+  setCutOff(maxY: number) {
+    const { position, height } = this.shape;
 
-  private initMaterial(shape: Shape) {
-    const material = new StandardMaterial(
-      `${this.id}_material`,
-      this.getScene(),
-    );
-    material.specularColor = Color3.Black();
-    material.diffuseColor = Color3.FromHexString(shape.color);
-    material.zOffset = this.ghost ? -10 : 0;
-    if (this.ghost) material.alpha = 0.33;
-    this.material = material;
+    if (position.y >= maxY) {
+      this.instance.setEnabled(false);
+      this.cutOff = true;
+    } else if (position.y + height >= maxY) {
+      this.instance.setEnabled(true);
+      this.instance.position.y = position.y + 0.5;
+      this.instance.scaling.y = 1;
+      this.cutOff = true;
+    } else {
+      this.instance.position.y = getCenter(this.shape).y;
+      this.instance.scaling.y = Math.max(this.shape.height, epsilon);
+      this.instance.setEnabled(true);
+      this.cutOff = false;
+    }
   }
 
   private updateEdges() {
-    this.disableEdgesRendering();
-    this.enableEdgesRendering();
-    this.setSelected(this.metadata.selected);
+    this.instance.disableEdgesRendering();
+    this.instance.enableEdgesRendering();
+    this.instance.edgesWidth = 4;
+    this.instance.edgesColor = Color4.FromHexString(this.shape.color);
+    this.setSelected(this.selected);
   }
-
-  private updateVertexData(shape: Shape) {
-    const { positions, normals } = this.buildVertexData(shape);
-    this.updateVerticesData(VertexBuffer.PositionKind, positions, true);
-    this.updateVerticesData(VertexBuffer.NormalKind, normals);
-  }
-
-  private updateMaterial(shape: Shape) {
-    if (this.material instanceof StandardMaterial) {
-      this.material.diffuseColor = Color3.FromHexString(shape.color);
-    }
-  }
-
-  private buildVertexData(shape: Shape) {
-    const width = new Vector3(shape.width, 0, 0);
-    const height = new Vector3(0, shape.height, 0);
-    const depth = new Vector3(0, 0, shape.depth);
-
-    const b0 = shape.position;
-    const b1 = b0.add(width);
-    const b2 = b0.add(width).add(depth);
-    const b3 = b0.add(depth);
-
-    const t0 = b0.add(height);
-    const t1 = t0.add(width);
-    const t2 = t0.add(width).add(depth);
-    const t3 = t0.add(depth);
-
-    const corners = [b0, b1, b2, b3, t0, t1, t2, t3];
-
-    const positions: number[] = [];
-    const indices: number[] = [];
-    const normals: number[] = [];
-
-    for (let i = 0; i < ShapeMesh.indices.length; i += 3) {
-      const a = corners[ShapeMesh.indices[i]];
-      const b = corners[ShapeMesh.indices[i + 1]];
-      const c = corners[ShapeMesh.indices[i + 2]];
-
-      positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-      indices.push(i, i + 1, i + 2);
-    }
-
-    VertexData.ComputeNormals(positions, indices, normals);
-
-    return { positions, normals, indices };
-  }
-
-  // prettier-ignore
-  static indices = [
-		// bottom
-		0, 2, 1, 0, 3, 2,
-		// top
-		4, 5, 6, 4, 6, 7,
-		// front
-		3, 6, 2, 3, 7, 6,
-		// back
-		0, 1, 5, 0, 5, 4,
-		// right
-		1, 2, 6, 1, 6, 5,
-		// left
-		0, 7, 3, 0, 4, 7
-	];
 }
