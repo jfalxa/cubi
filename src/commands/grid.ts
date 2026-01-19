@@ -2,8 +2,8 @@ import type { GridStore } from "$/stores/grid.svelte";
 
 import type { Command } from ".";
 
-export class SizeCommand implements Command {
-  label = "Grid size";
+export class GridCommand implements Command {
+  label = "Grid";
   group = "grid";
 
   constructor(private grid: GridStore) {}
