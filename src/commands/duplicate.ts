@@ -13,7 +13,10 @@ export class DuplicateCommand implements Command {
 
   shortcuts = ["d"];
 
-  constructor(private shapes: ShapeStore, private selection: SelectionStore) {}
+  constructor(
+    private shapes: ShapeStore,
+    private selection: SelectionStore,
+  ) {}
 
   isAvailable(context: Shape[]) {
     return context.length > 0;

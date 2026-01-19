@@ -10,7 +10,10 @@ export class DeleteCommand implements Command {
 
   shortcuts = ["delete", "backspace"];
 
-  constructor(private shapes: ShapeStore, private selection: SelectionStore) {}
+  constructor(
+    private shapes: ShapeStore,
+    private selection: SelectionStore,
+  ) {}
 
   isAvailable(context: Shape[]) {
     return context.length > 0;

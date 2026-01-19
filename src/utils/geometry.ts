@@ -8,7 +8,7 @@ import { normalizeShape } from "./shape";
 
 export function rotateShapes(
   shapes: Shape[],
-  counterclockwise = false
+  counterclockwise = false,
 ): Shape[] {
   if (shapes.length === 0) return [];
 
@@ -36,7 +36,7 @@ export function rotateShapes(
 export function scaleShapes(
   shapes: Shape[],
   amount: Vector3,
-  anchor: Vector3
+  anchor: Vector3,
 ): Shape[] {
   if (shapes.length === 0) return [];
 
@@ -45,7 +45,7 @@ export function scaleShapes(
   const scale = new Vector3(
     bbox.width === 0 ? 1 : (bbox.width + amount.x) / bbox.width,
     bbox.height === 0 ? 1 : (bbox.height + amount.y) / bbox.height,
-    bbox.depth === 0 ? 1 : (bbox.depth + amount.z) / bbox.depth
+    bbox.depth === 0 ? 1 : (bbox.depth + amount.z) / bbox.depth,
   );
 
   return shapes.map((shape) => {
@@ -65,15 +65,15 @@ export function scaleShapes(
 export function resizeShapes(
   shapes: Shape[],
   amount: Vector3,
-  axis: Vector3
+  axis: Vector3,
 ): Shape[] {
   return shapes.map((shape) => {
     const position = shape.position.subtract(
       new Vector3(
         axis.x < 0 ? amount.x : 0, //
         axis.y < 0 ? amount.y : 0,
-        axis.z < 0 ? amount.z : 0
-      )
+        axis.z < 0 ? amount.z : 0,
+      ),
     );
 
     const width = shape.width + amount.x;

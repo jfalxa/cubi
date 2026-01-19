@@ -9,7 +9,10 @@ export class UndoCommand implements Command {
 
   shortcuts = ["ctrl+z", "command+z"];
 
-  constructor(private shapes: ShapeStore, private selection: SelectionStore) {}
+  constructor(
+    private shapes: ShapeStore,
+    private selection: SelectionStore,
+  ) {}
 
   isAvailable() {
     return this.shapes.canUndo();
@@ -27,7 +30,10 @@ export class RedoCommand implements Command {
 
   shortcuts = ["ctrl+shift+z", "command+shift+z"];
 
-  constructor(private shapes: ShapeStore, private selection: SelectionStore) {}
+  constructor(
+    private shapes: ShapeStore,
+    private selection: SelectionStore,
+  ) {}
 
   isAvailable() {
     return this.shapes.canRedo();

@@ -7,21 +7,21 @@ import type { Shape } from "$/types";
 export function getGridPoint(
   pointer: Vector2,
   camera: Camera,
-  grid: Grid
+  grid: Grid,
 ): Vector3 | undefined {
   const scene = camera.getScene();
 
   const planeY = grid.layer;
   const plane = Plane.FromPositionAndNormal(
     new Vector3(0, planeY, 0),
-    Vector3.Up()
+    Vector3.Up(),
   );
 
   const ray = scene.createPickingRay(
     pointer.x,
     pointer.y,
     Matrix.Identity(),
-    camera
+    camera,
   );
   const distance = ray.intersectsPlane(plane);
 
@@ -34,7 +34,7 @@ export function getGridPoint(
 export function getElevation(
   pointer: Vector2,
   camera: Camera,
-  reference: Shape
+  reference: Shape,
 ) {
   const { position, width, depth } = reference;
 
@@ -51,7 +51,7 @@ export function getAxisPoint(
   pointer: Vector2,
   camera: Camera,
   origin: Vector3,
-  axis: Vector3
+  axis: Vector3,
 ) {
   const scene = camera.getScene();
 
@@ -59,7 +59,7 @@ export function getAxisPoint(
     pointer.x,
     pointer.y,
     Matrix.Identity(),
-    camera
+    camera,
   );
   const originToAxis = ray.origin.subtract(origin);
 

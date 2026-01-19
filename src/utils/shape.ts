@@ -2,8 +2,8 @@ import { Vector3 } from "@babylonjs/core";
 
 import type { PartialShape, SerializedShape, Shape } from "$/types";
 
-import { groupBy } from "./collection";
 import { areShapesConnected, getBounds } from "./bounds";
+import { groupBy } from "./collection";
 
 export function createShape(init: PartialShape): Shape {
   return {

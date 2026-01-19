@@ -7,11 +7,11 @@ import {
   MeshBuilder,
   StandardMaterial,
   type Scene,
-} from '@babylonjs/core';
+} from "@babylonjs/core";
 
-import { getColors } from '$/colors';
-import type { MeshFilter, Shape } from '$/types';
-import { getCenter, getDimensions } from '$/utils/bounds';
+import { getColors } from "$/colors";
+import type { MeshFilter, Shape } from "$/types";
+import { getCenter, getDimensions } from "$/utils/bounds";
 
 const epsilon = 1e-3;
 const sourceMeshesByColor = new Map<string, Mesh>();

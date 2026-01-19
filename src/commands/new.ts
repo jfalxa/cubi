@@ -1,5 +1,5 @@
-import type { ShapeStore } from "$/stores/shape.svelte";
 import type { ContextMenuStore } from "$/stores/context-menu.svelte";
+import type { ShapeStore } from "$/stores/shape.svelte";
 
 import type { Command } from ".";
 
@@ -11,7 +11,7 @@ export class NewCommand implements Command {
 
   constructor(
     private shapes: ShapeStore,
-    private contextMenu: ContextMenuStore
+    private contextMenu: ContextMenuStore,
   ) {}
 
   isAvailable() {
