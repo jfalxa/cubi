@@ -7,13 +7,13 @@ import type { ShapeStore } from "$/stores/shape.svelte";
 import type { Shape } from "$/types";
 
 import { ColorsCommand } from "./colors";
-import { CutOffCommand } from "./cut-off";
 import { DeleteCommand } from "./delete";
 import { DuplicateCommand } from "./duplicate";
 import { ExportCommand, ImportCommand, OpenCommand, SaveCommand } from "./file";
 import { GridCommand } from "./grid";
 import { GroupCommand, UngroupCommand } from "./group";
 import { RedoCommand, UndoCommand } from "./history";
+import { LevelCommand } from "./level";
 import { LockCommand, UnlockCommand } from "./lock";
 import { NewCommand } from "./new";
 import { RotateCCWCommand, RotateCWCommand } from "./rotate";
@@ -43,7 +43,7 @@ export class Commands {
   size: GridCommand;
   lock: LockCommand;
   unlock: UnlockCommand;
-  cutOff: CutOffCommand;
+  cutOff: LevelCommand;
 
   private shapes: ShapeStore;
   private selection: SelectionStore;
@@ -67,7 +67,7 @@ export class Commands {
     this.size = new GridCommand(grid);
     this.lock = new LockCommand(shapes);
     this.unlock = new UnlockCommand(shapes);
-    this.cutOff = new CutOffCommand(grid);
+    this.cutOff = new LevelCommand(grid);
 
     this.shapes = shapes;
     this.selection = selection;

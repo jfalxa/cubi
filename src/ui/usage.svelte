@@ -17,7 +17,7 @@
   titleClass="text-4xl font-semibold"
   bodyClass="p-6 max-h-[70vh] space-y-6 overflow-y-auto whitespace-normal text-sm leading-relaxed"
 >
-  <h2 id="3d-editor">3D Editor</h2>
+  <h2 id="3d-editor" class="mt-0">3D Editor</h2>
   <h3 id="navigation">Navigation</h3>
   <ul>
     <li>
@@ -57,9 +57,9 @@
   </p>
   <h3 id="carving">Carving</h3>
   <p>
-    When holding <code>Alt</code> when starting to draw a new box, the operation
-    will become a &quot;carving&quot; operation. This means that when the drawn box
-    will be committed, it will actually remove its volume from every box it was passing
+    When holding <code>Alt</code> when starting to draw a new box, the operation will
+    become a &quot;carving&quot; operation. This means that when the drawn box will
+    be committed, it will actually remove its volume from every box it was passing
     through, splitting them into smaller boxes that leave a hole inbetween.
   </p>
   <h3 id="selection">Selection</h3>
@@ -149,10 +149,23 @@
       inadvertently
     </li>
   </ul>
-  <h3 id="unclock">Unclock</h3>
+  <h3 id="unlock">Unlock</h3>
   <ul>
     <li>Shortcut: <code>Shift-L</code></li>
     <li>Unlock the selected shapes so they can be modified again</li>
+  </ul>
+  <h3 id="toggle-level">Toggle level</h3>
+  <ul>
+    <li>Shortcut: <code>Space</code></li>
+    <li>
+      Toggle level view mode. When active, all the shapes above the currently
+      active layer + the value defined in the <code>Level cut-off</code> field of
+      the grid settings will be hidden.
+    </li>
+    <li>
+      This allows you to define different vertical levels in your scene, and
+      focus on only one at a time.
+    </li>
   </ul>
   <h3 id="colors">Colors</h3>
   <ul>
@@ -179,6 +192,11 @@
       it&#39;s only used to compute the dimensions displayed in the floating
       measure label.
     </li>
+    <li>
+      The last field is &quot;Level cut-off&quot;, it defines the height beyond
+      which shapes will stop showing when in level view mode. See &quot;Toggle
+      level&quot;.
+    </li>
   </ul>
   <h3 id="import">Import</h3>
   <ul>
@@ -200,8 +218,7 @@
   <h3 id="new">New</h3>
   <ul>
     <li>
-      Shortcut: <code>Control/Command-N</code> (might conflict with core browser
-      shortcuts)
+      Shortcut: <code>Control/Command-N</code> (might conflict with core browser shortcuts)
     </li>
     <li>Empty the current scene and undo/redo history</li>
   </ul>

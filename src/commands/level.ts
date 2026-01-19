@@ -2,8 +2,8 @@ import type { GridStore } from "$/stores/grid.svelte";
 
 import type { Command } from ".";
 
-export class CutOffCommand implements Command {
-  label = "Toggle cut-off";
+export class LevelCommand implements Command {
+  label = "Toggle level";
   group = "view";
 
   shortcuts = ["space"];
