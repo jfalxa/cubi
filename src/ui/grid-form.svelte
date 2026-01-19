@@ -1,7 +1,6 @@
 <script lang="ts">
-  import Dialog from "$/ui/dialog.svelte";
-
-  import type { GridStore } from "$/stores/grid.svelte";
+  import type { GridStore } from '$/stores/grid.svelte';
+  import Dialog from '$/ui/dialog.svelte';
 
   type Props = {
     grid: GridStore;
@@ -9,15 +8,20 @@
 
   let { grid }: Props = $props();
 
-  let width = $state("");
-  let depth = $state("");
-  let unit = $state("");
+  let width = $state('');
+  let depth = $state('');
+  let unit = $state('');
+  let cutOff = $state('');
+
+  const gridToMeter = (size: number, unit: number) => (size * unit) / 100;
+  const meterToGrid = (size: number, unit: number) => Math.round((size / 100) * unit); // prettier-ignore
 
   $effect(() => {
     if (grid.showGridForm) {
-      width = String((grid.width * grid.unit) / 100);
-      depth = String((grid.depth * grid.unit) / 100);
       unit = String(grid.unit);
+      width = String(gridToMeter(grid.width, grid.unit));
+      depth = String(gridToMeter(grid.depth, grid.unit));
+      cutOff = String(gridToMeter(grid.cutOffHeight, grid.unit));
     }
   });
 
@@ -25,9 +29,10 @@
     const newUnit = parseFloat(unit);
 
     grid.update({
-      width: (parseFloat(width) * 100) / newUnit,
-      depth: (parseFloat(depth) * 100) / newUnit,
       unit: newUnit,
+      width: meterToGrid(parseFloat(width), newUnit),
+      depth: meterToGrid(parseFloat(depth), newUnit),
+      cutOff: meterToGrid(parseFloat(cutOff), newUnit),
     });
 
     grid.showGridForm = false;
@@ -75,6 +80,17 @@
         min="0.1"
         step="0.1"
         bind:value={unit}
+      />
+    </label>
+
+    <label class="grid gap-2 text-sm">
+      <span class="text-gray-500 dark:text-gray-400">Level cut-off (m)</span>
+      <input
+        class="surface rounded-md px-3 py-2"
+        type="number"
+        min="0"
+        step="0.1"
+        bind:value={cutOff}
       />
     </label>
   </div>

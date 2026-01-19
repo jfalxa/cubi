@@ -2,11 +2,17 @@ import { Vector3 } from "@babylonjs/core";
 
 import type { Shape } from "$/types";
 
+export function getCenter(shape: Shape) {
+  return shape.position.add(getDimensions(shape).scale(1 / 2));
+}
+
+export function getDimensions(shape: Shape) {
+  return new Vector3(shape.width, shape.height, shape.depth);
+}
+
 export function getBounds(shape: Shape) {
   const min = shape.position.clone();
-  const max = shape.position.add(
-    new Vector3(shape.width, shape.height, shape.depth)
-  );
+  const max = shape.position.add(getDimensions(shape));
   return { min, max };
 }
 
@@ -31,7 +37,7 @@ export function getBoundingBox(shapes: Shape[]) {
 export function areShapesConnected(
   a: Shape,
   b: Shape,
-  epsilon = 1e-6
+  epsilon = 1e-6,
 ): boolean {
   const aBounds = getBounds(a);
   const bBounds = getBounds(b);

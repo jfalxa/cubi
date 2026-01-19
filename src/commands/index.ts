@@ -1,21 +1,22 @@
 import hotkeys from "hotkeys-js";
 
+import type { ContextMenuStore } from "$/stores/context-menu.svelte";
+import type { GridStore } from "$/stores/grid.svelte";
 import type { SelectionStore } from "$/stores/selection.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";
 import type { Shape } from "$/types";
 
+import { ColorsCommand } from "./colors";
+import { CutOffCommand } from "./cut-off";
 import { DeleteCommand } from "./delete";
 import { DuplicateCommand } from "./duplicate";
-import { OpenCommand, SaveCommand, ImportCommand, ExportCommand } from "./file";
+import { ExportCommand, ImportCommand, OpenCommand, SaveCommand } from "./file";
+import { GridCommand } from "./grid";
 import { GroupCommand, UngroupCommand } from "./group";
 import { RedoCommand, UndoCommand } from "./history";
+import { LockCommand, UnlockCommand } from "./lock";
 import { NewCommand } from "./new";
 import { RotateCCWCommand, RotateCWCommand } from "./rotate";
-import { ColorsCommand } from "./colors";
-import { SizeCommand } from "./size";
-import type { GridStore } from "$/stores/grid.svelte";
-import type { ContextMenuStore } from "$/stores/context-menu.svelte";
-import { LockCommand, UnlockCommand } from "./lock";
 
 export interface Dependencies {
   selection: SelectionStore;
@@ -39,9 +40,10 @@ export class Commands {
   group: GroupCommand;
   ungroup: UngroupCommand;
   colors: ColorsCommand;
-  size: SizeCommand;
+  size: GridCommand;
   lock: LockCommand;
   unlock: UnlockCommand;
+  cutOff: CutOffCommand;
 
   private shapes: ShapeStore;
   private selection: SelectionStore;
@@ -62,9 +64,10 @@ export class Commands {
     this.group = new GroupCommand(shapes);
     this.ungroup = new UngroupCommand(shapes);
     this.colors = new ColorsCommand(shapes);
-    this.size = new SizeCommand(grid);
+    this.size = new GridCommand(grid);
     this.lock = new LockCommand(shapes);
     this.unlock = new UnlockCommand(shapes);
+    this.cutOff = new CutOffCommand(grid);
 
     this.shapes = shapes;
     this.selection = selection;
@@ -107,6 +110,7 @@ export class Commands {
       this.ungroup,
       this.lock,
       this.unlock,
+      this.cutOff,
       this.colors,
       this.rotateClockwise,
       this.rotateCounterclockwise,

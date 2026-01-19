@@ -1,10 +1,11 @@
-import type { MeshPredicate, Vector2 } from "@babylonjs/core";
+import type { Vector2 } from "@babylonjs/core";
+
+import type { MeshFilter } from "$/types";
 
 import { BoundingBox } from "./bounding-box";
 import { Camera } from "./camera";
 import { Grid } from "./grid";
 import { Interactions } from "./interactions";
-import { ShapeMesh } from "./mesh";
 import { View } from "./view";
 
 export class Stage {
@@ -34,7 +35,7 @@ export class Stage {
     this.view.dispose();
   }
 
-  pick(position: Vector2, predicate?: MeshPredicate) {
+  pick(position: Vector2, predicate?: MeshFilter) {
     return this.view.scene.pick(
       position.x,
       position.y,
@@ -42,11 +43,5 @@ export class Stage {
       false,
       this.camera,
     );
-  }
-
-  pickShape(position: Vector2, predicate = ShapeMesh.only) {
-    const mesh = this.pick(position, predicate).pickedMesh;
-    if (mesh instanceof ShapeMesh && !mesh.isLocked()) return mesh;
-    else return undefined;
   }
 }

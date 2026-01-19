@@ -30,7 +30,7 @@ export function createStores() {
 
 export function useSync(stores: Stores, stage: Stage, tools: Tools) {
   useCameraSync(stores.camera, stage.camera);
-  useGridSync(stores.grid, stage.grid);
+  useGridSync(stores.grid, stage);
   useShapeSync(stores.shapes, stage.view);
   useSelectionSync(stores.selection, stage, tools.selection);
 }
