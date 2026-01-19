@@ -1,0 +1,9 @@
+{
+  "singleQuote": true,
+  "semi": true,
+  "plugins": ["@ianvs/prettier-plugin-sort-imports"],
+  "importOrder": ["^[\\w]+", "^@[\\w]+", "", "^\\$\\/[\\w+]", "", "^\\."],
+  "importOrderParserPlugins": ["typescript", "svelte"],
+  "importOrderTypeScriptVersion": "5.0.0",
+  "importOrderCaseSensitive": false
+}
