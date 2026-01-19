@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { GridStore } from '$/stores/grid.svelte';
-  import Dialog from '$/ui/dialog.svelte';
+  import type { GridStore } from "$/stores/grid.svelte";
+  import Dialog from "$/ui/dialog.svelte";
 
   type Props = {
     grid: GridStore;
@@ -8,13 +8,13 @@
 
   let { grid }: Props = $props();
 
-  let width = $state('');
-  let depth = $state('');
-  let unit = $state('');
-  let cutOff = $state('');
+  let width = $state("");
+  let depth = $state("");
+  let unit = $state("");
+  let cutOff = $state("");
 
   const gridToMeter = (size: number, unit: number) => (size * unit) / 100;
-  const meterToGrid = (size: number, unit: number) => Math.round((size / 100) * unit); // prettier-ignore
+  const meterToGrid = (size: number, unit: number) => Math.round((size * 100) / unit); // prettier-ignore
 
   $effect(() => {
     if (grid.showGridForm) {
