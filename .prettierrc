@@ -1,5 +1,8 @@
 {
-  "plugins": ["@ianvs/prettier-plugin-sort-imports"],
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "@ianvs/prettier-plugin-sort-imports"
+  ],
   "importOrder": ["^[\\w]+", "^@[\\w]+", "", "^\\$\\/[\\w+]", "", "^\\."],
   "importOrderParserPlugins": ["typescript", "svelte"],
   "importOrderTypeScriptVersion": "5.0.0",
