@@ -4,20 +4,19 @@ import {
   CreateBoxVertexData,
   Mesh,
   StandardMaterial,
-  type MeshPredicate,
   type Scene,
-} from "@babylonjs/core";
+} from '@babylonjs/core';
 
-import type { Shape } from "$/types";
-import { getBoundingBox } from "$/utils/bounds";
-import { getColors } from "$/colors";
+import { getColors } from '$/colors';
+import type { MeshFilter, Shape } from '$/types';
+import { getBoundingBox } from '$/utils/bounds';
 
 export class BoundingBox extends Mesh {
-  static only: MeshPredicate = (mesh) => mesh.name === "bounding-box";
-  static ignore: MeshPredicate = (mesh) => mesh.name !== "bounding-box";
+  static only: MeshFilter = (mesh) => mesh.name === 'bounding-box';
+  static ignore: MeshFilter = (mesh) => mesh.name !== 'bounding-box';
 
   constructor(scene: Scene) {
-    super("bounding-box", scene);
+    super('bounding-box', scene);
 
     this.setEnabled(false);
 
@@ -39,7 +38,8 @@ export class BoundingBox extends Mesh {
 
     this.disableEdgesRendering();
     this.enableEdgesRendering();
-    this.edgesColor = Color4.FromHexString("#ffffff");
+    this.edgesWidth = 8;
+    this.edgesColor = Color4.FromHexString(getColors().ghost);
 
     this.setEnabled(true);
   }
@@ -51,8 +51,8 @@ export class BoundingBox extends Mesh {
 
   private initMaterial() {
     const material = new StandardMaterial(
-      "bounding_box_material",
-      this.getScene()
+      'bounding_box_material',
+      this.getScene(),
     );
     material.specularColor = Color3.Black();
     material.diffuseColor = Color3.FromHexString(getColors().ghost);

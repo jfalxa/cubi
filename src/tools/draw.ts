@@ -2,7 +2,6 @@ import { Vector2, Vector3 } from "@babylonjs/core";
 
 import type { Stage } from "$/stage";
 import { createIntent, type Context, type Intent } from "$/stage/interactions";
-import { ShapeMesh } from "$/stage/mesh";
 import type { ClickInfo, MoveInfo } from "$/stage/pointer";
 import type { PartialShape, Shape } from "$/types";
 import { getElevation, getGridPoint } from "$/utils/rays";
@@ -15,6 +14,7 @@ import {
 
 import type { Tool } from ".";
 import { getColors } from "$/colors";
+import { BoundingBox } from "$/stage/bounding-box";
 
 const DrawIntent = createIntent("draw");
 const CommitDrawIntent = createIntent("commit-draw");
@@ -32,7 +32,7 @@ export class DrawTool implements Tool {
   stage: Stage;
 
   shape: Shape;
-  ghost: ShapeMesh;
+  ghost: BoundingBox;
 
   state: DrawState = "idle";
   subtractive = false;
@@ -46,7 +46,7 @@ export class DrawTool implements Tool {
 
     this.shape = createShape({ id: "ghost", color: getColors().ghost });
 
-    this.ghost = new ShapeMesh(this.shape, this.stage.view.scene, true);
+    this.ghost = new BoundingBox(this.stage.view.scene);
     this.ghost.setEnabled(false);
 
     this.onDraw = callbacks.onDraw;
@@ -104,7 +104,7 @@ export class DrawTool implements Tool {
 
   update(shape: PartialShape) {
     this.shape = { ...this.shape, ...shape };
-    this.ghost.update(this.shape);
+    this.ghost.update([normalizeShape(this.shape)]);
   }
 
   handleCommit = (info: ClickInfo) => {
