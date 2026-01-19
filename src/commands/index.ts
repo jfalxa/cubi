@@ -40,10 +40,10 @@ export class Commands {
   group: GroupCommand;
   ungroup: UngroupCommand;
   colors: ColorsCommand;
-  size: GridCommand;
+  grid: GridCommand;
   lock: LockCommand;
   unlock: UnlockCommand;
-  cutOff: LevelCommand;
+  level: LevelCommand;
 
   private shapes: ShapeStore;
   private selection: SelectionStore;
@@ -64,10 +64,10 @@ export class Commands {
     this.group = new GroupCommand(shapes);
     this.ungroup = new UngroupCommand(shapes);
     this.colors = new ColorsCommand(shapes);
-    this.size = new GridCommand(grid);
+    this.grid = new GridCommand(grid);
     this.lock = new LockCommand(shapes);
     this.unlock = new UnlockCommand(shapes);
-    this.cutOff = new LevelCommand(grid);
+    this.level = new LevelCommand(grid);
 
     this.shapes = shapes;
     this.selection = selection;
@@ -110,11 +110,11 @@ export class Commands {
       this.ungroup,
       this.lock,
       this.unlock,
-      this.cutOff,
       this.colors,
       this.rotateClockwise,
       this.rotateCounterclockwise,
-      this.size,
+      this.grid,
+      this.level,
       this.import,
       this.export,
       this.new,

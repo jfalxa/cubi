@@ -4,7 +4,7 @@ import type { Command } from ".";
 
 export class LevelCommand implements Command {
   label = "Toggle level";
-  group = "view";
+  group = "grid";
 
   shortcuts = ["space"];
 
