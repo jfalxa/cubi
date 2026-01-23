@@ -5,14 +5,14 @@ interface GridInit {
   depth?: number;
   unit?: number;
   layer?: number;
-  cutOff?: number;
+  level?: number;
 }
 
 const DEFAULT_GRID = {
   width: 10,
   depth: 10,
   unit: 10,
-  cutOff: 20,
+  level: 20,
 };
 
 export class GridStore {
@@ -22,7 +22,7 @@ export class GridStore {
   layer = $state(0);
 
   cutOff = $state(false);
-  cutOffHeight = $state(0);
+  level = $state(0);
 
   showGridForm = $state(false);
 
@@ -33,15 +33,23 @@ export class GridStore {
     this.depth = init?.depth ?? cached.depth;
     this.unit = init?.unit ?? cached.unit;
     this.layer = init?.layer ?? 0;
-    this.cutOffHeight = init?.cutOff ?? cached.cutOff;
+    this.level = init?.level ?? cached.level;
   }
 
-  update({ width, depth, unit, layer, cutOff }: GridInit) {
+  setLayer(layer: number) {
+    this.layer = Math.max(0, layer);
+  }
+
+  moveLayer(delta: number) {
+    this.layer = Math.max(0, this.layer + delta);
+  }
+
+  update({ width, depth, unit, layer, level }: GridInit) {
     if (width !== undefined) this.width = width;
     if (depth !== undefined) this.depth = depth;
     if (unit !== undefined) this.unit = unit;
     if (layer !== undefined) this.layer = layer;
-    if (cutOff !== undefined) this.cutOffHeight = cutOff;
+    if (level !== undefined) this.level = level;
   }
 }
 
@@ -55,7 +63,7 @@ export function useGridSync(gridStore: GridStore, stage: Stage) {
 
   $effect(() => {
     const maxY = gridStore.cutOff
-      ? gridStore.layer + gridStore.cutOffHeight
+      ? gridStore.layer + gridStore.level
       : Infinity;
 
     for (const mesh of view.getMeshes()) {
@@ -68,7 +76,7 @@ export function useGridSync(gridStore: GridStore, stage: Stage) {
       gridStore.width,
       gridStore.depth,
       gridStore.unit,
-      gridStore.cutOffHeight,
+      gridStore.level,
     );
   });
 }

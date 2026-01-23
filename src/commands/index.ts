@@ -13,6 +13,12 @@ import { ExportCommand, ImportCommand, OpenCommand, SaveCommand } from "./file";
 import { GridCommand } from "./grid";
 import { GroupCommand, UngroupCommand } from "./group";
 import { RedoCommand, UndoCommand } from "./history";
+import {
+  LayerDownCommand,
+  LayerUpCommand,
+  LevelDownCommand,
+  LevelUpCommand,
+} from "./layer";
 import { LevelCommand } from "./level";
 import { LockCommand, UnlockCommand } from "./lock";
 import { NewCommand } from "./new";
@@ -44,6 +50,10 @@ export class Commands {
   lock: LockCommand;
   unlock: UnlockCommand;
   level: LevelCommand;
+  layerUp: LayerUpCommand;
+  layerDown: LayerDownCommand;
+  levelUp: LevelUpCommand;
+  levelDown: LevelDownCommand;
 
   private shapes: ShapeStore;
   private selection: SelectionStore;
@@ -68,6 +78,10 @@ export class Commands {
     this.lock = new LockCommand(shapes);
     this.unlock = new UnlockCommand(shapes);
     this.level = new LevelCommand(grid);
+    this.layerUp = new LayerUpCommand(grid);
+    this.layerDown = new LayerDownCommand(grid);
+    this.levelUp = new LevelUpCommand(grid);
+    this.levelDown = new LevelDownCommand(grid);
 
     this.shapes = shapes;
     this.selection = selection;
@@ -78,7 +92,11 @@ export class Commands {
 
   available(id?: string): AvailableCommand[] {
     const context = this.context(id);
-    const available = this.commands.filter((cmd) => cmd.isAvailable(context));
+
+    const available = this.commands.filter(
+      (cmd) => !cmd.hidden && cmd.isAvailable(context),
+    );
+
     return available.map((cmd) => ({
       label: cmd.label,
       group: cmd.group,
@@ -114,6 +132,10 @@ export class Commands {
       this.rotateClockwise,
       this.rotateCounterclockwise,
       this.grid,
+      this.layerUp,
+      this.layerDown,
+      this.levelUp,
+      this.levelDown,
       this.level,
       this.import,
       this.export,
@@ -145,6 +167,7 @@ export interface AvailableCommand {
 export interface Command {
   label: string;
   group: string;
+  hidden?: boolean;
   options?: Record<string, string>;
   shortcuts?: string[];
   isAvailable(context: Shape[]): boolean;
