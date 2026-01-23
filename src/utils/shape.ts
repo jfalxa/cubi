@@ -40,22 +40,6 @@ export function cloneShapes(shapes: Shape[]) {
   return Object.values(grouped).flatMap((s) => s);
 }
 
-export function stringifyShapes(shapes: Shape[]) {
-  return JSON.stringify(
-    shapes.map((s) => ({ ...s, position: s.position.asArray() })),
-  );
-}
-
-export function parseShapes(shapes: string): Shape[] {
-  try {
-    const json = JSON.parse(shapes) as SerializedShape[];
-    const result = json.map((s) => ({ ...s, position: Vector3.FromArray(s.position) })); // prettier-ignore
-    return cloneShapes(result);
-  } catch {
-    return [];
-  }
-}
-
 export function isValid(shape: Shape) {
   return (
     [shape.width, shape.height, shape.depth].filter((d) => d != 0).length >= 2

@@ -1,16 +1,15 @@
 import type { Stage } from "$/stage";
 
-interface GridInit {
-  width?: number;
-  depth?: number;
-  height?: number;
-  unit?: number;
-  layer?: number;
+export interface GridInit {
+  width: number;
+  depth: number;
+  height: number;
+  unit: number;
 }
 
-const DEFAULT_GRID = {
-  width: 10,
-  depth: 10,
+export const DEFAULT_GRID: GridInit = {
+  width: 100,
+  depth: 100,
   height: 20,
   unit: 10,
 };
@@ -27,14 +26,12 @@ export class GridStore {
 
   showGridForm = $state(false);
 
-  constructor(init?: GridInit) {
-    const cached = readGrid();
-
-    this.width = init?.width ?? cached.width;
-    this.depth = init?.depth ?? cached.depth;
-    this.height = init?.height ?? cached.height;
-    this.unit = init?.unit ?? cached.unit;
-    this.layer = init?.layer ?? 0;
+  constructor(init?: Partial<GridInit>) {
+    this.width = init?.width ?? DEFAULT_GRID.width;
+    this.depth = init?.depth ?? DEFAULT_GRID.depth;
+    this.height = init?.height ?? DEFAULT_GRID.height;
+    this.unit = init?.unit ?? DEFAULT_GRID.unit;
+    this.layer = 0;
   }
 
   setLayer(layer: number) {
@@ -45,12 +42,15 @@ export class GridStore {
     this.setLayer(level * this.height);
   }
 
-  update({ width, depth, unit, layer, height }: GridInit) {
+  update({ width, depth, unit, height }: Partial<GridInit>) {
     if (width !== undefined) this.width = width;
     if (depth !== undefined) this.depth = depth;
     if (height !== undefined) this.height = height;
     if (unit !== undefined) this.unit = unit;
-    if (layer !== undefined) this.layer = layer;
+  }
+
+  reset() {
+    this.update(DEFAULT_GRID);
   }
 }
 
@@ -71,29 +71,4 @@ export function useGridSync(gridStore: GridStore, stage: Stage) {
       mesh.setCutOff(maxY);
     }
   });
-
-  $effect(() => {
-    writeGrid(
-      gridStore.width,
-      gridStore.depth,
-      gridStore.unit,
-      gridStore.height,
-    );
-  });
-}
-
-function writeGrid(width: number, depth: number, height: number, unit: number) {
-  localStorage.setItem(
-    "cubi:grid",
-    JSON.stringify({ width, depth, height, unit }),
-  );
-}
-
-function readGrid(): typeof DEFAULT_GRID {
-  try {
-    const grid = JSON.parse(localStorage.getItem("cubi:grid") ?? "{}");
-    return { ...DEFAULT_GRID, ...grid };
-  } catch {
-    return DEFAULT_GRID;
-  }
 }
