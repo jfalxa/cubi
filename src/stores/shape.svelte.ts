@@ -1,15 +1,10 @@
 import type { View } from "$/stage/view";
 import type { PartialShape, PartialShapeWithId, Shape } from "$/types";
 import { indexById } from "$/utils/collection";
-import {
-  createShape,
-  parseShapes,
-  stringifyShapes,
-  subtractShapes,
-} from "$/utils/shape";
+import { createShape, subtractShapes } from "$/utils/shape";
 
 export class ShapeStore {
-  current = $state.raw<Shape[]>(readLocalStorage());
+  current = $state.raw<Shape[]>([]);
 
   past: Shape[][] = [];
   future: Shape[][] = [];
@@ -68,7 +63,6 @@ export class ShapeStore {
     this.past.push([...(this.beforePatch ?? this.current)]);
     this.future.length = 0;
     update?.();
-    writeLocalStorage(this.current);
     this.beforePatch = undefined;
   }
 
@@ -76,7 +70,6 @@ export class ShapeStore {
     this.past = [];
     this.future = [];
     this.current = shapes;
-    writeLocalStorage(this.current);
   }
 
   canUndo() {
@@ -100,16 +93,6 @@ export class ShapeStore {
     this.past.push([...this.current]);
     this.current = next;
   }
-}
-
-const LS_KEY = "cubi:shapes";
-
-function readLocalStorage() {
-  return parseShapes(localStorage.getItem(LS_KEY) ?? "");
-}
-
-function writeLocalStorage(shapes: Shape[]) {
-  localStorage.setItem(LS_KEY, stringifyShapes(shapes));
 }
 
 export function useShapeSync(shapeStore: ShapeStore, view: View) {

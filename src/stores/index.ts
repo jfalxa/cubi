@@ -4,6 +4,7 @@ import type { Tools } from "$/tools";
 import { CameraStore, useCameraSync } from "./camera.svelte";
 import { ContextMenuStore } from "./context-menu.svelte";
 import { GridStore, useGridSync } from "./grid.svelte";
+import { useLocalStorageSync } from "./local-storage.svelte";
 import { MeasureStore } from "./measure.svelte";
 import { SelectionStore, useSelectionSync } from "./selection.svelte";
 import { ShapeStore, useShapeSync } from "./shape.svelte";
@@ -33,4 +34,5 @@ export function useSync(stores: Stores, stage: Stage, tools: Tools) {
   useGridSync(stores.grid, stage);
   useShapeSync(stores.shapes, stage.view);
   useSelectionSync(stores.selection, stage, tools.selection);
+  useLocalStorageSync(stores.shapes, stores.grid);
 }
