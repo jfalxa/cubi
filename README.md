@@ -91,7 +91,7 @@ It will adapt based on where the mouse is pointing at, and the current selection
 ### Toggle level
 
 - Shortcut: `Space`
-- Toggle level view mode. When active, all the shapes above the currently active layer + the value defined in the `Level cut-off` field of the grid settings will be hidden.
+- Toggle level view mode. When active, all the shapes above the currently active layer + the value defined in the `Level height` field of the grid settings will be hidden.
 - This allows you to define different vertical levels in your scene, and focus on only one at a time.
 
 ### Colors
@@ -109,7 +109,7 @@ It will adapt based on where the mouse is pointing at, and the current selection
 - No shortcut
 - This is a meny that allows setting the width and depth of the drawing grid in meters.
 - You can also set a "Unit", that represents the size of a single grid square in centimeters. Note that this won't resize your shapes, it's only used to compute the dimensions displayed in the floating measure label.
-- The last field is "Level cut-off", it defines the height beyond which shapes will stop showing when in level view mode. See "Toggle level".
+- The last field is "Level height", it defines the height beyond which shapes will stop showing when in level view mode. See "Toggle level".
 
 ### Import
 

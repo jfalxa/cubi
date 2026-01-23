@@ -159,8 +159,8 @@
     <li>Shortcut: <code>Space</code></li>
     <li>
       Toggle level view mode. When active, all the shapes above the currently
-      active layer + the value defined in the <code>Level cut-off</code> field of
-      the grid settings will be hidden.
+      active layer + the value defined in the <code>Level height</code> field of the
+      grid settings will be hidden.
     </li>
     <li>
       This allows you to define different vertical levels in your scene, and
@@ -193,7 +193,7 @@
       measure label.
     </li>
     <li>
-      The last field is &quot;Level cut-off&quot;, it defines the height beyond
+      The last field is &quot;Level height&quot;, it defines the height beyond
       which shapes will stop showing when in level view mode. See &quot;Toggle
       level&quot;.
     </li>
