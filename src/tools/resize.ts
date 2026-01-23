@@ -12,7 +12,7 @@ import {
 import type { DragInfo } from "$/stage/pointer";
 import type { Box, Shape } from "$/types";
 import { getBBox } from "$/utils/bounds";
-import { resizeShapes, scaleShapes } from "$/utils/geometry";
+import { resizeShapes, resizeShapesAt } from "$/utils/geometry";
 import { getAxisPoint } from "$/utils/rays";
 
 import type { Tool } from ".";
@@ -155,7 +155,7 @@ export class ResizeTool implements Tool {
     }
 
     const resized = info.event.shiftKey
-      ? scaleShapes(this.snapshot, amount, this.anchor)
+      ? resizeShapesAt(this.snapshot, amount, this.anchor)
       : resizeShapes(this.snapshot, amount, this.axis);
 
     this.onResize(resized, getBBox(resized), info.position);

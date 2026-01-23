@@ -1,6 +1,7 @@
 import type { GridStore } from "$/stores/grid.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";
 import type { Shape } from "$/types";
+import { scaleShapes } from "$/utils/geometry";
 import { parse, serialize } from "$/utils/persistency";
 
 import type { Command } from ".";
@@ -43,15 +44,8 @@ class FileReadCommand implements Command {
 
     if (this.partial) {
       const ratio = grid.unit / this.grid.unit;
-      this.shapes.add(
-        ...shapes.map((s) => ({
-          ...s,
-          position: s.position.scale(ratio),
-          width: s.width * ratio,
-          height: s.height * ratio,
-          depth: s.depth * ratio,
-        })),
-      );
+      const scaled = scaleShapes(shapes, ratio);
+      this.shapes.add(...scaled);
     } else {
       this.shapes.reset(shapes);
       this.grid.update(grid);

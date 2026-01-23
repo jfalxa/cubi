@@ -3,6 +3,7 @@
   import type { GridStore } from "$/stores/grid.svelte";
   import type { ShapeStore } from "$/stores/shape.svelte";
   import Dialog from "$/ui/dialog.svelte";
+  import { scaleShapes } from "$/utils/geometry";
 
   type Props = {
     grid: GridStore;
@@ -43,16 +44,7 @@
     grid.showGridForm = false;
 
     if (ratio !== 1) {
-      shapes.update(
-        ...shapes.current.map((s) => ({
-          ...s,
-          position: s.position.scale(ratio),
-          width: s.width * ratio,
-          height: s.height * ratio,
-          depth: s.depth * ratio,
-        })),
-      );
-
+      shapes.update(...scaleShapes(shapes.current, ratio));
       camera.scale(ratio);
     }
   }

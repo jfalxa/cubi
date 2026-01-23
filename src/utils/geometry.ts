@@ -33,7 +33,39 @@ export function rotateShapes(
   });
 }
 
-export function scaleShapes(
+export function scaleShapes(shapes: Shape[], ratio: number) {
+  return shapes.map((s) => ({
+    ...s,
+    position: s.position.scale(ratio),
+    width: s.width * ratio,
+    height: s.height * ratio,
+    depth: s.depth * ratio,
+  }));
+}
+
+export function resizeShapes(
+  shapes: Shape[],
+  amount: Vector3,
+  axis: Vector3,
+): Shape[] {
+  return shapes.map((shape) => {
+    const position = shape.position.subtract(
+      new Vector3(
+        axis.x < 0 ? amount.x : 0, //
+        axis.y < 0 ? amount.y : 0,
+        axis.z < 0 ? amount.z : 0,
+      ),
+    );
+
+    const width = shape.width + amount.x;
+    const height = shape.height + amount.y;
+    const depth = shape.depth + amount.z;
+
+    return normalizeShape({ ...shape, position, width, height, depth });
+  });
+}
+
+export function resizeShapesAt(
   shapes: Shape[],
   amount: Vector3,
   anchor: Vector3,
@@ -59,27 +91,5 @@ export function scaleShapes(
       height: Math.round(shape.height * scale.y),
       depth: Math.round(shape.depth * scale.z),
     });
-  });
-}
-
-export function resizeShapes(
-  shapes: Shape[],
-  amount: Vector3,
-  axis: Vector3,
-): Shape[] {
-  return shapes.map((shape) => {
-    const position = shape.position.subtract(
-      new Vector3(
-        axis.x < 0 ? amount.x : 0, //
-        axis.y < 0 ? amount.y : 0,
-        axis.z < 0 ? amount.z : 0,
-      ),
-    );
-
-    const width = shape.width + amount.x;
-    const height = shape.height + amount.y;
-    const depth = shape.depth + amount.z;
-
-    return normalizeShape({ ...shape, position, width, height, depth });
   });
 }
