@@ -45,7 +45,7 @@ export class Tools {
   }: Dependencies) {
     this.layer = new LayerTool(stage, {
       onLayer: (layer) => {
-        grid.update({ layer });
+        grid.setLayer(layer);
         this.draw.reset();
         this.selection.clear();
       },
