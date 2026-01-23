@@ -5,7 +5,7 @@ import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import { ShapeMesh } from "$/stage/mesh";
 import type { MoveInfo } from "$/stage/pointer";
 import type { Box } from "$/types";
-import { getBoundingBox } from "$/utils/bounds";
+import { getBBox } from "$/utils/bounds";
 
 import type { Tool } from ".";
 
@@ -81,7 +81,7 @@ export class MeasureTool implements Tool {
       mesh.setHighlight(true);
     }
 
-    const box = getBoundingBox(boxMeshes.map((s) => s.shape));
+    const box = getBBox(boxMeshes.map((s) => s.shape));
     this.onMeasure(box, position);
   }
 }

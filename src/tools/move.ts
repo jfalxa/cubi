@@ -5,7 +5,7 @@ import { BoundingBox } from "$/stage/bounding-box";
 import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import type { DragInfo } from "$/stage/pointer";
 import type { Shape } from "$/types";
-import { getBoundingBox } from "$/utils/bounds";
+import { getBBox } from "$/utils/bounds";
 import { getElevation, getGridPoint } from "$/utils/rays";
 
 import type { Tool } from ".";
@@ -126,7 +126,7 @@ export class MoveTool implements Tool {
     const start = getElevation(info.start, camera, reference);
     const current = getElevation(info.position, camera, reference);
 
-    const minY = getBoundingBox(this.snapshot).min.y;
+    const minY = getBBox(this.snapshot).min.y;
     const travelY = Math.max(current - start, -minY);
 
     this.moveShapes(new Vector3(0, travelY, 0));

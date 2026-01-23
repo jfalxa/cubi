@@ -14,12 +14,20 @@ export interface Shape {
 export type PartialShape = Partial<Shape>;
 export type PartialShapeWithId = PartialShape & { id: string };
 
-export type SerializedShape = Omit<Shape, "position"> & { position: number[] };
+export type SerializedShape = Omit<Shape, "position"> & {
+  position: [number, number, number];
+};
 
 export interface Box {
   width: number;
   height: number;
   depth: number;
+}
+
+export interface BBox extends Box {
+  center: Vector3;
+  min: Vector3;
+  max: Vector3;
 }
 
 export type MeshFilter = (mesh: AbstractMesh) => boolean;

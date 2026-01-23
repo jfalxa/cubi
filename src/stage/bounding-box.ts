@@ -9,7 +9,7 @@ import {
 
 import { getColors } from "$/colors";
 import type { MeshFilter, Shape } from "$/types";
-import { getBoundingBox } from "$/utils/bounds";
+import { getBBox } from "$/utils/bounds";
 
 export class BoundingBox extends Mesh {
   static only: MeshFilter = (mesh) => mesh.name === "bounding-box";
@@ -30,7 +30,7 @@ export class BoundingBox extends Mesh {
       return;
     }
 
-    const { center, width, height, depth } = getBoundingBox(shapes);
+    const { center, width, height, depth } = getBBox(shapes);
 
     const p = 0.01; // padding
     this.scaling.set(width + p, height + p, depth + p);

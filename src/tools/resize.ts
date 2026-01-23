@@ -11,7 +11,7 @@ import {
 } from "$/stage/interactions";
 import type { DragInfo } from "$/stage/pointer";
 import type { Box, Shape } from "$/types";
-import { getBoundingBox } from "$/utils/bounds";
+import { getBBox } from "$/utils/bounds";
 import { resizeShapes, scaleShapes } from "$/utils/geometry";
 import { getAxisPoint } from "$/utils/rays";
 
@@ -112,7 +112,7 @@ export class ResizeTool implements Tool {
 
     const picked = this.pick(info.position);
     const face = Math.floor(picked.faceId / 2);
-    const bbox = getBoundingBox(this.snapshot);
+    const bbox = getBBox(this.snapshot);
 
     this.axis = ResizeTool.faces[face];
     this.anchor = bbox.center.clone();
@@ -145,7 +145,7 @@ export class ResizeTool implements Tool {
     const start = getAxisPoint(info.start, camera, this.anchor, this.axis);
     const current = getAxisPoint(info.position, camera, this.anchor, this.axis);
 
-    const bbox = getBoundingBox(this.snapshot);
+    const bbox = getBBox(this.snapshot);
     const amount = Grid.snap(this.axis.multiply(current.subtract(start)));
 
     if (this.axis.y > 0) {
@@ -158,7 +158,7 @@ export class ResizeTool implements Tool {
       ? scaleShapes(this.snapshot, amount, this.anchor)
       : resizeShapes(this.snapshot, amount, this.axis);
 
-    this.onResize(resized, getBoundingBox(resized), info.position);
+    this.onResize(resized, getBBox(resized), info.position);
   };
 
   private handleResizeEnd = () => {

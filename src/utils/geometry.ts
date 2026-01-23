@@ -3,7 +3,7 @@ import { Vector3 } from "@babylonjs/core";
 import { Grid } from "$/stage/grid";
 import type { Shape } from "$/types";
 
-import { getBoundingBox } from "./bounds";
+import { getBBox } from "./bounds";
 import { normalizeShape } from "./shape";
 
 export function rotateShapes(
@@ -12,7 +12,7 @@ export function rotateShapes(
 ): Shape[] {
   if (shapes.length === 0) return [];
 
-  const { min, max } = getBoundingBox(shapes);
+  const { min, max } = getBBox(shapes);
 
   return shapes.map((shape) => {
     const smin = shape.position;
@@ -40,7 +40,7 @@ export function scaleShapes(
 ): Shape[] {
   if (shapes.length === 0) return [];
 
-  const bbox = getBoundingBox(shapes);
+  const bbox = getBBox(shapes);
 
   const scale = new Vector3(
     bbox.width === 0 ? 1 : (bbox.width + amount.x) / bbox.width,

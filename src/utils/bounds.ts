@@ -1,6 +1,6 @@
 import { Vector3 } from "@babylonjs/core";
 
-import type { Shape } from "$/types";
+import type { BBox, Shape } from "$/types";
 
 export function getCenter(shape: Shape) {
   return shape.position.add(getDimensions(shape).scale(1 / 2));
@@ -16,7 +16,7 @@ export function getBounds(shape: Shape) {
   return { min, max };
 }
 
-export function getBoundingBox(shapes: Shape[]) {
+export function getBBox(shapes: Shape[]): BBox {
   let min = new Vector3(Infinity, Infinity, Infinity);
   let max = new Vector3(-Infinity, -Infinity, -Infinity);
 
