@@ -3,16 +3,16 @@ import type { Stage } from "$/stage";
 interface GridInit {
   width?: number;
   depth?: number;
+  height?: number;
   unit?: number;
   layer?: number;
-  level?: number;
 }
 
 const DEFAULT_GRID = {
   width: 10,
   depth: 10,
+  height: 20,
   unit: 10,
-  level: 20,
 };
 
 export class GridStore {
@@ -22,7 +22,8 @@ export class GridStore {
   layer = $state(0);
 
   cutOff = $state(false);
-  level = $state(0);
+  height = $state(0);
+  level = $derived(Math.floor(this.layer / this.height));
 
   showGridForm = $state(false);
 
@@ -31,25 +32,25 @@ export class GridStore {
 
     this.width = init?.width ?? cached.width;
     this.depth = init?.depth ?? cached.depth;
+    this.height = init?.height ?? cached.height;
     this.unit = init?.unit ?? cached.unit;
     this.layer = init?.layer ?? 0;
-    this.level = init?.level ?? cached.level;
   }
 
   setLayer(layer: number) {
     this.layer = Math.max(0, layer);
   }
 
-  moveLayer(delta: number) {
-    this.layer = Math.max(0, this.layer + delta);
+  setLevel(level: number) {
+    this.setLayer(level * this.height);
   }
 
-  update({ width, depth, unit, layer, level }: GridInit) {
+  update({ width, depth, unit, layer, height }: GridInit) {
     if (width !== undefined) this.width = width;
     if (depth !== undefined) this.depth = depth;
+    if (height !== undefined) this.height = height;
     if (unit !== undefined) this.unit = unit;
     if (layer !== undefined) this.layer = layer;
-    if (level !== undefined) this.level = level;
   }
 }
 
@@ -63,7 +64,7 @@ export function useGridSync(gridStore: GridStore, stage: Stage) {
 
   $effect(() => {
     const maxY = gridStore.cutOff
-      ? gridStore.layer + gridStore.level
+      ? (gridStore.level + 1) * gridStore.height
       : Infinity;
 
     for (const mesh of view.getMeshes()) {
@@ -76,15 +77,15 @@ export function useGridSync(gridStore: GridStore, stage: Stage) {
       gridStore.width,
       gridStore.depth,
       gridStore.unit,
-      gridStore.level,
+      gridStore.height,
     );
   });
 }
 
-function writeGrid(width: number, depth: number, unit: number, cutOff: number) {
+function writeGrid(width: number, depth: number, height: number, unit: number) {
   localStorage.setItem(
     "cubi:grid",
-    JSON.stringify({ width, depth, unit, cutOff }),
+    JSON.stringify({ width, depth, height, unit }),
   );
 }
 

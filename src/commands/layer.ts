@@ -16,7 +16,7 @@ export class LayerUpCommand implements Command {
   }
 
   execute(): void {
-    this.grid.moveLayer(+1);
+    this.grid.setLayer(this.grid.layer + 1);
   }
 }
 
@@ -34,7 +34,7 @@ export class LayerDownCommand implements Command {
   }
 
   execute(): void {
-    this.grid.moveLayer(-1);
+    this.grid.setLayer(this.grid.layer - 1);
   }
 }
 
@@ -52,7 +52,8 @@ export class LevelUpCommand implements Command {
   }
 
   execute(): void {
-    this.grid.moveLayer(this.grid.level);
+    const level = Math.floor(this.grid.layer / this.grid.height);
+    this.grid.setLevel(level + 1);
   }
 }
 
@@ -70,6 +71,7 @@ export class LevelDownCommand implements Command {
   }
 
   execute(): void {
-    this.grid.moveLayer(-this.grid.level);
+    const level = Math.ceil(this.grid.layer / this.grid.height);
+    this.grid.setLevel(level - 1);
   }
 }

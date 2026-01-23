@@ -21,7 +21,7 @@
       unit = String(grid.unit);
       width = String(gridToMeter(grid.width, grid.unit));
       depth = String(gridToMeter(grid.depth, grid.unit));
-      cutOff = String(gridToMeter(grid.level, grid.unit));
+      cutOff = String(gridToMeter(grid.height, grid.unit));
     }
   });
 
@@ -32,7 +32,7 @@
       unit: newUnit,
       width: meterToGrid(parseFloat(width), newUnit),
       depth: meterToGrid(parseFloat(depth), newUnit),
-      level: meterToGrid(parseFloat(cutOff), newUnit),
+      height: meterToGrid(parseFloat(cutOff), newUnit),
     });
 
     grid.showGridForm = false;

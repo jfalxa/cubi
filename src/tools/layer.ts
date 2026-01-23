@@ -53,7 +53,7 @@ export class LayerTool implements Tool {
   }
 
   handleLayer = (info: ClickInfo) => {
-    const picked = this.stage.pick(info.position, ShapeMesh.only);
+    const picked = this.stage.pick(info.position, ShapeMesh.visible);
 
     const position = picked.pickedPoint
       ? Grid.snap(picked.pickedPoint)
