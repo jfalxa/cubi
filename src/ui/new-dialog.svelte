@@ -1,22 +1,23 @@
 <script lang="ts">
   import type { ContextMenuStore } from "$/stores/context-menu.svelte";
+  import type { GridStore } from "$/stores/grid.svelte";
   import type { SelectionStore } from "$/stores/selection.svelte";
   import type { ShapeStore } from "$/stores/shape.svelte";
-  import { SelectionTool } from "$/tools/selection";
-
   import Dialog from "$/ui/dialog.svelte";
 
   type Props = {
     shapes: ShapeStore;
     selection: SelectionStore;
+    grid: GridStore;
     contextMenu: ContextMenuStore;
   };
 
-  let { shapes, selection, contextMenu }: Props = $props();
+  let { shapes, selection, grid, contextMenu }: Props = $props();
 
   function confirm() {
     shapes.reset();
     selection.clear();
+    grid.reset();
     contextMenu.showNewDialog = false;
   }
 

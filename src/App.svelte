@@ -7,8 +7,9 @@
   import { Tools } from "$/tools";
   import ContextMenu from "$/ui/context-menu.svelte";
   import FloatingMeasure from "$/ui/floating-measure.svelte";
-  import UsageDialog from "$/ui/usage.svelte";
   import NewDialog from "$/ui/new-dialog.svelte";
+  import UsageDialog from "$/ui/usage.svelte";
+
   import GridForm from "./ui/grid-form.svelte";
 
   let container: HTMLDivElement;
@@ -67,6 +68,7 @@
 <NewDialog
   shapes={stores.shapes}
   selection={stores.selection}
+  grid={stores.grid}
   contextMenu={stores.contextMenu}
 />
 
