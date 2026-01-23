@@ -12,8 +12,9 @@
   const { box, unit, position }: Props = $props();
 
   function meter(dimension: number) {
-    if (dimension < 100) return `${dimension}cm`;
-    else return `${(dimension / 100).toFixed(2)}m`.replace(".00", "");
+    if (dimension === 0) return "0";
+    if (dimension < 1) return `${(dimension * 100).toFixed(0)}cm`;
+    else return `${dimension.toFixed(2)}m`.replace(".00", "");
   }
 
   const width = $derived(meter(box.width * unit));

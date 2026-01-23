@@ -11,7 +11,7 @@ export const DEFAULT_GRID: GridInit = {
   width: 100,
   depth: 100,
   height: 20,
-  unit: 10,
+  unit: 0.1,
 };
 
 export class GridStore {
