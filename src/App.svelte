@@ -63,7 +63,7 @@
   position={stores.contextMenu.position}
 />
 
-<GridForm grid={stores.grid} shapes={stores.shapes} />
+<GridForm grid={stores.grid} shapes={stores.shapes} camera={stores.camera} />
 
 <NewDialog
   shapes={stores.shapes}

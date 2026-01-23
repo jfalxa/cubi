@@ -22,6 +22,11 @@ export class CameraStore {
     return isometricDirection.scale(100);
   }
 
+  scale(ratio: number) {
+    this.target = this.target.scale(ratio);
+    this.position = this.position.scale(ratio);
+  }
+
   reset() {
     this.position = CameraStore.defaultPosition();
     this.target = Vector3.Zero();

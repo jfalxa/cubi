@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { CameraStore } from "$/stores/camera.svelte";
   import type { GridStore } from "$/stores/grid.svelte";
   import type { ShapeStore } from "$/stores/shape.svelte";
   import Dialog from "$/ui/dialog.svelte";
@@ -6,9 +7,10 @@
   type Props = {
     grid: GridStore;
     shapes: ShapeStore;
+    camera: CameraStore;
   };
 
-  let { grid, shapes }: Props = $props();
+  let { grid, shapes, camera }: Props = $props();
 
   let width = $state("");
   let depth = $state("");
@@ -50,6 +52,8 @@
           depth: s.depth * ratio,
         })),
       );
+
+      camera.scale(ratio);
     }
   }
 
