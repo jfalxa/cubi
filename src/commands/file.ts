@@ -1,7 +1,7 @@
-import type { SelectionStore } from "$/stores/selection.svelte";
+import type { GridStore } from "$/stores/grid.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";
 import type { Shape } from "$/types";
-import { parseShapes, stringifyShapes } from "$/utils/shape";
+import { parse, serialize } from "$/utils/persistency";
 
 import type { Command } from ".";
 
@@ -12,7 +12,10 @@ class FileReadCommand implements Command {
   private input: HTMLInputElement;
   protected partial = false;
 
-  constructor(private shapes: ShapeStore) {
+  constructor(
+    private shapes: ShapeStore,
+    private grid: GridStore,
+  ) {
     this.input = document.createElement("input");
     this.input.type = "file";
     this.input.hidden = true;
@@ -36,12 +39,22 @@ class FileReadCommand implements Command {
     if (!file) return;
 
     const content = await file.text();
-    const shapes = parseShapes(content);
+    const { shapes, grid } = parse(content);
 
     if (this.partial) {
-      this.shapes.add(...shapes);
+      const ratio = grid.unit / this.grid.unit;
+      this.shapes.add(
+        ...shapes.map((s) => ({
+          ...s,
+          position: s.position.scale(ratio),
+          width: s.width * ratio,
+          height: s.height * ratio,
+          depth: s.depth * ratio,
+        })),
+      );
     } else {
       this.shapes.reset(shapes);
+      this.grid.update(grid);
     }
   };
 }
@@ -52,7 +65,10 @@ class FileWriteCommand implements Command {
 
   protected partial = false;
 
-  constructor(private shapes: ShapeStore) {}
+  constructor(
+    private shapes: ShapeStore,
+    private grid: GridStore,
+  ) {}
 
   isAvailable(context: Shape[]) {
     if (this.partial) {
@@ -64,7 +80,7 @@ class FileWriteCommand implements Command {
 
   execute(context: Shape[]): void {
     const shapes = this.partial ? context : this.shapes.current;
-    const serialized = stringifyShapes(shapes);
+    const serialized = serialize(shapes, this.grid);
 
     const blob = new Blob([serialized], {
       type: "application/json;charset=utf-8",

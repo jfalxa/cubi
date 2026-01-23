@@ -60,10 +60,10 @@ export class Commands {
   private commands!: Command[];
 
   constructor({ shapes, selection, grid, contextMenu }: Dependencies) {
-    this.open = new OpenCommand(shapes);
-    this.save = new SaveCommand(shapes);
-    this.import = new ImportCommand(shapes);
-    this.export = new ExportCommand(shapes);
+    this.open = new OpenCommand(shapes, grid);
+    this.save = new SaveCommand(shapes, grid);
+    this.import = new ImportCommand(shapes, grid);
+    this.export = new ExportCommand(shapes, grid);
     this.new = new NewCommand(shapes, contextMenu);
     this.undo = new UndoCommand(shapes, selection);
     this.redo = new RedoCommand(shapes, selection);
