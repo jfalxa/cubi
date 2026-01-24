@@ -98,6 +98,11 @@ It will adapt based on where the mouse is pointing at, and the current selection
 - Shortcut: `R` and `Shift-R`
 - Rotate the selection by +/- 90˚
 
+### Toggle camera
+
+- Shortcut: `F`
+- Switches between orbit camera and first person camera
+
 ### Toggle level
 
 - Shortcut: `Space`

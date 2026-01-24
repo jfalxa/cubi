@@ -166,6 +166,11 @@
     <li>Shortcut: <code>R</code> and <code>Shift-R</code></li>
     <li>Rotate the selection by +/- 90˚</li>
   </ul>
+  <h3 id="toggle-camera">Toggle camera</h3>
+  <ul>
+    <li>Shortcut: <code>F</code></li>
+    <li>Switches between orbit camera and first person camera</li>
+  </ul>
   <h3 id="toggle-level">Toggle level</h3>
   <ul>
     <li>Shortcut: <code>Space</code></li>
