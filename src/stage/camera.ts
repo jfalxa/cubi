@@ -21,6 +21,11 @@ const CameraPanIntent = createIntent("camera-pan");
 const CameraRotateIntent = createIntent("camera-rotate");
 const CameraZoomIntent = createIntent("camera-zoom");
 
+const MIN_CAMERA_RADIUS = 0.001;
+const WHEEL_DELTA_SCALE = 40;
+const MAX_WHEEL_DELTA = 0.2;
+const ZOOM_RESPONSE = 0.05;
+
 export class Camera extends ArcRotateCamera implements Interactive {
   view: View;
   interactions: Interactions;
@@ -101,12 +106,15 @@ export class Camera extends ArcRotateCamera implements Interactive {
 
   private handleZoom = (info: WheelInfo) => {
     info.event.preventDefault();
-    const delta = info.wheel / (this.wheelPrecision * 40);
-    this.inertialRadiusOffset += delta;
+    const rawDelta = info.wheel / (this.wheelPrecision * WHEEL_DELTA_SCALE);
+    const delta = Math.max(Math.min(rawDelta, MAX_WHEEL_DELTA), -MAX_WHEEL_DELTA);
+    const radius = Math.max(this.radius, MIN_CAMERA_RADIUS);
+    const zoomFactor = Math.exp(delta * ZOOM_RESPONSE);
+    this.inertialRadiusOffset += radius * (zoomFactor - 1);
   };
 
   private adaptPanningSensibility = () => {
-    const radius = Math.max(this.radius, 0.001);
+    const radius = Math.max(this.radius, MIN_CAMERA_RADIUS);
     this.panningSensibility = 10000 / radius;
   };
 }
