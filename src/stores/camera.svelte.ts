@@ -3,7 +3,7 @@ import { Vector3 } from "@babylonjs/core";
 
 import type { Camera } from "$/stage/camera";
 
-const DEFAULT_FOV = 0.8;
+export const CAMERA_FOV = 0.8;
 const FIT_PADDING = 1.1;
 
 interface CameraInit {
@@ -42,7 +42,7 @@ export class CameraStore {
     const distance =
       radius === 0
         ? CameraStore.defaultPosition().length()
-        : (radius / Math.sin(DEFAULT_FOV / 2)) * FIT_PADDING;
+        : (radius / Math.sin(CAMERA_FOV / 2)) * FIT_PADDING;
 
     this.position = direction.scale(distance);
     this.target = new Vector3(0, height / 2, 0);
