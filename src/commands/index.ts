@@ -1,6 +1,7 @@
 import hotkeys from "hotkeys-js";
 
 import type { ContextMenuStore } from "$/stores/context-menu.svelte";
+import type { CameraStore } from "$/stores/camera.svelte";
 import type { GridStore } from "$/stores/grid.svelte";
 import type { SelectionStore } from "$/stores/selection.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";
@@ -27,6 +28,7 @@ import { RotateCCWCommand, RotateCWCommand } from "./rotate";
 export interface Dependencies {
   selection: SelectionStore;
   shapes: ShapeStore;
+  camera: CameraStore;
   grid: GridStore;
   contextMenu: ContextMenuStore;
 }
@@ -59,10 +61,10 @@ export class Commands {
   private selection: SelectionStore;
   private commands!: Command[];
 
-  constructor({ shapes, selection, grid, contextMenu }: Dependencies) {
-    this.open = new OpenCommand(shapes, grid);
+  constructor({ shapes, selection, camera, grid, contextMenu }: Dependencies) {
+    this.open = new OpenCommand(shapes, grid, camera);
     this.save = new SaveCommand(shapes, grid);
-    this.import = new ImportCommand(shapes, grid);
+    this.import = new ImportCommand(shapes, grid, camera);
     this.export = new ExportCommand(shapes, grid);
     this.new = new NewCommand(shapes, contextMenu);
     this.undo = new UndoCommand(shapes, selection);

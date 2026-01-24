@@ -1,6 +1,8 @@
+import type { CameraStore } from "$/stores/camera.svelte";
 import type { GridStore } from "$/stores/grid.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";
 import type { Shape } from "$/types";
+import { getHeight } from "$/utils/bounds";
 import { scaleShapes } from "$/utils/geometry";
 import { parse, serialize } from "$/utils/persistency";
 
@@ -16,6 +18,7 @@ class FileReadCommand implements Command {
   constructor(
     private shapes: ShapeStore,
     private grid: GridStore,
+    private camera: CameraStore,
   ) {
     this.input = document.createElement("input");
     this.input.type = "file";
@@ -49,6 +52,8 @@ class FileReadCommand implements Command {
     } else {
       this.shapes.reset(shapes);
       this.grid.update(grid);
+      const height = getHeight(shapes);
+      this.camera.fit(grid.width, height, grid.depth);
     }
   };
 }

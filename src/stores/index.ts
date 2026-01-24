@@ -34,5 +34,5 @@ export function useSync(stores: Stores, stage: Stage, tools: Tools) {
   useGridSync(stores.grid, stage);
   useShapeSync(stores.shapes, stage.view);
   useSelectionSync(stores.selection, stage, tools.selection);
-  useLocalStorageSync(stores.shapes, stores.grid);
+  useLocalStorageSync(stores.shapes, stores.grid, stores.camera);
 }

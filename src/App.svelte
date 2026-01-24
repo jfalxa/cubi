@@ -21,6 +21,7 @@
   const commands = new Commands({
     shapes: stores.shapes,
     selection: stores.selection,
+    camera: stores.camera,
     grid: stores.grid,
     contextMenu: stores.contextMenu,
   });
@@ -69,6 +70,7 @@
   shapes={stores.shapes}
   selection={stores.selection}
   grid={stores.grid}
+  camera={stores.camera}
   contextMenu={stores.contextMenu}
 />
 

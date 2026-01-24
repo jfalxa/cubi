@@ -34,6 +34,18 @@ export function getBBox(shapes: Shape[]): BBox {
   return { center, width, height, depth, min, max };
 }
 
+export function getHeight(shapes: Shape[]): number {
+  if (shapes.length === 0) return 0;
+
+  let height = 0;
+  for (const shape of shapes) {
+    const shapeHeight = shape.position.y + shape.height;
+    if (shapeHeight > height) height = shapeHeight;
+  }
+
+  return height;
+}
+
 export function areShapesConnected(
   a: Shape,
   b: Shape,

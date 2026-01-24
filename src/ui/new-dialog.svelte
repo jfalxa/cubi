@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ContextMenuStore } from "$/stores/context-menu.svelte";
+  import type { CameraStore } from "$/stores/camera.svelte";
   import type { GridStore } from "$/stores/grid.svelte";
   import type { SelectionStore } from "$/stores/selection.svelte";
   import type { ShapeStore } from "$/stores/shape.svelte";
@@ -9,15 +10,17 @@
     shapes: ShapeStore;
     selection: SelectionStore;
     grid: GridStore;
+    camera: CameraStore;
     contextMenu: ContextMenuStore;
   };
 
-  let { shapes, selection, grid, contextMenu }: Props = $props();
+  let { shapes, selection, grid, camera, contextMenu }: Props = $props();
 
   function confirm() {
     shapes.reset();
     selection.clear();
     grid.reset();
+    camera.fit(grid.width, 0, grid.depth);
     contextMenu.showNewDialog = false;
   }
 
