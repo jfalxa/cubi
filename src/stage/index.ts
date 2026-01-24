@@ -2,6 +2,7 @@ import type { Vector2 } from "@babylonjs/core";
 
 import type { MeshFilter } from "$/types";
 
+import { Alignment } from "./align";
 import { BoundingBox } from "./bounding-box";
 import { Camera } from "./camera";
 import { Grid } from "./grid";
@@ -14,6 +15,7 @@ export class Stage {
   camera: Camera;
   grid: Grid;
   boundingBox: BoundingBox;
+  align: Alignment;
 
   constructor() {
     this.view = new View();
@@ -21,6 +23,7 @@ export class Stage {
     this.camera = new Camera(this.view, this.interactions);
     this.grid = new Grid(this.view);
     this.boundingBox = new BoundingBox(this.view.scene);
+    this.align = new Alignment(this);
   }
 
   mount(container: HTMLElement) {

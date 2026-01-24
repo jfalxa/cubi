@@ -24,10 +24,13 @@ export interface Box {
   depth: number;
 }
 
-export interface BBox extends Box {
-  center: Vector3;
+export interface Bounds {
   min: Vector3;
   max: Vector3;
+}
+
+export interface BBox extends Box, Bounds {
+  center: Vector3;
 }
 
 export type MeshFilter = (mesh: AbstractMesh) => boolean;

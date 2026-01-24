@@ -1,6 +1,6 @@
 import { Vector3 } from "@babylonjs/core";
 
-import type { BBox, Shape } from "$/types";
+import type { BBox, Bounds, Shape } from "$/types";
 
 export function getCenter(shape: Shape) {
   return shape.position.add(getDimensions(shape).scale(1 / 2));
@@ -10,7 +10,7 @@ export function getDimensions(shape: Shape) {
   return new Vector3(shape.width, shape.height, shape.depth);
 }
 
-export function getBounds(shape: Shape) {
+export function getBounds(shape: Shape): Bounds {
   const min = shape.position.clone();
   const max = shape.position.add(getDimensions(shape));
   return { min, max };
@@ -42,15 +42,17 @@ export function areShapesConnected(
   const aBounds = getBounds(a);
   const bBounds = getBounds(b);
 
-  const xOverlap =
-    aBounds.min.x <= bBounds.max.x + epsilon &&
-    aBounds.max.x + epsilon >= bBounds.min.x;
-  const yOverlap =
-    aBounds.min.y <= bBounds.max.y + epsilon &&
-    aBounds.max.y + epsilon >= bBounds.min.y;
-  const zOverlap =
-    aBounds.min.z <= bBounds.max.z + epsilon &&
-    aBounds.max.z + epsilon >= bBounds.min.z;
+  const xOverlap = hasOverlap("x", aBounds, bBounds, epsilon);
+  const yOverlap = hasOverlap("y", aBounds, bBounds, epsilon);
+  const zOverlap = hasOverlap("z", aBounds, bBounds, epsilon);
 
   return xOverlap && yOverlap && zOverlap;
+}
+
+type Axis = "x" | "y" | "z";
+
+export function hasOverlap(axis: Axis, a: Bounds, b: Bounds, epsilon = 1e-6) {
+  const isOverlapMin = a.min[axis] <= b.max[axis] + epsilon;
+  const isOverlapMax = a.max[axis] + epsilon >= b.min[axis];
+  return isOverlapMin && isOverlapMax;
 }
