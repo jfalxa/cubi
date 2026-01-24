@@ -39,10 +39,10 @@ export class Alignment {
   static createGuides(scene: Scene) {
     const guides = { x: {}, y: {}, z: {} } as Faces<Mesh>;
 
-    const material = new StandardMaterial("guide_material");
-    material.specularColor = Color3.Black();
-    material.diffuseColor = Color3.FromHexString(getColors().guide);
-    material.alpha = 0.2;
+    const material1 = new StandardMaterial("guide_material");
+    material1.specularColor = Color3.Black();
+    material1.diffuseColor = Color3.FromHexString(getColors().guide);
+    material1.alpha = 0.1;
 
     for (const axis of AXES) {
       for (const feature of FEATURES) {
@@ -52,7 +52,7 @@ export class Alignment {
           scene,
         );
 
-        guide.material = material;
+        guide.material = material1;
         guide.isPickable = false;
         guide.setEnabled(false);
         guides[axis][feature] = guide;
@@ -64,9 +64,10 @@ export class Alignment {
 
   start(selection: Shape[]) {
     const omit = new Set(selection.map((s) => s.id));
-    const shapes = this.stage.view.getMeshes().map((s) => s.shape);
-    const others = shapes.filter((s) => !omit.has(s.id));
-    const groups = Object.values(groupBy(others, (s) => s.group ?? s.id));
+    const meshes = this.stage.view.getMeshes();
+    const others = meshes.filter((s) => s.isVisible() && !omit.has(s.id));
+    const shapes = others.map((s) => s.shape);
+    const groups = Object.values(groupBy(shapes, (s) => s.group ?? s.id));
     this.others = groups.map(getBBox);
   }
 
@@ -125,8 +126,8 @@ export class Alignment {
                 max: a.max.clone(),
               };
 
-              bounds.min = Vector3.Maximize(bounds.min, b.min);
-              bounds.max = Vector3.Minimize(bounds.max, b.max);
+              bounds.min = Vector3.Minimize(bounds.min, b.min);
+              bounds.max = Vector3.Maximize(bounds.max, b.max);
 
               bounds.min[axis] = tA;
               bounds.max[axis] = tA;

@@ -89,18 +89,22 @@ export class MoveTool implements Tool {
   }
 
   private moveShapes(travel: Vector3) {
-    this.onMove(
-      this.snapshot.map((shape) => ({
-        ...shape,
-        position: shape.position.add(travel),
-      })),
-    );
+    const moved = this.snapshot.map((shape) => ({
+      ...shape,
+      position: shape.position.add(travel),
+    }));
+
+    this.stage.align.update(moved);
+
+    this.onMove(moved);
   }
 
   private handleMoveStart = (info: DragInfo) => {
     this.active = true;
     this.vertical = info.event.shiftKey;
     this.snapshot = this.onMoveStart();
+
+    this.stage.align.start(this.snapshot);
   };
 
   private handleMove = (info: DragInfo) => {
@@ -120,7 +124,7 @@ export class MoveTool implements Tool {
   };
 
   private handleMoveVertical = (info: DragInfo) => {
-    const { camera, grid } = this.stage;
+    const { camera } = this.stage;
     const [reference] = this.snapshot;
 
     const start = getElevation(info.start, camera, reference);
@@ -136,5 +140,6 @@ export class MoveTool implements Tool {
     this.active = false;
     this.vertical = false;
     this.onMoveEnd();
+    this.stage.align.stop();
   };
 }
