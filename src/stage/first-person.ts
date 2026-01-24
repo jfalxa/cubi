@@ -61,7 +61,6 @@ export class FirstPersonController {
   private beforeRenderObserver: Observer<Scene> | null = null;
   private groundMesh: GroundMesh | null = null;
   private groundAggregate: PhysicsAggregate | null = null;
-  private debugFrame = 0;
 
   private keys = {
     forward: false,
@@ -254,7 +253,7 @@ export class FirstPersonController {
     this.targetPitch = this.pitch;
     this.camera.rotation.set(this.pitch, this.yaw, 0);
 
-    return new Vector3(target.x, target.y + this.height + 100, target.z);
+    return new Vector3(target.x, target.y + this.height, target.z);
   }
 
   private hideGrid() {
@@ -486,18 +485,6 @@ export class FirstPersonController {
     this.cameraPos.y += (targetPos.y - this.cameraPos.y) * posSmoothing;
     this.cameraPos.z += (targetPos.z - this.cameraPos.z) * posSmoothing;
     this.camera.position.copyFrom(this.cameraPos);
-
-    this.debugFrame += 1;
-    if (this.debugFrame % 60 === 0) {
-      // Basic runtime signals to confirm physics and gravity are active.
-      const physicsEnabled = !!this.view.scene.getPhysicsEngine();
-      console.log("[fp]", {
-        physicsEnabled,
-        gravity: physicsGravity.asArray(),
-        supportedState: surface.supportedState,
-        pos: pos.asArray(),
-      });
-    }
   };
 
   private tryStepUp(desiredDir: Vector3) {
