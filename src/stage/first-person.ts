@@ -1,32 +1,40 @@
 import hotkeys from "hotkeys-js";
 import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { GroundMesh } from "@babylonjs/core/Meshes/groundMesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Observer } from "@babylonjs/core/Misc/observable";
+import {
+  CharacterSupportedState,
+  PhysicsCharacterController,
+} from "@babylonjs/core/Physics/v2/characterController";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+
+import "@babylonjs/core/Physics/v2/physicsEngineComponent";
+
+import { Color3, StandardMaterial } from "@babylonjs/core";
 import type { Scene } from "@babylonjs/core/scene";
+import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
 
 import type { Grid } from "$/stage/grid";
 import type { Interactions } from "$/stage/interactions";
+import type { ShapeMesh } from "$/stage/mesh";
 import type { View } from "$/stage/view";
-import { getColors } from "$/utils/colors";
 
-const PLAYER_HEIGHT_M = 1.6;
-const STEP_HEIGHT_M = 0.2;
-const PLAYER_RADIUS_M = 0.15;
-const WALK_SPEED_M = 3;
-const JUMP_SPEED_M = 4;
+const PLAYER_HEIGHT_M = 1.7;
+const PLAYER_RADIUS_M = 0.1;
+const WALK_SPEED_M = 4;
+const JUMP_SPEED_M = 5;
 const POINTER_SENSITIVITY = 0.0025;
-const GROUND_OFFSET = -0.002;
-const GROUND_LERP = 10; // vertical smoothing factor (per second)
-const STEP_TOLERANCE = 0.05; // extra meters beyond nominal step height
-const CLEARANCE_EPS = 0.01; // tolerance to avoid sticking
-const MIN_PITCH = -Math.PI / 2 + 0.05;
-const MAX_PITCH = Math.PI / 2 - 0.05;
+const POINTER_SMOOTHING = 40;
 const FIRST_PERSON_FOV = 0.8;
 const GRAVITY_M = 9.81;
+const MAX_SLOPE_DEG = 60;
+const STEP_HEIGHT_M = 0.2;
+const STEP_CLEARANCE_M = 0.03;
+const CAMERA_POS_SMOOTHING = 25;
 
 export class FirstPersonController {
   view: View;
@@ -34,31 +42,37 @@ export class FirstPersonController {
   interactions: Interactions;
 
   camera: UniversalCamera;
-  ground: GroundMesh;
-
   active = false;
 
   private unit = 1;
-  private eyeHeight = PLAYER_HEIGHT_M;
-  private stepHeight = STEP_HEIGHT_M;
   private radius = PLAYER_RADIUS_M;
+  private height = PLAYER_HEIGHT_M;
   private speed = WALK_SPEED_M;
-  private groundHeight = 0;
-  private verticalVelocity = 0;
-  private grounded = true;
+  private jumpSpeed = JUMP_SPEED_M;
+  private eyeOffset = PLAYER_HEIGHT_M * 0.35;
 
   private yaw = 0;
   private pitch = 0;
+  private targetYaw = 0;
+  private targetPitch = 0;
+  private cameraPos = Vector3.Zero();
+
+  private controller: PhysicsCharacterController | null = null;
+  private beforeRenderObserver: Observer<Scene> | null = null;
+  private groundMesh: GroundMesh | null = null;
+  private groundAggregate: PhysicsAggregate | null = null;
+  private debugFrame = 0;
 
   private keys = {
     forward: false,
     back: false,
     left: false,
     right: false,
+    jump: false,
   };
 
-  private beforeRenderObserver: Observer<Scene> | null = null;
-  private gridEnabledBefore = true;
+  private havokModule: HavokPhysicsWithBindings | null = null;
+  private physicsReady = false;
 
   constructor(view: View, grid: Grid, interactions: Interactions) {
     this.view = view;
@@ -77,44 +91,16 @@ export class FirstPersonController {
     this.camera.speed = 0;
     this.camera.inputs.clear();
     this.camera.setEnabled(false);
-
-    this.ground = MeshBuilder.CreateGround(
-      "first-person-ground",
-      { width: 1, height: 1 },
-      this.view.scene,
-    );
-
-    const material = new StandardMaterial(
-      "first-person-ground-mat",
-      this.view.scene,
-    );
-    const colors = getColors();
-    material.diffuseColor = Color3.FromHexString(colors.minor);
-    material.specularColor = Color3.Black();
-    material.alpha = 0.55;
-
-    this.ground.material = material;
-    this.ground.isVisible = false;
-    this.ground.checkCollisions = true;
-    this.ground.isPickable = false;
-    this.ground.position.y = GROUND_OFFSET;
   }
 
-  configure(unit: number, width: number, depth: number) {
+  configure(unit: number) {
     this.unit = unit;
-    this.eyeHeight = PLAYER_HEIGHT_M / unit;
-    this.stepHeight = STEP_HEIGHT_M / unit;
+    this.height = PLAYER_HEIGHT_M / unit;
     this.radius = PLAYER_RADIUS_M / unit;
     this.speed = WALK_SPEED_M / unit;
-    this.view.scene.gravity = new Vector3(0, -GRAVITY_M / this.unit, 0);
-
-    const halfHeight = this.eyeHeight / 2;
-    this.camera.ellipsoid = new Vector3(this.radius, halfHeight, this.radius);
-    this.camera.ellipsoidOffset = new Vector3(0, halfHeight, 0);
-
-    const safeWidth = Math.max(width, 0.001);
-    const safeDepth = Math.max(depth, 0.001);
-    this.ground.scaling.set(safeWidth, 1, safeDepth);
+    this.jumpSpeed = JUMP_SPEED_M / unit;
+    this.eyeOffset = this.height * 0.35;
+    this.applyGravity();
   }
 
   toggle(from?: { position: Vector3; target?: Vector3 }) {
@@ -122,25 +108,21 @@ export class FirstPersonController {
     return this.enter(from);
   }
 
-  enter(from?: { position: Vector3; target?: Vector3 }) {
+  async enter(from?: { position: Vector3; target?: Vector3 }) {
     if (this.active) return;
+
+    await this.ensurePhysics();
+    if (!this.physicsReady) return;
 
     this.active = true;
     this.interactions.suspend();
     hotkeys.setScope("fp");
 
-    this.view.scene.collisionsEnabled = true;
-    this.view.scene.gravity = new Vector3(0, -GRAVITY_M / this.unit, 0);
-    this.camera.checkCollisions = true;
-    this.camera.applyGravity = false;
+    this.hideGrid();
+    this.prepareGround();
 
     const spawn = this.getSpawn(from);
-    this.camera.position.copyFrom(spawn);
-
-    this.ground.isVisible = true;
-    this.ground.setEnabled(true);
-    this.gridEnabledBefore = this.grid.mesh.isEnabled();
-    this.grid.mesh.setEnabled(false);
+    this.setupController(spawn);
     this.camera.setEnabled(true);
     this.view.scene.activeCamera = this.camera;
 
@@ -178,25 +160,89 @@ export class FirstPersonController {
     }
 
     this.camera.setEnabled(false);
-    this.ground.isVisible = false;
-    this.ground.setEnabled(false);
-    this.grid.mesh.setEnabled(this.gridEnabledBefore);
+    this.restoreGrid();
+    this.teardownGround();
 
-    this.keys = {
-      forward: false,
-      back: false,
-      left: false,
-      right: false,
-    };
+    this.controller?.dispose();
+    this.controller = null;
+  }
 
-    this.verticalVelocity = 0;
-    this.grounded = true;
+  dispose() {
+    this.exit();
+
+    this.groundAggregate?.dispose();
+    this.groundAggregate = null;
+    this.groundMesh?.dispose();
+    this.groundMesh = null;
+  }
+
+  private async ensurePhysics() {
+    if (this.physicsReady) return;
+
+    const { default: loadHavok } = await import("@babylonjs/havok");
+    this.havokModule = await loadHavok();
+
+    const scene = this.view.scene;
+    const plugin = new HavokPlugin(true, this.havokModule);
+    scene.enablePhysics(new Vector3(0, -GRAVITY_M, 0), plugin);
+    this.applyGravity();
+
+    this.attachPhysicsToMeshes(scene, this.view.getMeshes());
+
+    this.physicsReady = true;
+  }
+
+  private applyGravity() {
+    const gravity = new Vector3(0, -GRAVITY_M / this.unit, 0);
+    this.view.scene.gravity = gravity;
+    this.view.scene.getPhysicsEngine()?.setGravity(gravity);
+  }
+
+  private attachPhysicsToMeshes(scene: Scene, meshes: ShapeMesh[]) {
+    for (const mesh of meshes) {
+      new PhysicsAggregate(
+        mesh.instance,
+        PhysicsShapeType.BOX,
+        {
+          mass: 0,
+          friction: 0.8,
+          restitution: 0,
+        },
+        scene,
+      );
+    }
+  }
+
+  private setupController(spawn: Vector3) {
+    const scene = this.view.scene;
+
+    this.controller?.dispose();
+
+    this.controller = new PhysicsCharacterController(
+      spawn,
+      {
+        capsuleHeight: this.height,
+        capsuleRadius: this.radius,
+      },
+      scene,
+    );
+
+    this.controller.maxSlopeCosine = Math.cos((MAX_SLOPE_DEG * Math.PI) / 180);
+    this.controller.up = new Vector3(0, 1, 0);
+    this.controller.maxCharacterSpeedForSolver = 10 / this.unit;
+    this.controller.penetrationRecoverySpeed = 2;
+    this.controller.acceleration = 0.3;
+    this.controller.maxAcceleration = this.speed * 15;
+
+    this.camera.position.copyFrom(spawn);
+    this.camera.position.y += this.eyeOffset;
+    this.cameraPos.copyFrom(this.camera.position);
+    this.camera.rotation.set(this.pitch, this.yaw, 0);
   }
 
   private getSpawn(from?: { position: Vector3; target?: Vector3 }) {
     const target = from?.target ?? Vector3.Zero();
-    const source =
-      from?.position ?? target.add(new Vector3(0, this.eyeHeight, 0));
+    const source = from?.position ?? target.add(new Vector3(0, this.height, 0));
     let forward = target.subtract(source).normalize();
     if (!isFinite(forward.lengthSquared()) || forward.lengthSquared() === 0) {
       forward = new Vector3(0, 0, 1);
@@ -204,27 +250,74 @@ export class FirstPersonController {
 
     this.yaw = Math.atan2(forward.x, forward.z);
     this.pitch = Math.asin(forward.y);
-    this.pitch = Math.min(Math.max(this.pitch, MIN_PITCH), MAX_PITCH);
+    this.targetYaw = this.yaw;
+    this.targetPitch = this.pitch;
     this.camera.rotation.set(this.pitch, this.yaw, 0);
 
-    const ground = this.getGroundHeight(target, 0);
-    const surface = ground ?? this.getSurfaceHeight(target);
-    this.groundHeight = Math.max(surface, 0);
-    this.verticalVelocity = 0;
-    this.grounded = true;
+    return new Vector3(target.x, target.y + this.height + 100, target.z);
+  }
 
-    return new Vector3(target.x, this.groundHeight + this.eyeHeight, target.z);
+  private hideGrid() {
+    this.grid.mesh.setEnabled(false);
+  }
+
+  private restoreGrid() {
+    this.grid.mesh.setEnabled(true);
+  }
+
+  private prepareGround() {
+    const scene = this.view.scene;
+
+    if (!this.groundMesh) {
+      this.groundMesh = MeshBuilder.CreateGround(
+        "fp-ground",
+        { width: 1, height: 1 },
+        scene,
+      );
+      const material = new StandardMaterial("ground_material", scene);
+      material.specularColor = Color3.Black();
+      material.diffuseColor = Color3.FromHexString("#dcdcdc");
+
+      this.groundMesh.material = material;
+    }
+
+    this.groundMesh.scaling.set(this.grid.width, 1, this.grid.depth);
+    this.groundMesh.position.set(0, 0, 0);
+    this.groundMesh.isVisible = true;
+    this.groundMesh.setEnabled(true);
+
+    this.groundAggregate?.dispose();
+    this.groundAggregate = new PhysicsAggregate(
+      this.groundMesh,
+      PhysicsShapeType.MESH,
+      {
+        mass: 0,
+        friction: 0.9,
+        restitution: 0,
+      },
+      scene,
+    );
+  }
+
+  private teardownGround() {
+    this.groundAggregate?.dispose();
+    this.groundAggregate = null;
+
+    if (this.groundMesh) {
+      this.groundMesh.isVisible = false;
+      this.groundMesh.setEnabled(false);
+    }
   }
 
   private handlePointerMove = (event: PointerEvent) => {
     if (!this.active) return;
     if (document.pointerLockElement !== this.view.canvas) return;
 
-    this.yaw += event.movementX * POINTER_SENSITIVITY;
-    this.pitch += event.movementY * POINTER_SENSITIVITY;
-    this.pitch = Math.min(Math.max(this.pitch, MIN_PITCH), MAX_PITCH);
-
-    this.camera.rotation.set(this.pitch, this.yaw, 0);
+    this.targetYaw += event.movementX * POINTER_SENSITIVITY;
+    this.targetPitch += event.movementY * POINTER_SENSITIVITY;
+    const minPitch = -Math.PI / 2 + 0.05;
+    const maxPitch = Math.PI / 2 - 0.05;
+    this.targetPitch = Math.min(Math.max(this.targetPitch, minPitch), maxPitch);
   };
 
   private handleKeyDown = (event: KeyboardEvent) => {
@@ -247,10 +340,7 @@ export class FirstPersonController {
         this.keys.right = true;
         break;
       case "Space":
-        if (this.grounded) {
-          this.verticalVelocity = JUMP_SPEED_M / this.unit;
-          this.grounded = false;
-        }
+        this.keys.jump = true;
         break;
       default:
         handled = false;
@@ -279,8 +369,7 @@ export class FirstPersonController {
         this.keys.right = false;
         break;
       case "Space":
-        // no-op on release
-        handled = false;
+        this.keys.jump = false;
         break;
       default:
         handled = false;
@@ -304,62 +393,17 @@ export class FirstPersonController {
   };
 
   private update = () => {
-    if (!this.active) return;
+    if (!this.active || !this.controller) return;
 
     const delta = this.view.engine.getDeltaTime() / 1000;
     if (!delta) return;
 
-    const direction = this.getMoveDirection();
-    const hasHorizontal = direction.lengthSquared() > 0;
+    const smoothing = 1 - Math.exp(-POINTER_SMOOTHING * delta);
+    this.yaw += (this.targetYaw - this.yaw) * smoothing;
+    this.pitch += (this.targetPitch - this.pitch) * smoothing;
+    this.camera.rotation.set(this.pitch, this.yaw, 0);
 
-    const horizontalStep = hasHorizontal
-      ? direction.normalize().scale(this.speed * delta)
-      : Vector3.Zero();
-
-    const target = this.camera.position.add(horizontalStep);
-    const support = this.getGroundHeight(target, this.groundHeight);
-    if (support === null) return;
-
-    // apply horizontal move immediately
-    this.camera.position.x = target.x;
-    this.camera.position.z = target.z;
-
-    // gravity integration
-    this.verticalVelocity -= (GRAVITY_M / this.unit) * delta;
-
-    // step-up snap when grounded and within step height
-    const rising = support > this.groundHeight + CLEARANCE_EPS;
-    const smallStep =
-      support - this.groundHeight <= this.stepHeight + STEP_TOLERANCE;
-
-    if (this.grounded && rising && smallStep) {
-      this.groundHeight = support;
-      this.verticalVelocity = 0;
-      this.grounded = true;
-    } else {
-      this.groundHeight = this.lerp(
-        this.groundHeight,
-        support,
-        1 - Math.exp(-GROUND_LERP * delta),
-      );
-      this.grounded = false;
-    }
-
-    // vertical position update
-    let nextY = this.camera.position.y + this.verticalVelocity * delta;
-    const floorY = support + this.eyeHeight;
-
-    if (nextY <= floorY) {
-      nextY = floorY;
-      this.verticalVelocity = 0;
-      this.grounded = true;
-      this.groundHeight = support;
-    }
-
-    this.camera.position.y = nextY;
-  };
-
-  private getMoveDirection() {
+    // desired velocity in local space
     const forward = this.camera.getDirection(Vector3.Forward());
     forward.y = 0;
     forward.normalize();
@@ -368,93 +412,131 @@ export class FirstPersonController {
     right.y = 0;
     right.normalize();
 
-    const dir = Vector3.Zero();
-    if (this.keys.forward) dir.addInPlace(forward);
-    if (this.keys.back) dir.subtractInPlace(forward);
-    if (this.keys.left) dir.subtractInPlace(right);
-    if (this.keys.right) dir.addInPlace(right);
-    return dir;
-  }
+    const desired = Vector3.Zero();
 
-  private getGroundHeight(
-    position: Vector3,
-    currentGround: number,
-  ): number | null {
-    const head = currentGround + this.eyeHeight;
-    const climbLimit = currentGround + this.stepHeight + STEP_TOLERANCE;
+    if (this.keys.forward) desired.addInPlace(forward);
+    if (this.keys.back) desired.subtractInPlace(forward);
+    if (this.keys.left) desired.subtractInPlace(right);
+    if (this.keys.right) desired.addInPlace(right);
 
-    let ground = 0;
-
-    const meshes = this.view.getMeshes();
-    for (const mesh of meshes) {
-      const { shape } = mesh;
-
-      const minX = shape.position.x - this.radius;
-      const maxX = shape.position.x + shape.width + this.radius;
-      const minZ = shape.position.z - this.radius;
-      const maxZ = shape.position.z + shape.depth + this.radius;
-
-      if (
-        position.x < minX ||
-        position.x > maxX ||
-        position.z < minZ ||
-        position.z > maxZ
-      ) {
-        continue;
-      }
-
-      const bottom = shape.position.y;
-      const top = bottom + shape.height;
-
-      if (top <= climbLimit + CLEARANCE_EPS) {
-        ground = Math.max(ground, top);
-        continue;
-      }
-
-      if (
-        bottom < head - CLEARANCE_EPS &&
-        top > currentGround - CLEARANCE_EPS
-      ) {
-        return null;
-      }
+    if (desired.lengthSquared() > 0) {
+      desired.normalize().scaleInPlace(this.speed);
     }
 
-    return ground;
-  }
+    const physicsGravity =
+      this.view.scene.getPhysicsEngine()?.gravity ?? this.view.scene.gravity;
+    if (physicsGravity.lengthSquared() === 0) {
+      physicsGravity.set(0, -GRAVITY_M / this.unit, 0);
+    }
+    const gravityDir =
+      physicsGravity.lengthSquared() > 0
+        ? physicsGravity.normalizeToNew()
+        : new Vector3(0, -1, 0);
 
-  private lerp(a: number, b: number, t: number) {
-    return a + (b - a) * t;
-  }
+    const surface = this.controller.checkSupport(delta, gravityDir);
+    const surfaceNormal =
+      surface.averageSurfaceNormal.lengthSquared() > 1e-6
+        ? surface.averageSurfaceNormal
+        : this.controller.up;
 
-  private getSurfaceHeight(position: Vector3) {
-    let surface = 0;
-
-    for (const mesh of this.view.getMeshes()) {
-      const { shape } = mesh;
-
-      const minX = shape.position.x - this.radius;
-      const maxX = shape.position.x + shape.width + this.radius;
-      const minZ = shape.position.z - this.radius;
-      const maxZ = shape.position.z + shape.depth + this.radius;
-
-      if (
-        position.x < minX ||
-        position.x > maxX ||
-        position.z < minZ ||
-        position.z > maxZ
-      ) {
-        continue;
-      }
-
-      surface = Math.max(surface, shape.position.y + shape.height);
+    if (
+      surface.supportedState === CharacterSupportedState.SUPPORTED &&
+      desired.lengthSquared() > 1e-6 &&
+      !this.keys.jump
+    ) {
+      this.tryStepUp(desired.normalizeToNew());
     }
 
-    return surface;
-  }
+    const currentVelocity = this.controller.getVelocity();
+    const movementVelocity = this.controller.calculateMovement(
+      delta,
+      forward,
+      surfaceNormal,
+      currentVelocity,
+      surface.averageSurfaceVelocity,
+      desired,
+      new Vector3(0, 1, 0),
+    );
+    const velocity = currentVelocity.clone();
+    velocity.x = movementVelocity.x;
+    velocity.z = movementVelocity.z;
 
-  dispose() {
-    this.exit();
-    this.ground.dispose();
-    this.camera.dispose();
+    if (surface.supportedState !== CharacterSupportedState.SUPPORTED) {
+      const gravityStep = new Vector3();
+      physicsGravity.scaleToRef(delta, gravityStep);
+      velocity.addInPlace(gravityStep);
+    } else {
+      velocity.y = 0;
+    }
+
+    if (
+      this.keys.jump &&
+      surface.supportedState === CharacterSupportedState.SUPPORTED
+    ) {
+      velocity.y = this.jumpSpeed;
+    }
+
+    this.controller.setVelocity(velocity);
+    this.controller.integrate(delta, surface, physicsGravity);
+
+    const pos = this.controller.getPosition();
+    const targetPos = new Vector3(pos.x, pos.y + this.eyeOffset, pos.z);
+    const posSmoothing = 1 - Math.exp(-CAMERA_POS_SMOOTHING * delta);
+    this.cameraPos.x += (targetPos.x - this.cameraPos.x) * posSmoothing;
+    this.cameraPos.y += (targetPos.y - this.cameraPos.y) * posSmoothing;
+    this.cameraPos.z += (targetPos.z - this.cameraPos.z) * posSmoothing;
+    this.camera.position.copyFrom(this.cameraPos);
+
+    this.debugFrame += 1;
+    if (this.debugFrame % 60 === 0) {
+      // Basic runtime signals to confirm physics and gravity are active.
+      const physicsEnabled = !!this.view.scene.getPhysicsEngine();
+      console.log("[fp]", {
+        physicsEnabled,
+        gravity: physicsGravity.asArray(),
+        supportedState: surface.supportedState,
+        pos: pos.asArray(),
+      });
+    }
+  };
+
+  private tryStepUp(desiredDir: Vector3) {
+    if (!this.controller) return;
+
+    const physicsEngine = this.view.scene.getPhysicsEngine();
+    if (!physicsEngine) return;
+
+    const pos = this.controller.getPosition();
+    const stepHeight = STEP_HEIGHT_M / this.unit;
+    const clearance = STEP_CLEARANCE_M / this.unit;
+    const stepForward = Math.max(this.radius + clearance, stepHeight * 0.5);
+    const footY = pos.y - this.height * 0.5 + this.radius;
+
+    const lowFrom = new Vector3(pos.x, footY, pos.z);
+    const lowTo = lowFrom.add(desiredDir.scale(stepForward));
+    const lowHit = physicsEngine.raycast(lowFrom, lowTo);
+    if (!lowHit.hasHit) return;
+
+    const highFrom = new Vector3(pos.x, footY + stepHeight + clearance, pos.z);
+    const highTo = highFrom.add(desiredDir.scale(stepForward));
+    const highHit = physicsEngine.raycast(highFrom, highTo);
+    if (highHit.hasHit) return;
+
+    const downFrom = new Vector3(
+      lowTo.x,
+      pos.y + stepHeight + this.height * 0.5,
+      lowTo.z,
+    );
+    const downTo = new Vector3(lowTo.x, pos.y - this.height, lowTo.z);
+    const downHit = physicsEngine.raycast(downFrom, downTo);
+
+    const next = pos.clone();
+    if (downHit.hasHit) {
+      next.y = Math.max(next.y, downHit.hitPointWorld.y + this.height * 0.5);
+    } else {
+      next.y += stepHeight;
+    }
+
+    this.controller.setPosition(next);
   }
 }

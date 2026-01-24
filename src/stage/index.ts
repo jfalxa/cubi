@@ -70,15 +70,12 @@ export class Stage {
       return;
     }
 
+    this.firstPerson.configure(this.grid.unit);
     this.firstPerson.enter({
       position: this.camera.position,
       target: this.camera.target,
     });
 
     this.view.scene.activeCamera = this.firstPerson.camera;
-  }
-
-  configureFirstPerson(unit: number, width: number, depth: number) {
-    this.firstPerson.configure(unit, width, depth);
   }
 }

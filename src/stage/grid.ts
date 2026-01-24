@@ -24,6 +24,7 @@ export class Grid {
   width = 1;
   depth = 1;
   layer = 0;
+  unit = 1;
 
   private removeAppearanceListener: () => void;
 
@@ -64,6 +65,10 @@ export class Grid {
   setLayer(layer: number) {
     this.layer = Math.max(layer, 0);
     this.mesh.position.set(0, this.layer + 0.01, 0);
+  }
+
+  setUnit(unit: number) {
+    this.unit = unit;
   }
 
   private createMesh() {
