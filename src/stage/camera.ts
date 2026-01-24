@@ -25,6 +25,8 @@ const MIN_CAMERA_RADIUS = 0.001;
 const WHEEL_DELTA_SCALE = 40;
 const MAX_WHEEL_DELTA = 0.2;
 const ZOOM_RESPONSE = 0.05;
+const TRACKPAD_ZOOM_SCALE = 0.25;
+const TRACKPAD_DELTA_THRESHOLD = 50;
 
 export class Camera extends ArcRotateCamera implements Interactive {
   view: View;
@@ -106,10 +108,24 @@ export class Camera extends ArcRotateCamera implements Interactive {
 
   private handleZoom = (info: WheelInfo) => {
     info.event.preventDefault();
-    const rawDelta = info.wheel / (this.wheelPrecision * WHEEL_DELTA_SCALE);
-    const delta = Math.max(Math.min(rawDelta, MAX_WHEEL_DELTA), -MAX_WHEEL_DELTA);
+
+    const isPixelDelta =
+      info.event.deltaMode === WheelEvent.DOM_DELTA_PIXEL &&
+      Math.abs(info.event.deltaY) < TRACKPAD_DELTA_THRESHOLD;
+
+    const inputScale = isPixelDelta ? TRACKPAD_ZOOM_SCALE : 1;
+
+    const rawDelta =
+      (info.wheel * inputScale) / (this.wheelPrecision * WHEEL_DELTA_SCALE);
+
+    const delta = Math.max(
+      Math.min(rawDelta, MAX_WHEEL_DELTA),
+      -MAX_WHEEL_DELTA,
+    );
+
     const radius = Math.max(this.radius, MIN_CAMERA_RADIUS);
     const zoomFactor = Math.exp(delta * ZOOM_RESPONSE);
+
     this.inertialRadiusOffset += radius * (zoomFactor - 1);
   };
 
