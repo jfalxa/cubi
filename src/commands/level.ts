@@ -26,14 +26,12 @@ class LevelCommand implements Command {
   execute(): void {
     const ratio = this.grid.layer / this.grid.height;
     const level = this.shift > 0 ? Math.floor(ratio) : Math.ceil(ratio);
-    const targetLevel = level + this.shift;
-    this.grid.setLevel(targetLevel);
-    this.shiftCamera(targetLevel);
+    this.grid.setLevel(level + this.shift);
+    this.shiftCamera(this.grid.level);
   }
 
   private shiftCamera(level: number) {
     const height = this.grid.height;
-    if (height <= 0) return;
 
     const levelMin = level * height;
     const levelMax = levelMin + height;
