@@ -1,11 +1,8 @@
-import {
-  Color3,
-  Color4,
-  CreateBoxVertexData,
-  Mesh,
-  StandardMaterial,
-  type Scene,
-} from "@babylonjs/core";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import { CreateBoxVertexData } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { Scene } from "@babylonjs/core/scene";
 
 import type { MeshFilter, Shape } from "$/types";
 import { getBBox } from "$/utils/bounds";

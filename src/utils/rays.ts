@@ -1,4 +1,5 @@
-import { Matrix, Plane, Vector2, Vector3 } from "@babylonjs/core";
+import { Plane } from "@babylonjs/core/Maths/math.plane";
+import { Matrix, Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Camera } from "$/stage/camera";
 import { Grid } from "$/stage/grid";

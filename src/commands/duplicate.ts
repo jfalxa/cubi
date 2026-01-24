@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { SelectionStore } from "$/stores/selection.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";

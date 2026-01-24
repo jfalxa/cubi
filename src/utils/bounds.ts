@@ -1,5 +1,3 @@
-import { Vector3 } from "@babylonjs/core";
-
 import type { BBox, Bounds, Shape } from "$/types";
 
 export function getCenter(shape: Shape) {

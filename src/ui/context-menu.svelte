@@ -1,9 +1,10 @@
 <script lang="ts">
   import { ContextMenu } from "bits-ui";
-  import type { Vector2 } from "@babylonjs/core";
+  import type { Vector2 } from "@babylonjs/core/Maths/math.vector";
 
   import type { AvailableCommand } from "$/commands";
   import { groupBy } from "$/utils/collection";
+
   import ColorMenu from "./color-menu.svelte";
 
   type Props = {

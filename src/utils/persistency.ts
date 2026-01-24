@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { DEFAULT_GRID, type GridInit } from "$/stores/grid.svelte";
 import type { SerializedShape, Shape } from "$/types";

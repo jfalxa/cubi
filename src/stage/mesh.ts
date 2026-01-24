@@ -1,13 +1,10 @@
-import {
-  AbstractMesh,
-  Color3,
-  Color4,
-  InstancedMesh,
-  Mesh,
-  MeshBuilder,
-  StandardMaterial,
-  type Scene,
-} from "@babylonjs/core";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
+import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { InstancedMesh } from "@babylonjs/core/Meshes/instancedMesh";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import type { Scene } from "@babylonjs/core/scene";
 
 import type { MeshFilter, Shape } from "$/types";
 import { getCenter, getDimensions } from "$/utils/bounds";

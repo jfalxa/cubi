@@ -1,5 +1,3 @@
-import type { Vector2 } from "@babylonjs/core";
-
 import type { MeshFilter } from "$/types";
 
 import { Alignment } from "./align";

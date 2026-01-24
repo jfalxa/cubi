@@ -1,5 +1,3 @@
-import { Vector2 } from "@babylonjs/core";
-
 import type { View } from "$/stage/view";
 
 type Button = "left" | "middle" | "right" | "back" | "forward";

@@ -1,11 +1,9 @@
-import {
-  Color4,
-  Engine,
-  HemisphericLight,
-  Light,
-  Scene,
-  Vector3,
-} from "@babylonjs/core";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import type { Light } from "@babylonjs/core/Lights/light";
+import { Color4 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
 
 import { ShapeMesh } from "$/stage/mesh";
 import type { Shape } from "$/types";

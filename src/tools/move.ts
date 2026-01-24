@@ -1,4 +1,4 @@
-import { Vector2, Vector3 } from "@babylonjs/core";
+import { Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Stage } from "$/stage";
 import { BoundingBox } from "$/stage/bounding-box";

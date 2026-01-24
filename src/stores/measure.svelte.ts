@@ -1,5 +1,3 @@
-import { Vector2 } from "@babylonjs/core";
-
 import type { Box } from "$/types";
 
 export class MeasureStore {

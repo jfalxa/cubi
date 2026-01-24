@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import { Grid } from "$/stage/grid";
 import type { Shape } from "$/types";

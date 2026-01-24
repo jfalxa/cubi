@@ -1,5 +1,3 @@
-import type { AbstractMesh, Vector3 } from "@babylonjs/core";
-
 export interface Shape {
   id: string;
   group: string | undefined;

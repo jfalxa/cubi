@@ -1,5 +1,3 @@
-import type { Vector2 } from "@babylonjs/core";
-
 import type { AvailableCommand } from "$/commands";
 
 export class ContextMenuStore {

@@ -1,9 +1,7 @@
-import {
-  ArcRotateCamera,
-  Vector3,
-  type Observer,
-  type Scene,
-} from "@babylonjs/core";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Observer } from "@babylonjs/core/Misc/observable";
+import type { Scene } from "@babylonjs/core/scene";
 
 import {
   createIntent,

@@ -1,12 +1,10 @@
-import {
-  Color3,
-  DynamicTexture,
-  GroundMesh,
-  MeshBuilder,
-  StandardMaterial,
-  Texture,
-  Vector3,
-} from "@babylonjs/core";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { GroundMesh } from "@babylonjs/core/Meshes/groundMesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 import type { MeshFilter } from "$/types";
 import { getColors, watchAppearance, type Colors } from "$/utils/colors";

@@ -1,4 +1,4 @@
-import { Vector3 } from "@babylonjs/core";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { CameraStore } from "$/stores/camera.svelte";
 import type { GridStore } from "$/stores/grid.svelte";

@@ -1,4 +1,4 @@
-import type { Vector2 } from "@babylonjs/core";
+import type { Vector2 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Stage } from "$/stage";
 import { createIntent, type Context, type Intent } from "$/stage/interactions";

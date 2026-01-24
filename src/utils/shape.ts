@@ -1,5 +1,3 @@
-import { Vector3 } from "@babylonjs/core";
-
 import type { PartialShape, SerializedShape, Shape } from "$/types";
 
 import { areShapesConnected, getBounds } from "./bounds";
