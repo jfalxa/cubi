@@ -1,7 +1,7 @@
 import hotkeys from "hotkeys-js";
 
-import type { ContextMenuStore } from "$/stores/context-menu.svelte";
 import type { CameraStore } from "$/stores/camera.svelte";
+import type { ContextMenuStore } from "$/stores/context-menu.svelte";
 import type { GridStore } from "$/stores/grid.svelte";
 import type { SelectionStore } from "$/stores/selection.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";
@@ -14,16 +14,12 @@ import { ExportCommand, ImportCommand, OpenCommand, SaveCommand } from "./file";
 import { GridCommand } from "./grid";
 import { GroupCommand, UngroupCommand } from "./group";
 import { RedoCommand, UndoCommand } from "./history";
-import {
-  LayerDownCommand,
-  LayerUpCommand,
-  LevelDownCommand,
-  LevelUpCommand,
-} from "./layer";
-import { LevelCommand } from "./level";
+import { LayerDownCommand, LayerUpCommand } from "./layer";
+import { LevelDownCommand, LevelUpCommand } from "./level";
 import { LockCommand, UnlockCommand } from "./lock";
 import { NewCommand } from "./new";
 import { RotateCCWCommand, RotateCWCommand } from "./rotate";
+import { ToggleLevelCommand } from "./toggle-level";
 
 export interface Dependencies {
   selection: SelectionStore;
@@ -51,7 +47,7 @@ export class Commands {
   grid: GridCommand;
   lock: LockCommand;
   unlock: UnlockCommand;
-  level: LevelCommand;
+  level: ToggleLevelCommand;
   layerUp: LayerUpCommand;
   layerDown: LayerDownCommand;
   levelUp: LevelUpCommand;
@@ -79,11 +75,11 @@ export class Commands {
     this.grid = new GridCommand(grid);
     this.lock = new LockCommand(shapes);
     this.unlock = new UnlockCommand(shapes);
-    this.level = new LevelCommand(grid);
+    this.level = new ToggleLevelCommand(grid);
     this.layerUp = new LayerUpCommand(grid);
     this.layerDown = new LayerDownCommand(grid);
-    this.levelUp = new LevelUpCommand(grid);
-    this.levelDown = new LevelDownCommand(grid);
+    this.levelUp = new LevelUpCommand(grid, camera);
+    this.levelDown = new LevelDownCommand(grid, camera);
 
     this.shapes = shapes;
     this.selection = selection;
