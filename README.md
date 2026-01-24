@@ -10,7 +10,7 @@ Draw axis aligned boxes that snap to a grid in 3D.
 - To rotate the camera, drag the mouse with the right button, or press `Control/Command-Shift` and drag with the left button
 - To zoom in or out, use the mouse wheel or scroll with your trackpad
 
-### Layering (active vertical level)
+### Layering (active vertical focus)
 
 - While pressing the `Control/Command` key, double click on some point of a shape to move the drawing grid to that vertical layer
 - Doing this on an empty space (with no shape under the mouse) resets the grid layer to 0.
@@ -88,12 +88,6 @@ It will adapt based on where the mouse is pointing at, and the current selection
 - Shortcut: `Shift-L`
 - Unlock the selected shapes so they can be modified again
 
-### Toggle level
-
-- Shortcut: `Space`
-- Toggle level view mode. When active, all the shapes above the currently active layer + the value defined in the `Level height` field of the grid settings will be hidden.
-- This allows you to define different vertical levels in your scene, and focus on only one at a time.
-
 ### Colors
 
 - No shortcut, only available in context menu.
@@ -104,12 +98,29 @@ It will adapt based on where the mouse is pointing at, and the current selection
 - Shortcut: `R` and `Shift-R`
 - Rotate the selection by +/- 90˚
 
+### Toggle level
+
+- Shortcut: `Space`
+- Toggle level view mode. When active, all the shapes above the currently active layer + the value defined in the `Level height` field of the grid settings will be hidden.
+- This allows you to define different vertical levels in your scene, and focus on only one at a time.
+
 ### Grid size
 
 - No shortcut
-- This is a meny that allows setting the width and depth of the drawing grid in meters.
+- This is a menu that allows setting the width and depth of the drawing grid in meters.
 - You can also set a "Unit", that represents the size of a single grid square in centimeters. Note that this won't resize your shapes, it's only used to compute the dimensions displayed in the floating measure label.
 - The last field is "Level height", it defines the height beyond which shapes will stop showing when in level view mode. See "Toggle level".
+
+### Layer up/down
+
+- Shortcut: `ArrowUp` / `ArrowDown`
+- Moves the currently active vertical grid layer up/down one step at a time
+
+### Level up/down
+
+- Shortcut: `Shift-ArrowUp` / `Shift-ArrowDown`
+- Moves the currently active level up/down
+- Uses "Level height" from grid config to make the current active layer jump to the next available level
 
 ### Import
 

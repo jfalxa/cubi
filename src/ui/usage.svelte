@@ -32,7 +32,7 @@
     </li>
     <li>To zoom in or out, use the mouse wheel or scroll with your trackpad</li>
   </ul>
-  <h3 id="layering-active-vertical-level-">Layering (active vertical level)</h3>
+  <h3 id="layering-active-vertical-focus-">Layering (active vertical focus)</h3>
   <ul>
     <li>
       While pressing the <code>Control/Command</code> key, double click on some point
@@ -154,6 +154,18 @@
     <li>Shortcut: <code>Shift-L</code></li>
     <li>Unlock the selected shapes so they can be modified again</li>
   </ul>
+  <h3 id="colors">Colors</h3>
+  <ul>
+    <li>No shortcut, only available in context menu.</li>
+    <li>
+      This is a menu that allows you to pick a color for the current selection
+    </li>
+  </ul>
+  <h3 id="rotate-90-">Rotate +/- 90˚</h3>
+  <ul>
+    <li>Shortcut: <code>R</code> and <code>Shift-R</code></li>
+    <li>Rotate the selection by +/- 90˚</li>
+  </ul>
   <h3 id="toggle-level">Toggle level</h3>
   <ul>
     <li>Shortcut: <code>Space</code></li>
@@ -167,23 +179,11 @@
       focus on only one at a time.
     </li>
   </ul>
-  <h3 id="colors">Colors</h3>
-  <ul>
-    <li>No shortcut, only available in context menu.</li>
-    <li>
-      This is a menu that allows you to pick a color for the current selection
-    </li>
-  </ul>
-  <h3 id="rotate-90-">Rotate +/- 90˚</h3>
-  <ul>
-    <li>Shortcut: <code>R</code> and <code>Shift-R</code></li>
-    <li>Rotate the selection by +/- 90˚</li>
-  </ul>
   <h3 id="grid-size">Grid size</h3>
   <ul>
     <li>No shortcut</li>
     <li>
-      This is a meny that allows setting the width and depth of the drawing grid
+      This is a menu that allows setting the width and depth of the drawing grid
       in meters.
     </li>
     <li>
@@ -196,6 +196,22 @@
       The last field is &quot;Level height&quot;, it defines the height beyond
       which shapes will stop showing when in level view mode. See &quot;Toggle
       level&quot;.
+    </li>
+  </ul>
+  <h3 id="layer-up-down">Layer up/down</h3>
+  <ul>
+    <li>Shortcut: <code>ArrowUp</code> / <code>ArrowDown</code></li>
+    <li>
+      Moves the currently active vertical grid layer up/down one step at a time
+    </li>
+  </ul>
+  <h3 id="level-up-down">Level up/down</h3>
+  <ul>
+    <li>Shortcut: <code>Shift-ArrowUp</code> / <code>Shift-ArrowDown</code></li>
+    <li>Moves the currently active level up/down</li>
+    <li>
+      Uses &quot;Level height&quot; from grid config to make the current active
+      layer jump to the next available level
     </li>
   </ul>
   <h3 id="import">Import</h3>
