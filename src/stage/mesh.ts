@@ -1,3 +1,5 @@
+import "@babylonjs/core/Rendering/edgesRenderer";
+
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
@@ -79,6 +81,7 @@ export class ShapeMesh {
       this.source = ShapeMesh.getSource(shape.color, this.scene);
       this.instance = this.source.createInstance(shape.id);
       this.instance.metadata = { shapeMesh: this };
+      this.instance.checkCollisions = true;
     }
 
     this.shape = shape;

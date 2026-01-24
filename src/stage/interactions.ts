@@ -24,6 +24,7 @@ export class Interactions {
   pointer: Pointer;
 
   locked: boolean;
+  suspended = false;
   interactives: Interactive[] = [];
 
   constructor(stage: Stage) {
@@ -34,6 +35,7 @@ export class Interactions {
 
   dispose(): void {
     this.locked = false;
+    this.suspended = false;
     this.interactives = [];
     this.pointer.dispose();
   }
@@ -48,6 +50,8 @@ export class Interactions {
   }
 
   process = (info: PointerInfo) => {
+    if (this.suspended) return;
+
     const context: Context = { locked: this.locked, info };
 
     const intents: [Interactive, Intent][] = [];
@@ -63,6 +67,14 @@ export class Interactions {
     const locked = interactive.applyIntent(intent, context);
     if (locked !== undefined) this.locked = locked;
   };
+
+  suspend() {
+    this.suspended = true;
+  }
+
+  resume() {
+    this.suspended = false;
+  }
 }
 
 export function hasShift(context: Context) {

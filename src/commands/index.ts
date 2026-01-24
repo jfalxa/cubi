@@ -1,5 +1,6 @@
 import hotkeys from "hotkeys-js";
 
+import type { Stage } from "$/stage";
 import type { CameraStore } from "$/stores/camera.svelte";
 import type { ContextMenuStore } from "$/stores/context-menu.svelte";
 import type { GridStore } from "$/stores/grid.svelte";
@@ -19,9 +20,11 @@ import { LevelDownCommand, LevelUpCommand } from "./level";
 import { LockCommand, UnlockCommand } from "./lock";
 import { NewCommand } from "./new";
 import { RotateCCWCommand, RotateCWCommand } from "./rotate";
+import { ToggleCameraCommand } from "./camera";
 import { ToggleLevelCommand } from "./toggle-level";
 
 export interface Dependencies {
+  stage: Stage;
   selection: SelectionStore;
   shapes: ShapeStore;
   camera: CameraStore;
@@ -45,6 +48,7 @@ export class Commands {
   ungroup: UngroupCommand;
   colors: ColorsCommand;
   grid: GridCommand;
+  toggleCamera: ToggleCameraCommand;
   lock: LockCommand;
   unlock: UnlockCommand;
   level: ToggleLevelCommand;
@@ -57,7 +61,14 @@ export class Commands {
   private selection: SelectionStore;
   private commands!: Command[];
 
-  constructor({ shapes, selection, camera, grid, contextMenu }: Dependencies) {
+  constructor({
+    stage,
+    shapes,
+    selection,
+    camera,
+    grid,
+    contextMenu,
+  }: Dependencies) {
     this.open = new OpenCommand(shapes, grid, camera);
     this.save = new SaveCommand(shapes, grid);
     this.import = new ImportCommand(shapes, grid, camera);
@@ -73,6 +84,7 @@ export class Commands {
     this.ungroup = new UngroupCommand(shapes);
     this.colors = new ColorsCommand(shapes);
     this.grid = new GridCommand(grid);
+    this.toggleCamera = new ToggleCameraCommand(stage);
     this.lock = new LockCommand(shapes);
     this.unlock = new UnlockCommand(shapes);
     this.level = new ToggleLevelCommand(grid);
@@ -135,6 +147,7 @@ export class Commands {
       this.levelUp,
       this.levelDown,
       this.level,
+      this.toggleCamera,
       this.import,
       this.export,
       this.new,
@@ -144,10 +157,11 @@ export class Commands {
   }
 
   initHotkeys() {
+    hotkeys.setScope("default");
     for (const command of this.commands) {
       const keys = command.shortcuts?.join(",");
       if (!keys) continue;
-      hotkeys(keys, (e) => {
+      hotkeys(keys, "default", (e) => {
         e.preventDefault();
         command.execute(this.selection.getSelectedShapes());
       });

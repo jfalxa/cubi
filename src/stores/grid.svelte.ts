@@ -60,6 +60,11 @@ export function useGridSync(gridStore: GridStore, stage: Stage) {
   $effect(() => {
     grid.setSize(gridStore.width, gridStore.depth);
     grid.setLayer(gridStore.layer);
+    stage.configureFirstPerson(
+      gridStore.unit,
+      gridStore.width,
+      gridStore.depth,
+    );
   });
 
   $effect(() => {

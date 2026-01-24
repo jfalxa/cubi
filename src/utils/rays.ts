@@ -1,13 +1,15 @@
+import "@babylonjs/core/Culling/ray";
+
 import { Plane } from "@babylonjs/core/Maths/math.plane";
 import { Matrix, Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { TargetCamera } from "@babylonjs/core/Cameras/targetCamera";
 
-import type { Camera } from "$/stage/camera";
 import { Grid } from "$/stage/grid";
 import type { Shape } from "$/types";
 
 export function getGridPoint(
   pointer: Vector2,
-  camera: Camera,
+  camera: TargetCamera,
   grid: Grid,
 ): Vector3 | undefined {
   const scene = camera.getScene();
@@ -34,7 +36,7 @@ export function getGridPoint(
 
 export function getElevation(
   pointer: Vector2,
-  camera: Camera,
+  camera: TargetCamera,
   reference: Shape,
 ) {
   const { position, width, depth } = reference;
@@ -50,7 +52,7 @@ export function getElevation(
 
 export function getAxisPoint(
   pointer: Vector2,
-  camera: Camera,
+  camera: TargetCamera,
   origin: Vector3,
   axis: Vector3,
 ) {

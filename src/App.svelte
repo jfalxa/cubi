@@ -19,6 +19,7 @@
   const stage = new Stage();
 
   const commands = new Commands({
+    stage,
     shapes: stores.shapes,
     selection: stores.selection,
     camera: stores.camera,
