@@ -99,12 +99,15 @@ export class DrawTool implements Tool {
     this.stage.interactions.locked = false;
     this.ghost.setEnabled(false);
     this.update({ position: Vector3.Zero(), width: 0, height: 0, depth: 0 });
+    this.stage.align.stop();
     this.onCancel();
   }
 
   update(shape: PartialShape) {
     this.shape = { ...this.shape, ...shape };
-    this.ghost.update([normalizeShape(this.shape)]);
+    const normalized = [normalizeShape(this.shape)];
+    this.stage.align.update(normalized);
+    this.ghost.update(normalized);
   }
 
   handleCommit = (info: ClickInfo) => {
@@ -117,6 +120,7 @@ export class DrawTool implements Tool {
         const position = getGridPoint(info.position, camera, grid);
         if (!position) break;
         this.update({ position, width: 0, height: 0, depth: 0 });
+        this.stage.align.start([this.shape]);
         return true;
       }
 

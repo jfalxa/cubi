@@ -108,6 +108,10 @@ export class ShapeMesh {
     return this.instance.isPickable && !this.locked && !this.cutOff;
   }
 
+  isVisible() {
+    return this.instance.isVisible && !this.cutOff;
+  }
+
   isGroup(group: string | undefined) {
     return this.shape.group === group;
   }

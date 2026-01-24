@@ -137,6 +137,8 @@ export class ResizeTool implements Tool {
         this.anchor.y = bbox.max.y;
         break;
     }
+
+    this.stage.align.start(this.snapshot);
   };
 
   private handleResize = (info: DragInfo) => {
@@ -158,11 +160,14 @@ export class ResizeTool implements Tool {
       ? resizeShapesAt(this.snapshot, amount, this.anchor)
       : resizeShapes(this.snapshot, amount, this.axis);
 
+    this.stage.align.update(resized);
+
     this.onResize(resized, getBBox(resized), info.position);
   };
 
   private handleResizeEnd = () => {
     this.active = false;
+    this.stage.align.stop();
     this.onResizeEnd();
   };
 }
