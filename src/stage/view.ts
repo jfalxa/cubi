@@ -7,9 +7,9 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
-import { getColors, watchAppearance, type Colors } from "$/colors";
 import { ShapeMesh } from "$/stage/mesh";
 import type { Shape } from "$/types";
+import { getColors, watchAppearance, type Colors } from "$/utils/colors";
 
 export class View {
   canvas: HTMLCanvasElement;

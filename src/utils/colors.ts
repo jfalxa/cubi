@@ -5,6 +5,7 @@ export interface Colors {
   mid: string;
   minor: string;
   ghost: string;
+  guide: string;
 }
 
 export const darkColors: Colors = {
@@ -14,6 +15,7 @@ export const darkColors: Colors = {
   mid: "#454954",
   minor: "#343842",
   ghost: "#00bcff",
+  guide: "#f59e0b",
 };
 
 export const lightColors: Colors = {
@@ -23,6 +25,7 @@ export const lightColors: Colors = {
   mid: "#b4b9c4",
   minor: "#cfd3db",
   ghost: "#00bcff",
+  guide: "#f59e0b",
 };
 
 export function isDarkMode() {

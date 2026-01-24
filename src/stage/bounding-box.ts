@@ -7,9 +7,9 @@ import {
   type Scene,
 } from "@babylonjs/core";
 
-import { getColors } from "$/colors";
 import type { MeshFilter, Shape } from "$/types";
 import { getBBox } from "$/utils/bounds";
+import { getColors } from "$/utils/colors";
 
 export class BoundingBox extends Mesh {
   static only: MeshFilter = (mesh) => mesh.name === "bounding-box";

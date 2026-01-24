@@ -8,8 +8,8 @@ import {
   Vector3,
 } from "@babylonjs/core";
 
-import { getColors, watchAppearance, type Colors } from "$/colors";
 import type { MeshFilter } from "$/types";
+import { getColors, watchAppearance, type Colors } from "$/utils/colors";
 
 import type { View } from "./view";
 

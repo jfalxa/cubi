@@ -9,9 +9,9 @@ import {
   type Scene,
 } from "@babylonjs/core";
 
-import { getColors } from "$/colors";
 import type { MeshFilter, Shape } from "$/types";
 import { getCenter, getDimensions } from "$/utils/bounds";
+import { getColors } from "$/utils/colors";
 
 const epsilon = 1e-3;
 const sourceMeshesByColor = new Map<string, Mesh>();

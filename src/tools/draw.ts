@@ -1,11 +1,11 @@
 import { Vector2, Vector3 } from "@babylonjs/core";
 
-import { getColors } from "$/colors";
 import type { Stage } from "$/stage";
 import { BoundingBox } from "$/stage/bounding-box";
 import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import type { ClickInfo, MoveInfo } from "$/stage/pointer";
 import type { PartialShape, Shape } from "$/types";
+import { getColors } from "$/utils/colors";
 import { getElevation, getGridPoint } from "$/utils/rays";
 import {
   cloneShape,
