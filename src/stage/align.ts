@@ -39,7 +39,7 @@ export class Alignment {
   static createGuides(scene: Scene) {
     const guides = { x: {}, y: {}, z: {} } as Faces<Mesh>;
 
-    const material1 = new StandardMaterial("guide_material");
+    const material1 = new StandardMaterial("guide_material", scene);
     material1.specularColor = Color3.Black();
     material1.diffuseColor = Color3.FromHexString(getColors().guide);
     material1.alpha = 0.1;
@@ -83,9 +83,9 @@ export class Alignment {
           const center = Vector3.Center(bounds.min, bounds.max);
           const dimensions = bounds.max.subtract(bounds.min);
 
-          if (dimensions.x === 0) dimensions.x = epsilon;
-          if (dimensions.y === 0) dimensions.y = epsilon;
-          if (dimensions.z === 0) dimensions.z = epsilon;
+          if (dimensions.x < epsilon) dimensions.x = epsilon;
+          if (dimensions.y < epsilon) dimensions.y = epsilon;
+          if (dimensions.z < epsilon) dimensions.z = epsilon;
 
           guide.position.copyFrom(center);
           guide.scaling.copyFrom(dimensions);
