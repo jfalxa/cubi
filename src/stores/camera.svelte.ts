@@ -1,4 +1,5 @@
 import { onMount } from "svelte";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Camera } from "$/stage/camera";
 

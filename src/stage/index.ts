@@ -1,3 +1,5 @@
+import type { Vector2 } from "@babylonjs/core/Maths/math.vector";
+
 import type { MeshFilter } from "$/types";
 
 import { Alignment } from "./align";
