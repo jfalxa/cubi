@@ -20,6 +20,11 @@ export type Faces<T> = Record<Axis, Record<Feature, T>>;
 export const AXES: Axis[] = ["x", "y", "z"];
 export const FEATURES: Feature[] = ["min", "center", "max"];
 
+export const X: Axis[] = ["x"];
+export const Y: Axis[] = ["y"];
+export const Z: Axis[] = ["z"];
+export const XZ: Axis[] = ["x", "z"];
+
 const epsilon = 1e-1;
 
 export class Alignment {
@@ -40,7 +45,7 @@ export class Alignment {
     const material1 = new StandardMaterial("guide_material", scene);
     material1.specularColor = Color3.Black();
     material1.diffuseColor = Color3.FromHexString(getColors().guide);
-    material1.alpha = 0.1;
+    material1.alpha = 0.15;
 
     for (const axis of AXES) {
       for (const feature of FEATURES) {
@@ -69,8 +74,8 @@ export class Alignment {
     this.others = groups.map(getBBox);
   }
 
-  update(selection: Shape[]) {
-    const alignement = this.getAlignment(selection);
+  update(selection: Shape[], axes = AXES) {
+    const alignement = this.getAlignment(selection, axes);
 
     for (const axis of AXES) {
       for (const feature of FEATURES) {
@@ -105,14 +110,14 @@ export class Alignment {
     }
   }
 
-  getAlignment(selection: Shape[]) {
+  getAlignment(selection: Shape[], axes = AXES) {
     const alignement = { x: {}, y: {}, z: {} } as Faces<Bounds>;
 
     const a = getBBox(selection);
     const candidates = this.others.filter((other) => mayAlign(a, other));
 
     for (const b of candidates) {
-      for (const axis of AXES) {
+      for (const axis of axes) {
         for (const featA of FEATURES) {
           const tA = a[featA][axis];
           for (const featB of FEATURES) {

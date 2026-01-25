@@ -1,6 +1,7 @@
 import { Vector3, type Vector2 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Stage } from "$/stage";
+import { XZ, Y, type Axis } from "$/stage/align";
 import { BoundingBox } from "$/stage/bounding-box";
 import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import type { ClickInfo, MoveInfo } from "$/stage/pointer";
@@ -103,10 +104,10 @@ export class DrawTool implements Tool {
     this.onCancel();
   }
 
-  update(shape: PartialShape) {
+  update(shape: PartialShape, axes: Axis[] = []) {
     this.shape = { ...this.shape, ...shape };
     const normalized = [normalizeShape(this.shape)];
-    this.stage.align.update(normalized);
+    this.stage.align.update(normalized, axes);
     this.ghost.update(normalized);
   }
 
@@ -164,7 +165,7 @@ export class DrawTool implements Tool {
         const position = getGridPoint(info.position, camera, grid);
         if (!position) break;
         const distance = position.subtract(this.shape.position);
-        this.update({ width: distance.x, depth: distance.z });
+        this.update({ width: distance.x, depth: distance.z }, XZ);
         this.onDraw(normalizeShape(this.shape), info.position);
         break;
       }
@@ -172,7 +173,7 @@ export class DrawTool implements Tool {
       case "elevation": {
         const elevation = getElevation(info.position, camera, this.shape);
         const height = Math.max(elevation, -this.shape.position.y);
-        this.update({ height });
+        this.update({ height }, Y);
         this.onDraw(normalizeShape(this.shape), info.position);
         break;
       }

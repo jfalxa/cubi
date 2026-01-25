@@ -1,6 +1,7 @@
 import { Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Stage } from "$/stage";
+import { XZ, Y, type Axis } from "$/stage/align";
 import { BoundingBox } from "$/stage/bounding-box";
 import { createIntent, type Context, type Intent } from "$/stage/interactions";
 import type { DragInfo } from "$/stage/pointer";
@@ -88,13 +89,13 @@ export class MoveTool implements Tool {
     return this.stage.pick(position, BoundingBox.only).hit;
   }
 
-  private moveShapes(travel: Vector3) {
+  private moveShapes(travel: Vector3, axes: Axis[] = []) {
     const moved = this.snapshot.map((shape) => ({
       ...shape,
       position: shape.position.add(travel),
     }));
 
-    this.stage.align.update(moved);
+    this.stage.align.update(moved, axes);
 
     this.onMove(moved);
   }
@@ -121,7 +122,7 @@ export class MoveTool implements Tool {
 
     if (!start || !current) return;
 
-    this.moveShapes(current.subtract(start));
+    this.moveShapes(current.subtract(start), XZ);
   };
 
   private handleMoveVertical = (info: DragInfo) => {
@@ -134,7 +135,7 @@ export class MoveTool implements Tool {
     const minY = getBBox(this.snapshot).min.y;
     const travelY = Math.max(current - start, -minY);
 
-    this.moveShapes(new Vector3(0, travelY, 0));
+    this.moveShapes(new Vector3(0, travelY, 0), Y);
   };
 
   private handleMoveEnd = () => {

@@ -1,6 +1,7 @@
 import { Vector3, type Vector2 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Stage } from "$/stage";
+import { X, Y, Z, type Axis } from "$/stage/align";
 import { BoundingBox } from "$/stage/bounding-box";
 import { Grid } from "$/stage/grid";
 import {
@@ -34,6 +35,7 @@ export class ResizeTool implements Tool {
   private snapshot: Shape[];
   private anchor: Vector3;
   private axis: Vector3;
+  private alignAxes: Axis[];
 
   private onResizeStart: ResizeCallbacks["onResizeStart"];
   private onResize: ResizeCallbacks["onResize"];
@@ -48,12 +50,22 @@ export class ResizeTool implements Tool {
     5: Vector3.Down(),
   };
 
+  static faceAlignAxes: Record<number, Axis[]> = {
+    0: Z,
+    1: Z,
+    2: X,
+    3: X,
+    4: Y,
+    5: Y,
+  };
+
   constructor(stage: Stage, callbacks: ResizeCallbacks) {
     this.stage = stage;
     this.active = false;
     this.snapshot = [];
     this.anchor = Vector3.Zero();
     this.axis = Vector3.Zero();
+    this.alignAxes = [];
 
     this.onResizeStart = callbacks.onResizeStart;
     this.onResize = callbacks.onResize;
@@ -115,6 +127,7 @@ export class ResizeTool implements Tool {
     const bbox = getBBox(this.snapshot);
 
     this.axis = ResizeTool.faces[face];
+    this.alignAxes = ResizeTool.faceAlignAxes[face];
     this.anchor = bbox.center.clone();
 
     switch (face) {
@@ -160,7 +173,7 @@ export class ResizeTool implements Tool {
       ? resizeShapesAt(this.snapshot, amount, this.anchor)
       : resizeShapes(this.snapshot, amount, this.axis);
 
-    this.stage.align.update(resized);
+    this.stage.align.update(resized, this.alignAxes);
 
     this.onResize(resized, getBBox(resized), info.position);
   };
