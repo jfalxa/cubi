@@ -50,6 +50,14 @@ export class Grid {
     this.mesh.dispose();
   }
 
+  show() {
+    this.mesh.setEnabled(true);
+  }
+
+  hide() {
+    this.mesh.setEnabled(false);
+  }
+
   setSize(width: number, depth: number) {
     this.width = width;
     this.depth = depth;

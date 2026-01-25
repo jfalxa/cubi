@@ -1,7 +1,6 @@
 import "@babylonjs/core/Physics/v2/physicsEngineComponent";
 
 import hotkeys from "hotkeys-js";
-import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { UniversalCamera } from "@babylonjs/core/Cameras/universalCamera";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -23,9 +22,9 @@ import type { View } from "./view";
 
 const GRAVITY_M = 9.81;
 const PLAYER_HEIGHT_M = 1.7;
-const PLAYER_RADIUS_M = 0.15;
+const PLAYER_RADIUS_M = 0.3;
 const WALK_SPEED_M = 4;
-const JUMP_SPEED_M = 5;
+const JUMP_SPEED_M = 4;
 const MAX_SLOPE_DEG = 75;
 const POINTER_SENSITIVITY = 0.0025;
 const LOOK_SMOOTHING = 35;
@@ -72,9 +71,15 @@ export class FirstPerson {
     this.camera.dispose();
   }
 
+  eyesShift = 0;
+
   async enter(init: FirstPersonInit) {
     if (this.active) return;
     this.active = true;
+
+    this.eyesShift = (PLAYER_HEIGHT_M * 0.4) / init.unit;
+
+    this.grid.hide();
 
     this.interactions.suspend();
     hotkeys.setScope("first-person");
@@ -93,6 +98,8 @@ export class FirstPerson {
 
     this.renderObserver?.remove();
     this.renderObserver = undefined;
+
+    this.grid.show();
 
     const orbitCamera = this.view.scene.getCameraByName("orbit-camera");
     this.view.setCamera(orbitCamera);
@@ -128,6 +135,7 @@ export class FirstPerson {
 
     this.physics.update(delta, direction, isJumping, this.forward);
     this.camera.position.copyFrom(this.physics.position);
+    this.camera.position.y += this.eyesShift;
   };
 }
 
@@ -149,8 +157,6 @@ class Physics {
 
   private player: PhysicsCharacterController | undefined;
   private shapes: PhysicsAggregate[] = [];
-
-  yaw = 0;
 
   get position() {
     return this.player!.getPosition();
@@ -174,7 +180,7 @@ class Physics {
 
     this.view.scene.enablePhysics(this.gravity, havokPlugin);
 
-    this.player = this.createPlayerController(new Vector3(0, 30, 0));
+    this.player = this.createPlayerController(new Vector3(0, 40, 0));
     this.shapes = this.view.getMeshes().map((m) => this.createMeshBody(m));
   }
 
@@ -224,18 +230,16 @@ class Physics {
     const surfaceVelocity = isSupported ? surface.averageSurfaceVelocity : this.zero; // prettier-ignore
     const desiredVelocity = this.getDesiredVelocity(direction);
 
-    if (isSupported) {
-      this.player.calculateMovementToRef(
-        delta,
-        forward,
-        surfaceNormal,
-        currentVelocity,
-        surfaceVelocity,
-        desiredVelocity,
-        this.up,
-        this.velocity,
-      );
-    }
+    this.player.calculateMovementToRef(
+      delta,
+      forward,
+      surfaceNormal,
+      currentVelocity,
+      surfaceVelocity,
+      desiredVelocity,
+      this.up,
+      this.velocity,
+    );
 
     if (isSupported && jump) {
       this.velocity.y = this.jumpSpeed;
@@ -261,8 +265,6 @@ class Physics {
 
     controller.maxSlopeCosine = Math.cos((MAX_SLOPE_DEG * Math.PI) / 180);
     controller.up = Vector3.Up();
-    controller.keepDistance = 0.08 / this.unit;
-    controller.keepContactTolerance = 0.16 / this.unit;
     controller.maxCharacterSpeedForSolver = 10 / this.unit;
     controller.penetrationRecoverySpeed = 2;
     controller.acceleration = 0.1;
