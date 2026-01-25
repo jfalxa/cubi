@@ -1,7 +1,11 @@
 import type { Stage } from "$/stage";
 import type { Tools } from "$/tools";
 
-import { CameraStore, useCameraSync } from "./camera.svelte";
+import {
+  CameraStore,
+  useCameraSync,
+  useFirstPersonSync,
+} from "./camera.svelte";
 import { ContextMenuStore } from "./context-menu.svelte";
 import { GridStore, useGridSync } from "./grid.svelte";
 import { useLocalStorageSync } from "./local-storage.svelte";
@@ -30,7 +34,8 @@ export function createStores() {
 }
 
 export function useSync(stores: Stores, stage: Stage, tools: Tools) {
-  useCameraSync(stores.camera, stores.measure, stage);
+  useCameraSync(stores.camera, stage.camera);
+  useFirstPersonSync(stores.camera, stores.selection, stores.measure, stage);
   useGridSync(stores.grid, stage);
   useShapeSync(stores.shapes, stage.view);
   useSelectionSync(stores.selection, stage, tools.selection);

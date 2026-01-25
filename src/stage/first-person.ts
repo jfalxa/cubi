@@ -35,15 +35,16 @@ interface FirstPersonInit {
 }
 
 export class FirstPerson {
-  view: View;
-  grid: Grid;
-  interactions: Interactions;
+  private view: View;
+  private grid: Grid;
+  private interactions: Interactions;
 
-  camera: UniversalCamera;
-  physics: Physics;
-  inputs: Inputs;
+  private camera: UniversalCamera;
+  private physics: Physics;
+  private inputs: Inputs;
 
-  active = false;
+  private active = false;
+  private eyesShift = 0;
 
   private renderObserver?: Observer<Scene>;
 
@@ -69,8 +70,6 @@ export class FirstPerson {
     this.physics.dispose();
     this.camera.dispose();
   }
-
-  eyesShift = 0;
 
   async enter(init: FirstPersonInit) {
     if (this.active) return;
@@ -189,38 +188,11 @@ class Physics {
     this.view.scene.disablePhysicsEngine();
   }
 
-  isSupported() {
-    return this.surface?.supportedState === CharacterSupportedState.SUPPORTED;
-  }
-
-  getSupport(delta: number) {
-    this.gravity.normalizeToRef(this.gravityDirection);
-
-    if (!this.surface) {
-      this.surface = this.player!.checkSupport(delta, this.gravityDirection);
-    } else {
-      this.player!.checkSupportToRef(delta, this.gravityDirection, this.surface); // prettier-ignore
-    }
-
-    return this.surface;
-  }
-
-  getDesiredVelocity(direction: Vector3) {
-    if (direction.lengthSquared() > 1e-6) {
-      this.desired.x = direction.x * this.speed;
-      this.desired.z = direction.z * this.speed;
-    } else {
-      this.desired.setAll(0);
-    }
-
-    return this.desired;
-  }
-
   update(delta: number, direction: Vector3, jump: boolean, forward: Vector3) {
     if (!this.player) return;
 
     const surface = this.getSupport(delta);
-    const isSupported = this.isSupported();
+    const isSupported = surface.supportedState === CharacterSupportedState.SUPPORTED; // prettier-ignore
 
     const previousVelocityY = this.velocity.y;
 
@@ -250,6 +222,29 @@ class Physics {
 
     this.player.setVelocity(this.velocity);
     this.player.integrate(delta, surface, this.gravity);
+  }
+
+  private getSupport(delta: number) {
+    this.gravity.normalizeToRef(this.gravityDirection);
+
+    if (!this.surface) {
+      this.surface = this.player!.checkSupport(delta, this.gravityDirection);
+    } else {
+      this.player!.checkSupportToRef(delta, this.gravityDirection, this.surface); // prettier-ignore
+    }
+
+    return this.surface;
+  }
+
+  private getDesiredVelocity(direction: Vector3) {
+    if (direction.lengthSquared() > 1e-6) {
+      this.desired.x = direction.x * this.speed;
+      this.desired.z = direction.z * this.speed;
+    } else {
+      this.desired.setAll(0);
+    }
+
+    return this.desired;
   }
 
   private createPlayerController(spawn = Vector3.Zero()) {
@@ -289,21 +284,20 @@ class Physics {
 type Button = "forward" | "backward" | "left" | "right" | "jump";
 
 class Inputs {
-  buttons: Record<Button, boolean> = {
+  yaw = 0;
+  pitch = 0;
+
+  private yawTarget = 0;
+  private pitchTarget = 0;
+  private direction = Vector3.Zero();
+
+  private buttons: Record<Button, boolean> = {
     forward: false,
     backward: false,
     left: false,
     right: false,
     jump: false,
   };
-
-  yaw = 0;
-  pitch = 0;
-
-  yawTarget = 0;
-  pitchTarget = 0;
-
-  private direction = Vector3.Zero();
 
   constructor(private view: View) {}
 
@@ -326,22 +320,6 @@ class Inputs {
     this.view.canvas.removeEventListener("pointermove", this.handlePointerMove);
 
     this.exitPointerLock();
-  }
-
-  hasPointerLock() {
-    return document.pointerLockElement === this.view.canvas;
-  }
-
-  requestPointerLock = () => {
-    if (!this.hasPointerLock()) {
-      this.view.canvas.requestPointerLock();
-    }
-  };
-
-  exitPointerLock() {
-    if (this.hasPointerLock()) {
-      document.exitPointerLock();
-    }
   }
 
   isJumping() {
@@ -370,7 +348,23 @@ class Inputs {
     this.pitch += (this.pitchTarget - this.pitch) * t;
   }
 
-  static codeToButton: Record<string, Button> = {
+  private hasPointerLock() {
+    return document.pointerLockElement === this.view.canvas;
+  }
+
+  private requestPointerLock = () => {
+    if (!this.hasPointerLock()) {
+      this.view.canvas.requestPointerLock();
+    }
+  };
+
+  private exitPointerLock() {
+    if (this.hasPointerLock()) {
+      document.exitPointerLock();
+    }
+  }
+
+  private static codeToButton: Record<string, Button> = {
     KeyW: "forward",
     KeyS: "backward",
     KeyA: "left",

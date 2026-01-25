@@ -2,8 +2,10 @@ import { onMount } from "svelte";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Stage } from "$/stage";
+import type { Camera } from "$/stage/camera";
 
 import type { MeasureStore } from "./measure.svelte";
+import type { SelectionStore } from "./selection.svelte";
 
 export const CAMERA_FOV = 0.8;
 const FIT_PADDING = 1.1;
@@ -57,13 +59,7 @@ export class CameraStore {
   }
 }
 
-export function useCameraSync(
-  cameraStore: CameraStore,
-  measureStore: MeasureStore,
-  stage: Stage,
-) {
-  const { camera, firstPerson, grid, view } = stage;
-
+export function useCameraSync(cameraStore: CameraStore, camera: Camera) {
   // sync store to camera
   $effect(() => {
     if (!camera.position.equals(cameraStore.position)) {
@@ -72,19 +68,6 @@ export function useCameraSync(
 
     if (!camera.target.equals(cameraStore.target)) {
       camera.setTarget(cameraStore.target);
-    }
-  });
-
-  $effect(() => {
-    if (cameraStore.firstPerson) {
-      measureStore.clear();
-
-      firstPerson.enter({
-        position: stage.getPointUnderPointer() ?? Vector3.Zero(),
-        unit: grid.unit,
-      });
-    } else {
-      firstPerson.exit();
     }
   });
 
@@ -103,5 +86,28 @@ export function useCameraSync(
     return () => {
       camera.onViewMatrixChangedObservable.remove(observer);
     };
+  });
+}
+
+export function useFirstPersonSync(
+  cameraStore: CameraStore,
+  selectionStore: SelectionStore,
+  measureStore: MeasureStore,
+  stage: Stage,
+) {
+  const { firstPerson, grid } = stage;
+
+  $effect(() => {
+    if (cameraStore.firstPerson) {
+      measureStore.clear();
+      selectionStore.clear();
+
+      firstPerson.enter({
+        position: stage.getPointUnderPointer() ?? Vector3.Zero(),
+        unit: grid.unit,
+      });
+    } else {
+      firstPerson.exit();
+    }
   });
 }
