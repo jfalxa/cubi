@@ -27,6 +27,7 @@ const PLAYER_RADIUS_M = 0.1;
 const WALK_SPEED_M = 4;
 const JUMP_SPEED_M = 5;
 const MAX_SLOPE_DEG = 60;
+const POINTER_SENSITIVITY = 0.0025;
 
 interface FirstPersonInit {
   position: Vector3;
@@ -120,6 +121,7 @@ export class FirstPerson {
     );
 
     this.camera.position.copyFrom(this.physics.position);
+    this.camera.rotation.set(this.inputs.pitch, this.inputs.yaw, 0);
   };
 }
 
@@ -288,6 +290,9 @@ class Inputs {
     jump: false,
   };
 
+  yaw = 0;
+  pitch = 0;
+
   private direction = Vector3.Zero();
 
   constructor(private view: View) {}
@@ -295,11 +300,33 @@ class Inputs {
   mount() {
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
+    this.view.canvas.addEventListener("pointermove", this.handlePointerMove);
+
+    this.requestPointerLock();
   }
 
   dispose() {
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("keyup", this.handleKeyUp);
+    this.view.canvas.removeEventListener("pointermove", this.handlePointerMove);
+
+    this.exitPointerLock();
+  }
+
+  hasPointerLock() {
+    return document.pointerLockElement === this.view.canvas;
+  }
+
+  requestPointerLock() {
+    if (!this.hasPointerLock()) {
+      this.view.canvas.requestPointerLock();
+    }
+  }
+
+  exitPointerLock() {
+    if (this.hasPointerLock()) {
+      document.exitPointerLock();
+    }
   }
 
   isJumping() {
@@ -346,5 +373,16 @@ class Inputs {
     if (!button) return;
     e.preventDefault();
     this.buttons[button] = false;
+  };
+
+  private handlePointerMove = (event: PointerEvent) => {
+    if (!this.hasPointerLock()) return;
+
+    this.yaw += event.movementX * POINTER_SENSITIVITY;
+    this.pitch += event.movementY * POINTER_SENSITIVITY;
+
+    const minPitch = -Math.PI / 2 + 0.05;
+    const maxPitch = Math.PI / 2 - 0.05;
+    this.pitch = Math.min(Math.max(this.pitch, minPitch), maxPitch);
   };
 }
