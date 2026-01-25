@@ -97,6 +97,7 @@ export class ShapeMesh {
     this.instance.scaling.copyFrom(size);
 
     this.updateEdges();
+    this.setSelected(this.selected);
     this.setLocked(shape.locked);
   }
 
@@ -168,8 +169,10 @@ export class ShapeMesh {
   private updateEdges() {
     this.instance.disableEdgesRendering();
     this.instance.enableEdgesRendering();
-    this.instance.edgesWidth = 4;
-    this.instance.edgesColor = Color4.FromHexString(this.shape.color);
-    this.setSelected(this.selected);
+
+    if (!this.selected) {
+      this.instance.edgesColor = Color4.FromHexString(this.shape.color);
+      this.instance.edgesWidth = 4;
+    }
   }
 }
