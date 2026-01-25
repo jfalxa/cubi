@@ -132,9 +132,14 @@ class Physics {
 
   private gravity = Vector3.Zero();
   private gravityDirection = Vector3.Zero();
-  private gravityStep = Vector3.Zero();
 
-  private player?: PhysicsCharacterController;
+  private velocity = Vector3.Zero();
+  private desired = Vector3.Zero();
+  private zero = Vector3.Zero();
+  private up = Vector3.Up();
+  private surface: CharacterSurfaceInfo | undefined;
+
+  private player: PhysicsCharacterController | undefined;
   private shapes: PhysicsAggregate[] = [];
 
   yaw = 0;
@@ -171,65 +176,71 @@ class Physics {
     this.view.scene.disablePhysicsEngine();
   }
 
-  velocity = Vector3.Zero();
-  desired = Vector3.Zero();
-  zero = Vector3.Zero();
-  up = Vector3.Up();
-  surface?: CharacterSurfaceInfo;
-
   isSupported() {
     return this.surface?.supportedState === CharacterSupportedState.SUPPORTED;
+  }
+
+  getSupport(delta: number) {
+    this.gravity.normalizeToRef(this.gravityDirection);
+
+    if (!this.surface) {
+      this.surface = this.player!.checkSupport(delta, this.gravityDirection);
+    } else {
+      this.player!.checkSupportToRef(delta, this.gravityDirection, this.surface); // prettier-ignore
+    }
+
+    return this.surface;
+  }
+
+  getDesiredVelocity(direction: Vector3) {
+    if (direction.lengthSquared() > 1e-6) {
+      this.desired.x = direction.x * this.speed;
+      this.desired.z = direction.z * this.speed;
+    } else {
+      this.desired.setAll(0);
+    }
+
+    return this.desired;
   }
 
   update(forward: Vector3, direction: Vector3, delta: number, jump: boolean) {
     if (!this.player) return;
 
-    this.gravity.normalizeToRef(this.gravityDirection);
+    const surface = this.getSupport(delta);
+    const isSupported = this.isSupported();
 
-    if (!this.surface) {
-      this.surface = this.player.checkSupport(delta, this.gravityDirection);
+    const previousVelocityY = this.velocity.y;
+
+    const surfaceNormal = isSupported ? surface.averageSurfaceNormal : this.up;
+    const currentVelocity = this.player.getVelocity();
+    const surfaceVelocity = isSupported ? surface.averageSurfaceVelocity : this.zero; // prettier-ignore
+    const desiredVelocity = this.getDesiredVelocity(direction);
+
+    if (isSupported) {
+      this.player.calculateMovementToRef(
+        delta,
+        forward,
+        surfaceNormal,
+        currentVelocity,
+        surfaceVelocity,
+        desiredVelocity,
+        this.up,
+        this.velocity,
+      );
+    }
+
+    if (!isSupported) {
+      this.velocity.y = previousVelocityY + this.gravity.y * delta;
     } else {
-      this.player.checkSupportToRef(delta, this.gravityDirection, this.surface);
+      this.velocity.y = Math.max(this.velocity.y, 0);
     }
 
-    // Reset desired velocity every frame to avoid accumulating stale input.
-    this.desired.setAll(0);
-
-    if (direction.lengthSquared() > 1e-6) {
-      this.desired.x = direction.x * this.speed;
-      this.desired.z = direction.z * this.speed;
-    }
-
-    const surfaceNormal = this.isSupported()
-      ? this.surface.averageSurfaceNormal
-      : this.up;
-
-    const surfaceVelocity = this.isSupported()
-      ? this.surface.averageSurfaceVelocity
-      : this.zero;
-
-    this.player.calculateMovementToRef(
-      delta,
-      forward,
-      surfaceNormal,
-      this.player.getVelocity(),
-      surfaceVelocity,
-      this.desired,
-      this.player.up,
-      this.velocity,
-    );
-
-    if (!this.isSupported()) {
-      this.gravity.scaleToRef(delta, this.gravityStep);
-      this.velocity.addInPlace(this.gravityStep);
-    }
-
-    if (this.isSupported() && jump) {
-      this.velocity.y += this.jumpSpeed;
+    if (isSupported && jump) {
+      this.velocity.y = this.jumpSpeed;
     }
 
     this.player.setVelocity(this.velocity);
-    this.player.integrate(delta, this.surface, this.gravity);
+    this.player.integrate(delta, surface, this.gravity);
   }
 
   private createPlayerController(spawn = Vector3.Zero()) {
@@ -246,8 +257,8 @@ class Physics {
     controller.up = Vector3.Up();
     controller.maxCharacterSpeedForSolver = 10 / this.unit;
     controller.penetrationRecoverySpeed = 2;
-    controller.acceleration = 0.3;
-    controller.maxAcceleration = this.speed * 15;
+    controller.acceleration = 0.1;
+    controller.maxAcceleration = this.speed * 3;
 
     return controller;
   }
