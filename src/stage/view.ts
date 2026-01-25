@@ -1,3 +1,4 @@
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import type { Light } from "@babylonjs/core/Lights/light";
@@ -76,11 +77,19 @@ export class View {
       .map((s) => s.metadata.shapeMesh as ShapeMesh);
   }
 
+  setCamera(camera: Camera | null) {
+    if (this.scene.activeCamera === camera) return;
+    this.scene.activeCamera?.setEnabled(false);
+    this.scene.activeCamera = camera;
+    camera?.setEnabled(true);
+  }
+
   private handleResize = () => {
     this.engine.resize();
   };
 
   private render = () => {
+    this.scene.deltaTime = this.engine.getDeltaTime();
     this.scene.render();
   };
 

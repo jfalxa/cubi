@@ -5,7 +5,7 @@ import type { MeshFilter } from "$/types";
 import { Alignment } from "./align";
 import { BoundingBox } from "./bounding-box";
 import { Camera } from "./camera";
-import { FirstPersonController } from "./first-person";
+import { FirstPerson } from "./first-person";
 import { Grid } from "./grid";
 import { Interactions } from "./interactions";
 import { View } from "./view";
@@ -14,7 +14,7 @@ export class Stage {
   view: View;
   interactions: Interactions;
   camera: Camera;
-  firstPerson: FirstPersonController;
+  firstPerson: FirstPerson;
   grid: Grid;
   boundingBox: BoundingBox;
   align: Alignment;
@@ -24,11 +24,7 @@ export class Stage {
     this.interactions = new Interactions(this);
     this.camera = new Camera(this.view, this.interactions);
     this.grid = new Grid(this.view);
-    this.firstPerson = new FirstPersonController(
-      this.view,
-      this.grid,
-      this.interactions,
-    );
+    this.firstPerson = new FirstPerson(this.view, this.grid, this.interactions);
     this.boundingBox = new BoundingBox(this.view.scene);
     this.align = new Alignment(this);
 
@@ -70,10 +66,10 @@ export class Stage {
       return;
     }
 
-    this.firstPerson.configure(this.grid.unit);
     this.firstPerson.enter({
       position: this.camera.position,
       target: this.camera.target,
+      unit: this.grid.unit,
     });
 
     this.view.scene.activeCamera = this.firstPerson.camera;

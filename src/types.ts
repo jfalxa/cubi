@@ -4,7 +4,7 @@ import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 export interface Shape {
   id: string;
   group: string | undefined;
-  position: Vector3;
+  position: Vector3; // box corner with minimal x,y,z
   width: number;
   height: number;
   depth: number;

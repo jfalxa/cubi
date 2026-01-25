@@ -33,7 +33,7 @@ export class Camera extends ArcRotateCamera implements Interactive {
   private zoomObserver: Observer<Scene>;
 
   constructor(view: View, interactions: Interactions) {
-    super("camera", 0, 0, 0, Vector3.Zero(), view.scene);
+    super("orbit-camera", 0, 0, 0, Vector3.Zero(), view.scene);
 
     this.view = view;
     this.interactions = interactions;
