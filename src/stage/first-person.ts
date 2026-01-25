@@ -23,11 +23,12 @@ import type { View } from "./view";
 
 const GRAVITY_M = 9.81;
 const PLAYER_HEIGHT_M = 1.7;
-const PLAYER_RADIUS_M = 0.1;
+const PLAYER_RADIUS_M = 0.15;
 const WALK_SPEED_M = 4;
 const JUMP_SPEED_M = 5;
-const MAX_SLOPE_DEG = 60;
+const MAX_SLOPE_DEG = 75;
 const POINTER_SENSITIVITY = 0.0025;
+const LOOK_SMOOTHING = 35;
 
 interface FirstPersonInit {
   position: Vector3;
@@ -79,11 +80,11 @@ export class FirstPerson {
     hotkeys.setScope("first-person");
 
     this.view.setCamera(this.camera);
+
+    this.inputs.mount();
     await this.physics.mount(init);
 
     this.renderObserver = this.view.scene.onBeforeRenderObservable.add(this.update); // prettier-ignore
-
-    this.inputs.mount();
   }
 
   exit() {
@@ -106,22 +107,27 @@ export class FirstPerson {
   private forward = Vector3.Zero();
   private right = Vector3.Zero();
 
-  private update = () => {
+  private updateDirections() {
     this.camera.getDirectionToRef(Axis.Z, this.forward);
     this.camera.getDirectionToRef(Axis.X, this.right);
 
+    this.forward.y = 0;
+    this.right.y = 0;
+  }
+
+  private update = () => {
     const delta = this.view.scene.deltaTime / 1000;
+
+    this.inputs.update(delta);
+    this.camera.rotation.set(this.inputs.pitch, this.inputs.yaw, 0);
+
+    this.updateDirections();
+
+    const isJumping = this.inputs.isJumping();
     const direction = this.inputs.getDirection(this.forward, this.right);
 
-    this.physics.update(
-      this.forward,
-      direction,
-      delta,
-      this.inputs.isJumping(),
-    );
-
+    this.physics.update(delta, direction, isJumping, this.forward);
     this.camera.position.copyFrom(this.physics.position);
-    this.camera.rotation.set(this.inputs.pitch, this.inputs.yaw, 0);
   };
 }
 
@@ -205,7 +211,7 @@ class Physics {
     return this.desired;
   }
 
-  update(forward: Vector3, direction: Vector3, delta: number, jump: boolean) {
+  update(delta: number, direction: Vector3, jump: boolean, forward: Vector3) {
     if (!this.player) return;
 
     const surface = this.getSupport(delta);
@@ -231,14 +237,12 @@ class Physics {
       );
     }
 
-    if (!isSupported) {
-      this.velocity.y = previousVelocityY + this.gravity.y * delta;
-    } else {
-      this.velocity.y = Math.max(this.velocity.y, 0);
-    }
-
     if (isSupported && jump) {
       this.velocity.y = this.jumpSpeed;
+    } else if (isSupported) {
+      this.velocity.y = Math.max(this.velocity.y, 0);
+    } else {
+      this.velocity.y = previousVelocityY + this.gravity.y * delta;
     }
 
     this.player.setVelocity(this.velocity);
@@ -257,10 +261,12 @@ class Physics {
 
     controller.maxSlopeCosine = Math.cos((MAX_SLOPE_DEG * Math.PI) / 180);
     controller.up = Vector3.Up();
+    controller.keepDistance = 0.08 / this.unit;
+    controller.keepContactTolerance = 0.16 / this.unit;
     controller.maxCharacterSpeedForSolver = 10 / this.unit;
     controller.penetrationRecoverySpeed = 2;
     controller.acceleration = 0.1;
-    controller.maxAcceleration = this.speed * 3;
+    controller.maxAcceleration = this.speed * 4;
 
     return controller;
   }
@@ -282,7 +288,7 @@ class Physics {
 type Button = "forward" | "backward" | "left" | "right" | "jump";
 
 class Inputs {
-  buttons: Record<string, boolean> = {
+  buttons: Record<Button, boolean> = {
     forward: false,
     backward: false,
     left: false,
@@ -293,11 +299,17 @@ class Inputs {
   yaw = 0;
   pitch = 0;
 
+  private yawTarget = 0;
+  private pitchTarget = 0;
+
   private direction = Vector3.Zero();
 
   constructor(private view: View) {}
 
   mount() {
+    this.yawTarget = this.yaw;
+    this.pitchTarget = this.pitch;
+
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
     this.view.canvas.addEventListener("pointermove", this.handlePointerMove);
@@ -349,6 +361,12 @@ class Inputs {
     return this.direction.normalize();
   }
 
+  update(delta: number) {
+    const t = Math.min(1, delta * LOOK_SMOOTHING);
+    this.yaw += (this.yawTarget - this.yaw) * t;
+    this.pitch += (this.pitchTarget - this.pitch) * t;
+  }
+
   static codeToButton: Record<string, Button> = {
     KeyW: "forward",
     KeyS: "backward",
@@ -378,11 +396,11 @@ class Inputs {
   private handlePointerMove = (event: PointerEvent) => {
     if (!this.hasPointerLock()) return;
 
-    this.yaw += event.movementX * POINTER_SENSITIVITY;
-    this.pitch += event.movementY * POINTER_SENSITIVITY;
+    this.yawTarget += event.movementX * POINTER_SENSITIVITY;
+    this.pitchTarget += event.movementY * POINTER_SENSITIVITY;
 
     const minPitch = -Math.PI / 2 + 0.05;
     const maxPitch = Math.PI / 2 - 0.05;
-    this.pitch = Math.min(Math.max(this.pitch, minPitch), maxPitch);
+    this.pitchTarget = Math.min(Math.max(this.pitchTarget, minPitch), maxPitch);
   };
 }
