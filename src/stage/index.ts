@@ -54,24 +54,13 @@ export class Stage {
     );
   }
 
+  getPointUnderPointer() {
+    const { scene } = this.view;
+    return scene.pick(scene.pointerX, scene.pointerY).pickedPoint;
+  }
+
   getCamera() {
     if (this.firstPerson.active) return this.firstPerson.camera;
     return this.camera;
-  }
-
-  toggleFirstPerson() {
-    if (this.firstPerson.active) {
-      this.firstPerson.exit();
-      this.view.scene.activeCamera = this.camera;
-      return;
-    }
-
-    this.firstPerson.enter({
-      position: this.camera.position,
-      target: this.camera.target,
-      unit: this.grid.unit,
-    });
-
-    this.view.scene.activeCamera = this.firstPerson.camera;
   }
 }

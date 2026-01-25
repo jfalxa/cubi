@@ -12,6 +12,7 @@ import { ColorsCommand } from "./colors";
 import { DeleteCommand } from "./delete";
 import { DuplicateCommand } from "./duplicate";
 import { ExportCommand, ImportCommand, OpenCommand, SaveCommand } from "./file";
+import { FirstPersonCommand } from "./first-person";
 import { GridCommand } from "./grid";
 import { GroupCommand, UngroupCommand } from "./group";
 import { RedoCommand, UndoCommand } from "./history";
@@ -20,11 +21,9 @@ import { LevelDownCommand, LevelUpCommand } from "./level";
 import { LockCommand, UnlockCommand } from "./lock";
 import { NewCommand } from "./new";
 import { RotateCCWCommand, RotateCWCommand } from "./rotate";
-import { ToggleCameraCommand } from "./camera";
 import { ToggleLevelCommand } from "./toggle-level";
 
 export interface Dependencies {
-  stage: Stage;
   selection: SelectionStore;
   shapes: ShapeStore;
   camera: CameraStore;
@@ -48,7 +47,7 @@ export class Commands {
   ungroup: UngroupCommand;
   colors: ColorsCommand;
   grid: GridCommand;
-  toggleCamera: ToggleCameraCommand;
+  firstPerson: FirstPersonCommand;
   lock: LockCommand;
   unlock: UnlockCommand;
   level: ToggleLevelCommand;
@@ -61,14 +60,7 @@ export class Commands {
   private selection: SelectionStore;
   private commands!: Command[];
 
-  constructor({
-    stage,
-    shapes,
-    selection,
-    camera,
-    grid,
-    contextMenu,
-  }: Dependencies) {
+  constructor({ shapes, selection, camera, grid, contextMenu }: Dependencies) {
     this.open = new OpenCommand(shapes, grid, camera);
     this.save = new SaveCommand(shapes, grid);
     this.import = new ImportCommand(shapes, grid, camera);
@@ -84,7 +76,7 @@ export class Commands {
     this.ungroup = new UngroupCommand(shapes);
     this.colors = new ColorsCommand(shapes);
     this.grid = new GridCommand(grid);
-    this.toggleCamera = new ToggleCameraCommand(stage);
+    this.firstPerson = new FirstPersonCommand(camera);
     this.lock = new LockCommand(shapes);
     this.unlock = new UnlockCommand(shapes);
     this.level = new ToggleLevelCommand(grid);
@@ -147,7 +139,7 @@ export class Commands {
       this.levelUp,
       this.levelDown,
       this.level,
-      this.toggleCamera,
+      this.firstPerson,
       this.import,
       this.export,
       this.new,
@@ -157,14 +149,19 @@ export class Commands {
   }
 
   initHotkeys() {
+    const defaultScopes = ["default"];
     hotkeys.setScope("default");
+
     for (const command of this.commands) {
       const keys = command.shortcuts?.join(",");
       if (!keys) continue;
-      hotkeys(keys, "default", (e) => {
-        e.preventDefault();
-        command.execute(this.selection.getSelectedShapes());
-      });
+
+      for (const scope of command.scopes ?? defaultScopes) {
+        hotkeys(keys, scope, (e) => {
+          e.preventDefault();
+          command.execute(this.selection.getSelectedShapes());
+        });
+      }
     }
   }
 }
@@ -179,6 +176,7 @@ export interface AvailableCommand {
 export interface Command {
   label: string;
   group: string;
+  scopes?: string[];
   hidden?: boolean;
   options?: Record<string, string>;
   shortcuts?: string[];

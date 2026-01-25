@@ -31,7 +31,6 @@ const LOOK_SMOOTHING = 35;
 
 interface FirstPersonInit {
   position: Vector3;
-  target: Vector3;
   unit: number;
 }
 
@@ -80,16 +79,15 @@ export class FirstPerson {
     this.eyesShift = (PLAYER_HEIGHT_M * 0.4) / init.unit;
 
     this.grid.hide();
-
     this.interactions.suspend();
     hotkeys.setScope("first-person");
-
-    this.view.setCamera(this.camera);
 
     this.inputs.mount();
     await this.physics.mount(init);
 
     this.renderObserver = this.view.scene.onBeforeRenderObservable.add(this.update); // prettier-ignore
+
+    this.view.setCamera(this.camera);
   }
 
   exit() {
@@ -99,16 +97,15 @@ export class FirstPerson {
     this.renderObserver?.remove();
     this.renderObserver = undefined;
 
-    this.grid.show();
+    this.physics.dispose();
+    this.inputs.dispose();
 
     const orbitCamera = this.view.scene.getCameraByName("orbit-camera");
     this.view.setCamera(orbitCamera);
 
+    this.grid.show();
     this.interactions.resume();
-    hotkeys.setScope("editor");
-
-    this.physics.dispose();
-    this.inputs.dispose();
+    hotkeys.setScope("default");
   }
 
   private forward = Vector3.Zero();
@@ -164,7 +161,7 @@ class Physics {
 
   constructor(private view: View) {}
 
-  async mount({ unit }: FirstPersonInit) {
+  async mount({ position, unit }: FirstPersonInit) {
     const { default: HavokPhysics } = await import("@babylonjs/havok");
 
     this.unit = unit;
@@ -180,7 +177,9 @@ class Physics {
 
     this.view.scene.enablePhysics(this.gravity, havokPlugin);
 
-    this.player = this.createPlayerController(new Vector3(0, 40, 0));
+    position.y += this.height / 2;
+
+    this.player = this.createPlayerController(position);
     this.shapes = this.view.getMeshes().map((m) => this.createMeshBody(m));
   }
 
@@ -301,8 +300,8 @@ class Inputs {
   yaw = 0;
   pitch = 0;
 
-  private yawTarget = 0;
-  private pitchTarget = 0;
+  yawTarget = 0;
+  pitchTarget = 0;
 
   private direction = Vector3.Zero();
 
@@ -314,6 +313,7 @@ class Inputs {
 
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
+    this.view.canvas.addEventListener("click", this.requestPointerLock);
     this.view.canvas.addEventListener("pointermove", this.handlePointerMove);
 
     this.requestPointerLock();
@@ -322,6 +322,7 @@ class Inputs {
   dispose() {
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("keyup", this.handleKeyUp);
+    this.view.canvas.removeEventListener("click", this.requestPointerLock);
     this.view.canvas.removeEventListener("pointermove", this.handlePointerMove);
 
     this.exitPointerLock();
@@ -331,11 +332,11 @@ class Inputs {
     return document.pointerLockElement === this.view.canvas;
   }
 
-  requestPointerLock() {
+  requestPointerLock = () => {
     if (!this.hasPointerLock()) {
       this.view.canvas.requestPointerLock();
     }
-  }
+  };
 
   exitPointerLock() {
     if (this.hasPointerLock()) {
