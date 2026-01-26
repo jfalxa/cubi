@@ -62,6 +62,7 @@ export class FirstPerson {
       this.view.scene,
     );
 
+    this.camera.fov = 0.9;
     this.camera.inputs.clear();
   }
 
