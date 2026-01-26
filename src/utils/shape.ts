@@ -88,6 +88,8 @@ export function subtractShapes(a: Shape, b: Shape): Shape[] {
     return [a];
   }
 
+  const group = a.group ?? crypto.randomUUID();
+
   const makeBox = (min: Vector3, max: Vector3) => {
     const width = max.x - min.x;
     const height = max.y - min.y;
@@ -97,6 +99,7 @@ export function subtractShapes(a: Shape, b: Shape): Shape[] {
 
     return cloneShape(a, {
       position: new Vector3(min.x, min.y, min.z),
+      group,
       width,
       height,
       depth,
