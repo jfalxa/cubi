@@ -72,7 +72,7 @@ export class Grid {
 
   setLayer(layer: number) {
     this.layer = Math.max(layer, 0);
-    this.mesh.position.set(0, this.layer + 0.01, 0);
+    this.mesh.position.set(0, this.layer + 0.05, 0);
   }
 
   setUnit(unit: number) {
