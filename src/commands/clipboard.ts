@@ -1,6 +1,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Stage } from "$/stage";
+import { Grid } from "$/stage/grid";
 import { DEFAULT_GRID, type GridStore } from "$/stores/grid.svelte";
 import type { SelectionStore } from "$/stores/selection.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";
@@ -79,14 +80,18 @@ export class PasteCommand implements Command {
   }
 
   private positionAtPointer(shapes: Shape[]) {
-    const pointer = this.stage.getPointUnderPointer();
+    const point = this.stage.getPointUnderPointer();
     const shift = new Vector3(1, 0, 1);
 
-    if (pointer) {
+    if (point) {
       const { center, height } = getBBox(shapes);
-      shift.x = pointer.x - center.x;
-      shift.y = pointer.y - center.y + height / 2;
-      shift.z = pointer.z - center.z;
+      const snapped = Grid.snap(point);
+
+      shift.set(
+        snapped.x - center.x,
+        snapped.y - center.y + height / 2,
+        snapped.z - center.z,
+      );
     }
 
     for (const shape of shapes) {
