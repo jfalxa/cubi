@@ -147,16 +147,20 @@ export class ShapeMesh {
     this.instance.outlineColor = Color3.FromHexString(getColors().ghost);
   }
 
-  setCutOff(maxY: number) {
+  setCutOff(minY: number, maxY: number) {
     const { position, height } = this.shape;
 
-    if (position.y >= maxY) {
-      this.instance.setEnabled(false);
-      this.cutOff = true;
-    } else if (position.y + height >= maxY) {
+    const startsAboveLevel = position.y >= maxY;
+    const startsOnLevelBase = position.y === minY;
+    const endsAboveLevel = position.y + height >= maxY;
+
+    if (startsOnLevelBase && endsAboveLevel) {
       this.instance.setEnabled(true);
       this.instance.position.y = position.y + 0.5;
       this.instance.scaling.y = 1;
+      this.cutOff = true;
+    } else if (startsAboveLevel || endsAboveLevel) {
+      this.instance.setEnabled(false);
       this.cutOff = true;
     } else {
       this.instance.position.y = getCenter(this.shape).y;

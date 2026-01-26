@@ -64,12 +64,14 @@ export function useGridSync(gridStore: GridStore, stage: Stage) {
   });
 
   $effect(() => {
+    const minY = gridStore.level * gridStore.height;
+
     const maxY = gridStore.cutOff
       ? (gridStore.level + 1) * gridStore.height
       : Infinity;
 
     for (const mesh of view.getMeshes()) {
-      mesh.setCutOff(maxY);
+      mesh.setCutOff(minY, maxY);
     }
   });
 }
