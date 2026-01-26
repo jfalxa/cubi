@@ -25,6 +25,7 @@
     camera: stores.camera,
     grid: stores.grid,
     menu: stores.menu,
+    stage,
   });
 
   const tools = new Tools({

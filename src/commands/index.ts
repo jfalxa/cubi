@@ -1,5 +1,6 @@
 import hotkeys from "hotkeys-js";
 
+import type { Stage } from "$/stage";
 import type { CameraStore } from "$/stores/camera.svelte";
 import type { MenuStore } from "$/stores/context-menu.svelte";
 import type { GridStore } from "$/stores/grid.svelte";
@@ -7,6 +8,7 @@ import type { SelectionStore } from "$/stores/selection.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";
 import type { Shape } from "$/types";
 
+import { CopyCommand, PasteCommand } from "./clipboard";
 import { ColorsCommand } from "./colors";
 import { DeleteCommand } from "./delete";
 import { DuplicateCommand } from "./duplicate";
@@ -28,6 +30,7 @@ export interface Dependencies {
   camera: CameraStore;
   grid: GridStore;
   menu: MenuStore;
+  stage: Stage;
 }
 
 export class Commands {
@@ -54,6 +57,8 @@ export class Commands {
   layerDown: LayerDownCommand;
   levelUp: LevelUpCommand;
   levelDown: LevelDownCommand;
+  copy: CopyCommand;
+  paste: PasteCommand;
 
   private shapes: ShapeStore;
   private selection: SelectionStore;
@@ -62,7 +67,7 @@ export class Commands {
   private contextCommands!: Command[];
   private hiddenCommands!: Command[];
 
-  constructor({ shapes, selection, camera, grid, menu }: Dependencies) {
+  constructor({ shapes, selection, camera, grid, menu, stage }: Dependencies) {
     this.open = new OpenCommand(shapes, grid, camera);
     this.save = new SaveCommand(shapes, grid);
     this.import = new ImportCommand(shapes, grid, camera);
@@ -86,6 +91,8 @@ export class Commands {
     this.layerDown = new LayerDownCommand(grid);
     this.levelUp = new LevelUpCommand(grid, camera);
     this.levelDown = new LevelDownCommand(grid, camera);
+    this.copy = new CopyCommand(grid);
+    this.paste = new PasteCommand(shapes, selection, grid, stage);
 
     this.shapes = shapes;
     this.selection = selection;
@@ -143,6 +150,8 @@ export class Commands {
     this.contextCommands = [
       this.delete,
       this.duplicate,
+      this.copy,
+      this.paste,
       this.group,
       this.ungroup,
       this.lock,
