@@ -1,14 +1,17 @@
 import type { Vector2 } from "@babylonjs/core/Maths/math.vector";
 
-import type { AvailableCommand } from "$/commands";
+import type { AvailableCommand, Commands } from "$/commands";
 
-export class ContextMenuStore {
-  commands = $state<AvailableCommand[]>([]);
+export class MenuStore {
+  general = $state<AvailableCommand[]>([]);
+  context = $state<AvailableCommand[]>([]);
+
   position = $state<Vector2>();
   showNewDialog = $state(false);
+}
 
-  update(commands: AvailableCommand[], position: Vector2) {
-    this.commands = commands;
-    this.position = position;
-  }
+export function useMenuSync(menuStore: MenuStore, commands: Commands) {
+  $effect(() => {
+    menuStore.general = commands.getGeneralCommands();
+  });
 }

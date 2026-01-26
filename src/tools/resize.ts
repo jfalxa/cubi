@@ -155,7 +155,7 @@ export class ResizeTool implements Tool {
   };
 
   private handleResize = (info: DragInfo) => {
-    const camera = this.stage.getCamera();
+    const { camera } = this.stage;
 
     const start = getAxisPoint(info.start, camera, this.anchor, this.axis);
     const current = getAxisPoint(info.position, camera, this.anchor, this.axis);

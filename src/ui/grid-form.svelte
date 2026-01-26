@@ -56,7 +56,7 @@
 
 <Dialog
   bind:open={grid.showGridForm}
-  title="Grid size"
+  title="Grid settings"
   contentClass="w-[min(90vw,420px)] p-6"
   titleClass="text-2xl font-semibold"
 >

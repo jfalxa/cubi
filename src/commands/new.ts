@@ -1,5 +1,4 @@
-import type { ContextMenuStore } from "$/stores/context-menu.svelte";
-import type { ShapeStore } from "$/stores/shape.svelte";
+import type { MenuStore } from "$/stores/context-menu.svelte";
 
 import type { Command } from ".";
 
@@ -9,17 +8,13 @@ export class NewCommand implements Command {
 
   shortcuts = ["ctrl+n", "command+n"];
 
-  constructor(
-    private shapes: ShapeStore,
-    private contextMenu: ContextMenuStore,
-  ) {}
+  constructor(private menu: MenuStore) {}
 
   isAvailable() {
-    return this.shapes.current.length > 0;
+    return true;
   }
 
   execute(): void {
-    if (this.shapes.current.length === 0) return;
-    this.contextMenu.showNewDialog = true;
+    this.menu.showNewDialog = true;
   }
 }

@@ -10,6 +10,7 @@
   import NewDialog from "$/ui/new-dialog.svelte";
   import UsageDialog from "$/ui/usage.svelte";
 
+  import GeneralMenu from "./ui/general-menu.svelte";
   import GridForm from "./ui/grid-form.svelte";
 
   let container: HTMLDivElement;
@@ -19,12 +20,11 @@
   const stage = new Stage();
 
   const commands = new Commands({
-    stage,
     shapes: stores.shapes,
     selection: stores.selection,
     camera: stores.camera,
     grid: stores.grid,
-    contextMenu: stores.contextMenu,
+    menu: stores.menu,
   });
 
   const tools = new Tools({
@@ -32,7 +32,7 @@
     commands,
     shapes: stores.shapes,
     selection: stores.selection,
-    contextMenu: stores.contextMenu,
+    menu: stores.menu,
     grid: stores.grid,
     measure: stores.measure,
   });
@@ -47,23 +47,16 @@
     stage.dispose();
   });
 
-  useSync(stores, stage, tools);
-
-  let usageOpen = $state(false);
+  useSync(stores, stage, commands, tools);
 </script>
 
 <div bind:this={container}></div>
 
-<button class="fixed right-4 top-4" onclick={() => (usageOpen = true)}>
-  Usage
-</button>
+<GeneralMenu commands={stores.menu.general} />
 
-<UsageDialog bind:open={usageOpen} />
+<UsageDialog />
 
-<ContextMenu
-  commands={stores.contextMenu.commands}
-  position={stores.contextMenu.position}
-/>
+<ContextMenu commands={stores.menu.context} position={stores.menu.position} />
 
 <GridForm grid={stores.grid} shapes={stores.shapes} camera={stores.camera} />
 
@@ -72,7 +65,7 @@
   selection={stores.selection}
   grid={stores.grid}
   camera={stores.camera}
-  contextMenu={stores.contextMenu}
+  menu={stores.menu}
 />
 
 {#if stores.measure.box && stores.measure.position}

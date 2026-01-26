@@ -1,3 +1,4 @@
+import type { Commands } from "$/commands";
 import type { Stage } from "$/stage";
 import type { Tools } from "$/tools";
 
@@ -6,7 +7,7 @@ import {
   useCameraSync,
   useFirstPersonSync,
 } from "./camera.svelte";
-import { ContextMenuStore } from "./context-menu.svelte";
+import { MenuStore, useMenuSync } from "./context-menu.svelte";
 import { GridStore, useGridSync } from "./grid.svelte";
 import { useLocalStorageSync } from "./local-storage.svelte";
 import { MeasureStore } from "./measure.svelte";
@@ -18,7 +19,7 @@ export interface Stores {
   camera: CameraStore;
   grid: GridStore;
   selection: SelectionStore;
-  contextMenu: ContextMenuStore;
+  menu: MenuStore;
   measure: MeasureStore;
 }
 
@@ -27,13 +28,19 @@ export function createStores() {
   const camera = new CameraStore();
   const grid = new GridStore();
   const selection = new SelectionStore(shapes);
-  const contextMenu = new ContextMenuStore();
-  const draw = new MeasureStore();
+  const menu = new MenuStore();
+  const measure = new MeasureStore();
 
-  return { shapes, camera, grid, selection, contextMenu, measure: draw };
+  return { shapes, camera, grid, selection, menu, measure };
 }
 
-export function useSync(stores: Stores, stage: Stage, tools: Tools) {
+export function useSync(
+  stores: Stores,
+  stage: Stage,
+  commands: Commands,
+  tools: Tools,
+) {
+  useMenuSync(stores.menu, commands);
   useCameraSync(stores.camera, stage.camera);
   useFirstPersonSync(stores.camera, stores.selection, stores.measure, stage);
   useGridSync(stores.grid, stage);

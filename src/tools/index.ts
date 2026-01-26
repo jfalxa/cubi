@@ -1,7 +1,7 @@
 import type { Commands } from "$/commands";
 import type { Stage } from "$/stage";
 import type { Interactive } from "$/stage/interactions";
-import type { ContextMenuStore } from "$/stores/context-menu.svelte";
+import type { MenuStore } from "$/stores/context-menu.svelte";
 import type { GridStore } from "$/stores/grid.svelte";
 import type { MeasureStore } from "$/stores/measure.svelte";
 import type { SelectionStore } from "$/stores/selection.svelte";
@@ -20,7 +20,7 @@ interface Dependencies {
   commands: Commands;
   selection: SelectionStore;
   shapes: ShapeStore;
-  contextMenu: ContextMenuStore;
+  menu: MenuStore;
   grid: GridStore;
   measure: MeasureStore;
 }
@@ -39,7 +39,7 @@ export class Tools {
     commands,
     selection,
     shapes,
-    contextMenu,
+    menu: contextMenu,
     grid,
     measure,
   }: Dependencies) {
@@ -101,8 +101,8 @@ export class Tools {
 
     this.contextMenu = new ContextMenuTool(stage, {
       onContextMenu: (id, position) => {
-        const available = commands.available(id);
-        contextMenu.update(available, position);
+        contextMenu.context = commands.getContextCommands(id);
+        contextMenu.position = position;
       },
     });
   }

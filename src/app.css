@@ -19,4 +19,12 @@ canvas {
     @apply border-gray-200 bg-gray-900 text-gray-100 hover:border-gray-900 hover:bg-gray-100 hover:text-gray-900;
     @apply dark:border-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:border-gray-200 dark:hover:bg-gray-900 dark:hover:text-gray-100;
   }
+
+  [data-dropdown-menu-item][data-disabled] {
+    @apply text-gray-500;
+  }
+
+  [data-dropdown-menu-item][data-disabled]:hover {
+    background-color: unset;
+  }
 }

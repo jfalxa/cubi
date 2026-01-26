@@ -50,17 +50,12 @@ export class Stage {
       position.y,
       predicate,
       false,
-      this.getCamera(),
+      this.camera,
     );
   }
 
   getPointUnderPointer() {
     const { scene } = this.view;
     return scene.pick(scene.pointerX, scene.pointerY).pickedPoint;
-  }
-
-  getCamera() {
-    if (this.firstPerson.active) return this.firstPerson.camera;
-    return this.camera;
   }
 }

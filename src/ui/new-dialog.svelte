@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { ContextMenuStore } from "$/stores/context-menu.svelte";
   import type { CameraStore } from "$/stores/camera.svelte";
+  import type { MenuStore } from "$/stores/context-menu.svelte";
   import type { GridStore } from "$/stores/grid.svelte";
   import type { SelectionStore } from "$/stores/selection.svelte";
   import type { ShapeStore } from "$/stores/shape.svelte";
@@ -11,32 +11,32 @@
     selection: SelectionStore;
     grid: GridStore;
     camera: CameraStore;
-    contextMenu: ContextMenuStore;
+    menu: MenuStore;
   };
 
-  let { shapes, selection, grid, camera, contextMenu }: Props = $props();
+  let { shapes, selection, grid, camera, menu }: Props = $props();
 
   function confirm() {
     shapes.reset();
     selection.clear();
     grid.reset();
     camera.fit(grid.width, 0, grid.depth);
-    contextMenu.showNewDialog = false;
+    menu.showNewDialog = false;
   }
 
   function cancel() {
-    contextMenu.showNewDialog = false;
+    menu.showNewDialog = false;
   }
 </script>
 
 <Dialog
-  bind:open={contextMenu.showNewDialog}
+  bind:open={menu.showNewDialog}
   title="New stage"
   contentClass="w-[min(90vw,420px)] p-6"
   titleClass="text-2xl font-semibold"
 >
   <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
-    Your stage is not empty, clear it anyway?
+    Clear the current stage and reset grid settings?
   </p>
 
   <div class="mt-6 flex justify-end gap-3">

@@ -1,8 +1,7 @@
 import hotkeys from "hotkeys-js";
 
-import type { Stage } from "$/stage";
 import type { CameraStore } from "$/stores/camera.svelte";
-import type { ContextMenuStore } from "$/stores/context-menu.svelte";
+import type { MenuStore } from "$/stores/context-menu.svelte";
 import type { GridStore } from "$/stores/grid.svelte";
 import type { SelectionStore } from "$/stores/selection.svelte";
 import type { ShapeStore } from "$/stores/shape.svelte";
@@ -13,7 +12,7 @@ import { DeleteCommand } from "./delete";
 import { DuplicateCommand } from "./duplicate";
 import { ExportCommand, ImportCommand, OpenCommand, SaveCommand } from "./file";
 import { FirstPersonCommand } from "./first-person";
-import { GridCommand } from "./grid";
+import { GridSettingsCommand } from "./grid-settings";
 import { GroupCommand, UngroupCommand } from "./group";
 import { RedoCommand, UndoCommand } from "./history";
 import { LayerDownCommand, LayerUpCommand } from "./layer";
@@ -28,7 +27,7 @@ export interface Dependencies {
   shapes: ShapeStore;
   camera: CameraStore;
   grid: GridStore;
-  contextMenu: ContextMenuStore;
+  menu: MenuStore;
 }
 
 export class Commands {
@@ -46,7 +45,7 @@ export class Commands {
   group: GroupCommand;
   ungroup: UngroupCommand;
   colors: ColorsCommand;
-  grid: GridCommand;
+  grid: GridSettingsCommand;
   firstPerson: FirstPersonCommand;
   lock: LockCommand;
   unlock: UnlockCommand;
@@ -58,14 +57,17 @@ export class Commands {
 
   private shapes: ShapeStore;
   private selection: SelectionStore;
-  private commands!: Command[];
 
-  constructor({ shapes, selection, camera, grid, contextMenu }: Dependencies) {
+  private generalCommands!: Command[];
+  private contextCommands!: Command[];
+  private hiddenCommands!: Command[];
+
+  constructor({ shapes, selection, camera, grid, menu }: Dependencies) {
     this.open = new OpenCommand(shapes, grid, camera);
     this.save = new SaveCommand(shapes, grid);
     this.import = new ImportCommand(shapes, grid, camera);
     this.export = new ExportCommand(shapes, grid);
-    this.new = new NewCommand(shapes, contextMenu);
+    this.new = new NewCommand(menu);
     this.undo = new UndoCommand(shapes, selection);
     this.redo = new RedoCommand(shapes, selection);
     this.delete = new DeleteCommand(shapes, selection);
@@ -75,7 +77,7 @@ export class Commands {
     this.group = new GroupCommand(shapes);
     this.ungroup = new UngroupCommand(shapes);
     this.colors = new ColorsCommand(shapes);
-    this.grid = new GridCommand(grid);
+    this.grid = new GridSettingsCommand(grid);
     this.firstPerson = new FirstPersonCommand(camera);
     this.lock = new LockCommand(shapes);
     this.unlock = new UnlockCommand(shapes);
@@ -92,22 +94,27 @@ export class Commands {
     this.initHotkeys();
   }
 
-  available(id?: string): AvailableCommand[] {
-    const context = this.context(id);
-
-    const available = this.commands.filter(
-      (cmd) => !cmd.hidden && cmd.isAvailable(context),
-    );
-
-    return available.map((cmd) => ({
-      label: cmd.label,
-      group: cmd.group,
-      options: cmd.options,
-      action: (option?: string) => cmd.execute(context, option),
-    }));
+  getGeneralCommands(): AvailableCommand[] {
+    const context: Shape[] = [];
+    return this.generalCommands.map((cmd) => this.available(cmd, context));
   }
 
-  context(id?: string) {
+  getContextCommands(id?: string): AvailableCommand[] {
+    const context = this.getContext(id);
+    return this.contextCommands.map((cmd) => this.available(cmd, context));
+  }
+
+  private available(command: Command, context: Shape[]) {
+    return {
+      label: command.label,
+      group: command.group,
+      options: command.options,
+      action: (option?: string) => command.execute(context, option),
+      isDisabled: () => !command.isAvailable(context),
+    };
+  }
+
+  private getContext(id?: string) {
     if (id === undefined) {
       return [];
     } else if (this.selection.has(id)) {
@@ -120,39 +127,51 @@ export class Commands {
     }
   }
 
-  initCommands() {
-    this.commands = [
+  private initCommands() {
+    this.generalCommands = [
+      this.new,
+      this.open,
+      this.save,
       this.undo,
       this.redo,
+      this.import,
+      this.export,
+      this.grid,
+      this.level,
+    ];
+
+    this.contextCommands = [
       this.delete,
       this.duplicate,
       this.group,
       this.ungroup,
       this.lock,
       this.unlock,
-      this.colors,
       this.rotateClockwise,
       this.rotateCounterclockwise,
-      this.grid,
+      this.colors,
+      this.firstPerson,
+    ];
+
+    this.hiddenCommands = [
       this.layerUp,
       this.layerDown,
       this.levelUp,
       this.levelDown,
-      this.level,
-      this.firstPerson,
-      this.import,
-      this.export,
-      this.new,
-      this.open,
-      this.save,
     ];
   }
 
-  initHotkeys() {
+  private initHotkeys() {
+    const commands = [
+      ...this.generalCommands,
+      ...this.contextCommands,
+      ...this.hiddenCommands,
+    ];
+
     const defaultScopes = ["default"];
     hotkeys.setScope("default");
 
-    for (const command of this.commands) {
+    for (const command of commands) {
       const keys = command.shortcuts?.join(",");
       if (!keys) continue;
 
@@ -171,13 +190,13 @@ export interface AvailableCommand {
   group: string;
   options?: Record<string, string>;
   action: (option?: string) => void;
+  isDisabled: () => boolean;
 }
 
 export interface Command {
   label: string;
   group: string;
   scopes?: string[];
-  hidden?: boolean;
   options?: Record<string, string>;
   shortcuts?: string[];
   isAvailable(context: Shape[]): boolean;

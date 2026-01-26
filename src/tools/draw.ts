@@ -117,8 +117,7 @@ export class DrawTool implements Tool {
         this.state = "base";
         this.ghost.setEnabled(true);
         this.subtractive = info.event.altKey;
-        const camera = this.stage.getCamera();
-        const { grid } = this.stage;
+        const { camera, grid } = this.stage;
         const position = getGridPoint(info.position, camera, grid);
         if (!position) break;
         this.update({ position, width: 0, height: 0, depth: 0 });
@@ -157,8 +156,7 @@ export class DrawTool implements Tool {
   };
 
   handleMove = (info: MoveInfo) => {
-    const camera = this.stage.getCamera();
-    const { grid } = this.stage;
+    const { camera, grid } = this.stage;
 
     switch (this.state) {
       case "base": {

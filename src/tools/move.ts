@@ -114,8 +114,7 @@ export class MoveTool implements Tool {
   };
 
   private handleMoveHorizontal = (info: DragInfo) => {
-    const camera = this.stage.getCamera();
-    const { grid } = this.stage;
+    const { camera, grid } = this.stage;
 
     const start = getGridPoint(info.start, camera, grid);
     const current = getGridPoint(info.position, camera, grid);
@@ -126,7 +125,7 @@ export class MoveTool implements Tool {
   };
 
   private handleMoveVertical = (info: DragInfo) => {
-    const camera = this.stage.getCamera();
+    const { camera } = this.stage;
     const [reference] = this.snapshot;
 
     const start = getElevation(info.start, camera, reference);
