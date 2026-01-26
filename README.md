@@ -47,96 +47,9 @@ When holding `Alt` when starting to draw a new box, the operation will become a 
 
 - While pressing the `Alt` key, drag around one of the current selection bounding box faces to resize the shapes in that direction
 
-## Commands
+## General menu
 
-All commands are accessible by right clicking the scene to open the context menu.
-It will adapt based on where the mouse is pointing at, and the current selection.
-
-### Undo/Redo
-
-- Shortcut: `Command/Control-Z` and `Command/Control-Shift-Z`
-- Undo/redo actions that modified the shapes
-
-### Delete
-
-- Shortcut: `Delete` or `Backspace`
-- Remove the currently selected shapes from the scene
-
-### Duplicate
-
-- Shortcut: `D`
-- Duplicate the current selection
-
-### Group
-
-- Shortcut: `G`
-- Group all the selected shapes together, so that clicking any of them later will select all the others.
-- Note that there is only one level of grouping, if you select two different groups and group them, all the shapes will form a single new group.
-
-### Ungroup
-
-- Shortcut: `Shift-G`
-- Ungroup the currently selected shapes
-
-### Lock
-
-- Shortcut: `L`
-- Locks the selected shapes so they cannot be selected and modified inadvertently
-
-### Unlock
-
-- Shortcut: `Shift-L`
-- Unlock the selected shapes so they can be modified again
-
-### Colors
-
-- No shortcut, only available in context menu.
-- This is a menu that allows you to pick a color for the current selection
-
-### Rotate +/- 90˚
-
-- Shortcut: `R` and `Shift-R`
-- Rotate the selection by +/- 90˚
-
-### Toggle camera
-
-- Shortcut: `F`
-- Switches between orbit camera and first person camera
-
-### Toggle level
-
-- Shortcut: `Space`
-- Toggle level view mode. When active, all the shapes above the currently active layer + the value defined in the `Level height` field of the grid settings will be hidden.
-- This allows you to define different vertical levels in your scene, and focus on only one at a time.
-
-### Grid size
-
-- No shortcut
-- This is a menu that allows setting the width and depth of the drawing grid in meters.
-- You can also set a "Unit", that represents the size of a single grid square in centimeters. Note that this won't resize your shapes, it's only used to compute the dimensions displayed in the floating measure label.
-- The last field is "Level height", it defines the height beyond which shapes will stop showing when in level view mode. See "Toggle level".
-
-### Layer up/down
-
-- Shortcut: `ArrowUp` / `ArrowDown`
-- Moves the currently active vertical grid layer up/down one step at a time
-
-### Level up/down
-
-- Shortcut: `Shift-ArrowUp` / `Shift-ArrowDown`
-- Moves the currently active level up/down
-- Uses "Level height" from grid config to make the current active layer jump to the next available level
-
-### Import
-
-- Shortcut: `Control/Command-I`
-- Imports a JSON file in the current scene, without clearing its current state
-
-### Export
-
-- Shortcut: `Control/Command-E`
-- Exports the currently selected shapes in a JSON file
-- Combined with "Import", it allows you to create a library of reusable components
+The "Menu" button on the top left of the screen provides a list of commands to manipulate your current scene.
 
 ### New
 
@@ -152,3 +65,87 @@ It will adapt based on where the mouse is pointing at, and the current selection
 
 - Shortcut: `Control/Command-S`
 - Shows a download dialog that allows you to store the current scene's content in a JSON file on your device
+
+### Undo/Redo
+
+- Shortcut: `Command/Control-Z` and `Command/Control-Shift-Z`
+- Undo/redo actions that modified the shapes
+
+### Import
+
+- Shortcut: `Control/Command-I`
+- Imports a JSON file in the current scene, without clearing its current state
+
+### Export
+
+- Shortcut: `Control/Command-E`
+- Exports the currently selected shapes in a JSON file
+- Combined with "Import", it allows you to create a library of reusable components
+
+### Grid settings
+
+- No shortcut
+- This is a menu that allows setting the width and depth of the drawing grid in meters.
+- You can also set a "Unit", that represents the size of a single grid square in centimeters. Note that this won't resize your shapes, it's only used to compute the dimensions displayed in the floating measure label.
+- The last field is "Level height", it defines the height beyond which shapes will stop showing when in level view mode. See "Toggle level".
+
+### Toggle level
+
+- Shortcut: `Space`
+- Toggle level view mode. When active, all the shapes above the currently active layer + the value defined in the `Level height` field of the grid settings will be hidden.
+- This allows you to define different vertical levels in your scene, and focus on only one at a time.
+
+## Context menu
+
+All commands are accessible by right clicking the scene to open the context menu.
+It will adapt based on where the mouse is pointing at, and the current selection.
+
+### Delete
+
+- Shortcut: `Delete` or `Backspace`
+- Remove the currently selected shapes from the scene
+
+### Duplicate
+
+- Shortcut: `D`
+- Duplicate the current selection
+
+### Group/Ungroup
+
+- Shortcut: `G` and `Shift-G`
+- Group all the selected shapes together, so that clicking any of them later will select all the others.
+- Note that there is only one level of grouping, if you select two different groups and group them, all the shapes will form a single new group.
+
+### Lock/Unlock
+
+- Shortcut: `L` and `Shift-L`
+- Locks the selected shapes so they cannot be selected and modified inadvertently
+
+### Rotate +/- 90˚
+
+- Shortcut: `R` and `Shift-R`
+- Rotate the selection by +/- 90˚
+
+### Colors
+
+- No shortcut, only available in context menu.
+- This is a menu that allows you to pick a color for the current selection
+
+### First person
+
+- Shortcut: `F`
+- Switches between orbit camera and first person camera
+- The new camera will spawn at the position the mouse is pointing at
+
+## Keyboard only commands
+
+### Layer up/down
+
+- Shortcut: `ArrowUp` / `ArrowDown`
+- Moves the currently active vertical grid layer up/down one step at a time
+
+### Level up/down
+
+- Shortcut: `Shift-ArrowUp` / `Shift-ArrowDown`
+- Moves the currently active level up/down
+- Uses "Level height" from grid config to make the current active layer jump to the next available level

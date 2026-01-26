@@ -5,8 +5,12 @@
     open?: boolean;
   };
 
-  let { open = $bindable(false) }: Props = $props();
+  let open = $state(false);
 </script>
+
+<button class="fixed right-4 top-4" onclick={() => (open = true)}>
+  Usage
+</button>
 
 <Dialog
   bind:open
@@ -100,142 +104,11 @@
       bounding box faces to resize the shapes in that direction
     </li>
   </ul>
-  <h2 id="commands">Commands</h2>
+  <h2 id="general-menu">General menu</h2>
   <p>
-    All commands are accessible by right clicking the scene to open the context
-    menu. It will adapt based on where the mouse is pointing at, and the current
-    selection.
+    The &quot;Menu&quot; button on the top left of the screen provides a list of
+    commands to manipulate your current scene.
   </p>
-  <h3 id="undo-redo">Undo/Redo</h3>
-  <ul>
-    <li>
-      Shortcut: <code>Command/Control-Z</code> and
-      <code>Command/Control-Shift-Z</code>
-    </li>
-    <li>Undo/redo actions that modified the shapes</li>
-  </ul>
-  <h3 id="delete">Delete</h3>
-  <ul>
-    <li>Shortcut: <code>Delete</code> or <code>Backspace</code></li>
-    <li>Remove the currently selected shapes from the scene</li>
-  </ul>
-  <h3 id="duplicate">Duplicate</h3>
-  <ul>
-    <li>Shortcut: <code>D</code></li>
-    <li>Duplicate the current selection</li>
-  </ul>
-  <h3 id="group">Group</h3>
-  <ul>
-    <li>Shortcut: <code>G</code></li>
-    <li>
-      Group all the selected shapes together, so that clicking any of them later
-      will select all the others.
-    </li>
-    <li>
-      Note that there is only one level of grouping, if you select two different
-      groups and group them, all the shapes will form a single new group.
-    </li>
-  </ul>
-  <h3 id="ungroup">Ungroup</h3>
-  <ul>
-    <li>Shortcut: <code>Shift-G</code></li>
-    <li>Ungroup the currently selected shapes</li>
-  </ul>
-  <h3 id="lock">Lock</h3>
-  <ul>
-    <li>Shortcut: <code>L</code></li>
-    <li>
-      Locks the selected shapes so they cannot be selected and modified
-      inadvertently
-    </li>
-  </ul>
-  <h3 id="unlock">Unlock</h3>
-  <ul>
-    <li>Shortcut: <code>Shift-L</code></li>
-    <li>Unlock the selected shapes so they can be modified again</li>
-  </ul>
-  <h3 id="colors">Colors</h3>
-  <ul>
-    <li>No shortcut, only available in context menu.</li>
-    <li>
-      This is a menu that allows you to pick a color for the current selection
-    </li>
-  </ul>
-  <h3 id="rotate-90-">Rotate +/- 90˚</h3>
-  <ul>
-    <li>Shortcut: <code>R</code> and <code>Shift-R</code></li>
-    <li>Rotate the selection by +/- 90˚</li>
-  </ul>
-  <h3 id="toggle-camera">Toggle camera</h3>
-  <ul>
-    <li>Shortcut: <code>F</code></li>
-    <li>Switches between orbit camera and first person camera</li>
-  </ul>
-  <h3 id="toggle-level">Toggle level</h3>
-  <ul>
-    <li>Shortcut: <code>Space</code></li>
-    <li>
-      Toggle level view mode. When active, all the shapes above the currently
-      active layer + the value defined in the <code>Level height</code> field of the
-      grid settings will be hidden.
-    </li>
-    <li>
-      This allows you to define different vertical levels in your scene, and
-      focus on only one at a time.
-    </li>
-  </ul>
-  <h3 id="grid-size">Grid size</h3>
-  <ul>
-    <li>No shortcut</li>
-    <li>
-      This is a menu that allows setting the width and depth of the drawing grid
-      in meters.
-    </li>
-    <li>
-      You can also set a &quot;Unit&quot;, that represents the size of a single
-      grid square in centimeters. Note that this won&#39;t resize your shapes,
-      it&#39;s only used to compute the dimensions displayed in the floating
-      measure label.
-    </li>
-    <li>
-      The last field is &quot;Level height&quot;, it defines the height beyond
-      which shapes will stop showing when in level view mode. See &quot;Toggle
-      level&quot;.
-    </li>
-  </ul>
-  <h3 id="layer-up-down">Layer up/down</h3>
-  <ul>
-    <li>Shortcut: <code>ArrowUp</code> / <code>ArrowDown</code></li>
-    <li>
-      Moves the currently active vertical grid layer up/down one step at a time
-    </li>
-  </ul>
-  <h3 id="level-up-down">Level up/down</h3>
-  <ul>
-    <li>Shortcut: <code>Shift-ArrowUp</code> / <code>Shift-ArrowDown</code></li>
-    <li>Moves the currently active level up/down</li>
-    <li>
-      Uses &quot;Level height&quot; from grid config to make the current active
-      layer jump to the next available level
-    </li>
-  </ul>
-  <h3 id="import">Import</h3>
-  <ul>
-    <li>Shortcut: <code>Control/Command-I</code></li>
-    <li>
-      Imports a JSON file in the current scene, without clearing its current
-      state
-    </li>
-  </ul>
-  <h3 id="export">Export</h3>
-  <ul>
-    <li>Shortcut: <code>Control/Command-E</code></li>
-    <li>Exports the currently selected shapes in a JSON file</li>
-    <li>
-      Combined with &quot;Import&quot;, it allows you to create a library of
-      reusable components
-    </li>
-  </ul>
   <h3 id="new">New</h3>
   <ul>
     <li>
@@ -257,6 +130,134 @@
     <li>
       Shows a download dialog that allows you to store the current scene&#39;s
       content in a JSON file on your device
+    </li>
+  </ul>
+  <h3 id="undo-redo">Undo/Redo</h3>
+  <ul>
+    <li>
+      Shortcut: <code>Command/Control-Z</code> and
+      <code>Command/Control-Shift-Z</code>
+    </li>
+    <li>Undo/redo actions that modified the shapes</li>
+  </ul>
+  <h3 id="import">Import</h3>
+  <ul>
+    <li>Shortcut: <code>Control/Command-I</code></li>
+    <li>
+      Imports a JSON file in the current scene, without clearing its current
+      state
+    </li>
+  </ul>
+  <h3 id="export">Export</h3>
+  <ul>
+    <li>Shortcut: <code>Control/Command-E</code></li>
+    <li>Exports the currently selected shapes in a JSON file</li>
+    <li>
+      Combined with &quot;Import&quot;, it allows you to create a library of
+      reusable components
+    </li>
+  </ul>
+  <h3 id="grid-settings">Grid settings</h3>
+  <ul>
+    <li>No shortcut</li>
+    <li>
+      This is a menu that allows setting the width and depth of the drawing grid
+      in meters.
+    </li>
+    <li>
+      You can also set a &quot;Unit&quot;, that represents the size of a single
+      grid square in centimeters. Note that this won&#39;t resize your shapes,
+      it&#39;s only used to compute the dimensions displayed in the floating
+      measure label.
+    </li>
+    <li>
+      The last field is &quot;Level height&quot;, it defines the height beyond
+      which shapes will stop showing when in level view mode. See &quot;Toggle
+      level&quot;.
+    </li>
+  </ul>
+  <h3 id="toggle-level">Toggle level</h3>
+  <ul>
+    <li>Shortcut: <code>Space</code></li>
+    <li>
+      Toggle level view mode. When active, all the shapes above the currently
+      active layer + the value defined in the <code>Level height</code> field of the
+      grid settings will be hidden.
+    </li>
+    <li>
+      This allows you to define different vertical levels in your scene, and
+      focus on only one at a time.
+    </li>
+  </ul>
+  <h2 id="context-menu">Context menu</h2>
+  <p>
+    All commands are accessible by right clicking the scene to open the context
+    menu. It will adapt based on where the mouse is pointing at, and the current
+    selection.
+  </p>
+  <h3 id="delete">Delete</h3>
+  <ul>
+    <li>Shortcut: <code>Delete</code> or <code>Backspace</code></li>
+    <li>Remove the currently selected shapes from the scene</li>
+  </ul>
+  <h3 id="duplicate">Duplicate</h3>
+  <ul>
+    <li>Shortcut: <code>D</code></li>
+    <li>Duplicate the current selection</li>
+  </ul>
+  <h3 id="group-ungroup">Group/Ungroup</h3>
+  <ul>
+    <li>Shortcut: <code>G</code> and <code>Shift-G</code></li>
+    <li>
+      Group all the selected shapes together, so that clicking any of them later
+      will select all the others.
+    </li>
+    <li>
+      Note that there is only one level of grouping, if you select two different
+      groups and group them, all the shapes will form a single new group.
+    </li>
+  </ul>
+  <h3 id="lock-unlock">Lock/Unlock</h3>
+  <ul>
+    <li>Shortcut: <code>L</code> and <code>Shift-L</code></li>
+    <li>
+      Locks the selected shapes so they cannot be selected and modified
+      inadvertently
+    </li>
+  </ul>
+  <h3 id="rotate-90-">Rotate +/- 90˚</h3>
+  <ul>
+    <li>Shortcut: <code>R</code> and <code>Shift-R</code></li>
+    <li>Rotate the selection by +/- 90˚</li>
+  </ul>
+  <h3 id="colors">Colors</h3>
+  <ul>
+    <li>No shortcut, only available in context menu.</li>
+    <li>
+      This is a menu that allows you to pick a color for the current selection
+    </li>
+  </ul>
+  <h3 id="first-person">First person</h3>
+  <ul>
+    <li>Shortcut: <code>F</code></li>
+    <li>Switches between orbit camera and first person camera</li>
+    <li>The new camera will spawn at the position the mouse is pointing at</li>
+  </ul>
+  <h2 id="keyboard-only-commands">Keyboard only commands</h2>
+  <h3 id="layer-up-down">Layer up/down</h3>
+  <ul>
+    <li>Shortcut: <code>ArrowUp</code> / <code>ArrowDown</code></li>
+    <li>
+      Moves the currently active vertical grid layer up/down one step at a time
+    </li>
+  </ul>
+  <h3 id="level-up-down">Level up/down</h3>
+  <ul>
+    <li>Shortcut: <code>Shift-ArrowUp</code> / <code>Shift-ArrowDown</code></li>
+    <li>Moves the currently active level up/down</li>
+    <li>
+      Uses &quot;Level height&quot; from grid config to make the current active
+      layer jump to the next available level
     </li>
   </ul>
 </Dialog>
