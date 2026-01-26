@@ -18,8 +18,9 @@
   let unit = $state("");
   let height = $state("");
 
-  const gridToMeter = (size: number, unit: number) => size * unit;
-  const meterToGrid = (size: number, unit: number) => Math.round((size) / unit); // prettier-ignore
+  const round = (num: number) => Math.round(num * 10) / 10;
+  const gridToMeter = (size: number, unit: number) => round(size * unit);
+  const meterToGrid = (size: number, unit: number) => round(size / unit);
 
   $effect(() => {
     if (grid.showGridForm) {
